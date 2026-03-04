@@ -174,7 +174,7 @@ app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
 
 //not existing routes
-app.all("(.*)",(req,res,next)=>{
+app.all("*any",(req,res,next)=>{
     next(new ExpressError(404, " Page Not Found! You made a request of which page doesn't exist yet."));
 })
 
