@@ -15,11 +15,13 @@ const storage = new CloudinaryStorage({
     allowedFormats: ["png", "jpeg", "jpg"],
     quality: 'auto',
     fetch_format: 'auto',
-    secure: true,
     transformation: [
       { width: 1200, height: 800, crop: 'fill', quality: 'auto' }
     ]
   },
+  params: {
+    secure: true,
+  }
 });
 
 module.exports = {
