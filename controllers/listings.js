@@ -12,8 +12,10 @@ module.exports.validate = async (req,res)=>{
     let filename = req.file.filename;
     const newListing = new List(req.body.listing);
     // store as array so multiple owners can be supported
-    newListing.owners = [req.user._id];
     newListing.image = {url, filename};
+     if (process.env.OWNER_IDS) {
+        newListing.owners = process.env.OWNER_IDS.split(',').map(id => id.trim());
+    }
     await newListing.save();
     req.flash("new", `New Product Added Successfully`);
     res.redirect("/listings");

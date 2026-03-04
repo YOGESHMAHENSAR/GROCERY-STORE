@@ -47,7 +47,7 @@
     </div>
   </div>
 </nav>
-<!-- model for permanently delete start -->
+<!-- model for permanently logout start -->
 <div class="modal fade" id="logout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -63,6 +63,12 @@
                 <form action="/logout">
                     <button class="btn btn-warning">LOGOUT</button>
                 </form>
+            </div>
+            <div class="loader-overlay" id="loaderOverlay">
+              <div class="loader-container">
+                <div class="loader"></div>
+                <p class="loader-text">Logging Out ... </p>
+              </div>
             </div>
         </div>
     </div>
