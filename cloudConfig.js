@@ -4,7 +4,8 @@ const CloudinaryStorage = require('multer-storage-cloudinary');
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET
+    api_secret: process.env.CLOUD_API_SECRET,
+    secure: true // This forces HTTPS for all generated URLs
 })
 
 const storage = new CloudinaryStorage({
