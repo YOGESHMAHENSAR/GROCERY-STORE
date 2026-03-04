@@ -1,0 +1,119 @@
+<% layout("/layouts/boilerplate") -%>
+<body>
+  <br />
+  <div class="row">
+    <div class="col-8 offset-2">
+      <h2>Add New Product</h2>
+      <br />
+      <form
+        action="/listings"
+        method="POST"
+        class="needs-validation"
+        enctype="multipart/form-data"
+        novalidate
+      >
+        <div class="mb-3">
+          <label class="form-label" for="title">Name of Product </label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="text"
+            class="form-control"
+            width="50%"
+            id="title"
+            placeholder="Enter Name Of Product"
+            name="listing[title]"
+            required
+          />
+          <div class="invalid-feedback">Please Enter a valid Name</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="desc">Description </label
+          ><span> <b style="color: red"> *</b> : </span>
+          <textarea
+            name="listing[description]"
+            class="form-control"
+            id="desc"
+            rows="5"
+            cols="30"
+            placeholder="Enter the description of the Product"
+            required
+          ></textarea>
+          <div class="invalid-feedback">
+            Please provide the valid Description
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="img">Upload Image of Product</label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="file"
+            class="form-control"
+            width="50%"
+            accept="image/jpeg, image/png, image/jpg"
+            placeholder="Browse Image to Upload"
+            width="500px"
+            id="img"
+            name="listing[image]"
+            required
+          />
+          <div class="invalid-feedback">
+            Please Select image of type: jpeg, png only
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="mb-3 col-md-4">
+            <label class="form-label" for="price">Price </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="text"
+              min="0"
+              class="form-control"
+              width="50%"
+              placeholder="Enter price of Product"
+              id="price"
+              name="listing[price]"
+              oninput="if (this.value < 0) this.value = 0;"
+              required
+            />
+            <div class="invalid-feedback">Please Provide the valid Price</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="loc">Location of Origination</label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="text"
+            class="form-control"
+            width="50%"
+            placeholder="Enter location of Origination"
+            id="loc"
+            name="listing[location]"
+            value="Jothwara, Jaipur"
+            required
+          />
+          <div class="invalid-feedback">
+            Please provide the Valid Location of Origination
+          </div>
+        </div>
+        <div class="new-btn">
+          <button
+            class="btn btn-outline-dark mb-3 mt-3"
+            onclick="
+              document.getElementById('loaderOverlay').classList.add('active')
+            "
+          >
+            Add Product
+          </button>
+        </div>
+        <br /><br />
+      </form>
+    </div>
+  </div>
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-container">
+      <div class="loader"></div>
+      <p class="loader-text">Adding New Product ...</p>
+    </div>
+  </div>
+</body>

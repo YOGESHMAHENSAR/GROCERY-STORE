@@ -1,0 +1,97 @@
+<nav class="navbar navbar-expand-md bg-body-light sticky-top border-bottom">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/listings"><img src="/css/grocery-image.png" style="width: 105px; margin-left: 10px; height: 102px;" alt="logo"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
+      <div class="navbar-nav d-flex justify-content-center w-80 ms-auto">
+        <a class="nav-link d-flex flex-columns align-items-center" aria-current="page" href="/listings">
+          <i class="fa-solid fa-house" style="font-size: 1.35rem; color: rgb(185, 86, 86)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Home</span>
+        </a>
+        <a class="nav-link d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings/review">
+          <i class="fa-solid fa-bread-slice" style="font-size: 1.35rem; color: rgb(229, 140, 45)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Beverages</span>
+        </a>
+        <a class="nav-link d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings/review">
+          <i class="fa-solid fa-cookie-bite" style="font-size: 1.35rem; color: brown"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Snacks & Sweets</span>
+        </a>
+        <a class="nav-link d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings/review">
+          <i class="fa-solid fa-cow" style="font-size: 1.35rem; color: rgb(0, 0, 0)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Dairy & Eggs</span>
+        </a>
+        <% if(currUser && ownerId.includes(currUser._id.toString())) {%>
+          <a class="nav-link d-flex flex-columns align-items-center ms-5" href="/listings/new">
+            <i class="fa-solid fa-cart-plus" style="font-size: 1.35rem; color: rgb(0, 72, 255)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Add Products</span>
+          </a>
+        <% } %>
+      </div>
+      <div class="navbar-nav d-flex justify-content-center w-80 ms-auto">
+        <% if(currUser) {%>
+          <a class="nav-link d-flex flex-columns align-items-center" aria-current="page" href="/listings/profile">
+              <span><i class="fa-regular fa-circle-user" style="font-size: 2rem; margin-top: 8px; color: rgb(42, 99, 174);"></i></span>
+          </a>
+          <% } %>
+        <% if(!currUser) {%>
+          <a class="nav-link d-flex flex-columns align-items-center" aria-current="page" href="/login">
+            <button class="btn btn-outline-dark"><span>Login</span></button>
+          </a>
+          <a class="nav-link d-flex align-items-center flex-columns" aria-current="page" href="/signup">
+            <button class="btn btn-outline-dark"><span>Sign Up</span></button>
+          </a>
+        <% } %>
+        <% if(currUser){ %>
+          <a class="nav-link d-flex flex-columns align-items-center" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#logout">
+            <button class="btn btn-outline-dark"><span>Log Out</span></button>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+<!-- model for permanently delete start -->
+<div class="modal fade" id="logout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel"><b>LOGOUT !</b></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to <b>LOGOUT</b></b></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+                <form action="/logout">
+                    <button class="btn btn-warning">LOGOUT</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- model ends -->
+
+<script>
+  // Select your video elements
+  const video1 = document.querySelector("#house");
+  const video2 = document.querySelector("#balloon");
+  const video3 = document.querySelector("#consierge");
+
+  setTimeout(() => { video1.pause(); }, 930);
+  setTimeout(() => { video2.pause(); }, 1300);
+  setTimeout(() => { video3.pause(); }, 890);
+
+  // Function to add hover behavior
+  const addHoverResume = (video) => {
+    // Resume when mouse enters
+    video.addEventListener("mouseenter", () => {
+      video.play();
+    });
+
+    // Pause when mouse leaves (Optional, but recommended)
+    video.addEventListener("mouseleave", () => {
+      video.pause();
+    });
+  };
+
+  // Apply the behavior to all videos
+  [video1, video2, video3].forEach(addHoverResume);
+</script>

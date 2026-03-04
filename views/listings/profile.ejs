@@ -1,0 +1,30 @@
+<% layout("/layouts/boilerplate") -%>
+<body>
+    <div class="row">
+        <h2 style="text-align: center;" class="mt-4">Your Profile</h2>
+        <div class="col-md-8 offset-3 mt-4">
+            <br>
+            <div class="div" style="border: 1px solid black; border-radius: 20px; width: 100vh; height: 40vh; padding: 1.2rem;">
+                <div class="mb-3 row">
+                    <div class="col-md-3">
+                        <label class="form-label" for="title"><h3>Name : </h3></label>
+                    </div>
+                    <div class="col-md-6 me-3">
+                        <h4 id="title"><%=user%></h4>
+                    </div>
+                    <!-- <div class="invalid-feedback">Please provide the valid Name</div> -->
+                </div>
+                <div class="mb-3 row ">
+                    <div class="col-md-3 mt-4">
+                        <label class="form-label" for="title"> <h3>Email : </h3></label>
+                    </div>
+                    <div class="col-md-6 mt-4">
+                        <h4 id="title"><%=mail%></h4>
+                    </div>                
+                    <!-- <div class="invalid-feedback">Please provide the valid Name</div> -->
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>

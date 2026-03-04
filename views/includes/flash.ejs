@@ -1,0 +1,71 @@
+<!-- flash msg for new listing -->
+<% if(addNewMsg && addNewMsg.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-success position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: green; z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-1" ></i>  <%= addNewMsg %> 
+  </div>
+<% } %>
+
+<!-- flash msg for editing existing listing -->
+<% if(editMsg && editMsg.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-success position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: green; z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-2" ></i>  <%= editMsg %> 
+  </div>
+<% } %>
+
+<!-- flash msg for deleting listing -->
+<% if(deleteMsg && deleteMsg.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-success position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: red; z-index: 1050;">
+    <i class="fa-solid fa-trash mt-1 me-2"></i><%= deleteMsg %> 
+  </div>
+<% } %>
+
+<!-- flash msg for adding new review -->
+<% if(reviewAddMsg && reviewAddMsg.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-success position-fixed top-0 end-0 m-3 shadow"
+  style="color: white; font-weight: 700; text-align: center; background-color: green; z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-2" ></i>  <%= reviewAddMsg %> 
+  </div>
+<% } %>
+
+<!-- flash msg for deleting review -->
+<% if(reviewDelMsg && reviewDelMsg.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-success position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: red; z-index: 1050;">
+    <i class="fa-solid fa-trash mt-1 me-1"></i><%= reviewDelMsg %> 
+  </div>
+<% } %>
+
+<!-- flash msg for error -->
+<% if(errorDel && errorDel.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-danger position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: red; z-index: 1050;">
+    <i class="fa-solid fa-xmark mt-1 me-1"></i><%= errorDel %> 
+  </div>
+<% } %>
+
+<!-- flash msg for signup -->
+<% if(signup && signup.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-danger position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: green; z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-1"></i><%= signup %> 
+  </div>
+<% } %>
+
+<!-- flash msg for error in signup -->
+<% if(signupErr && signupErr.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-danger position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: red; z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-1"></i><%= signupErr %> 
+  </div>
+<% } %>
+
+<!-- flash msg for login  -->
+<% if(login && login.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-danger position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: green; z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-1"></i><%= login %> 
+  </div>
+<% } %>

@@ -1,0 +1,71 @@
+<% layout("/layouts/boilerplate") -%>
+<body>
+  <br />
+  <div class="row">
+    <div class="col-6 offset-3">
+      <h2 class="" style="text-align: center">Login on GROCERY-STORE</h2>
+      <br />
+      <div class="login-container mt-4 mb-3">
+        <div>
+          <a
+            href="/auth/google?intent=login<% if(typeof redirectUrl !== 'undefined') { %>&redirect=<%= redirectUrl %><% } %>"
+            class="google-btn"
+          >
+            <div class="google-icon-wrapper">
+              <img
+                class="google-icon"
+                src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+              />
+            </div>
+            <span class="btn-text">Sign in with Google</span>
+          </a>
+
+          <div class="divider mt-4 mb-3">
+            <span style="margin-left: 300px">or</span>
+            <!-- <hr> -->
+          </div>
+        </div>
+      </div>
+      <form action="/login" method="post" class="needs-validation" novalidate>
+        <div class="mb-3 mt-3">
+          <label class="form-label" for="username">UserName </label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="text"
+            class="form-control"
+            width="50%"
+            id="username"
+            placeholder="Enter your UserName"
+            name="username"
+            required
+          />
+          <div class="invalid-feedback">Please Enter the Correct UserName</div>
+        </div>
+        <div class="">
+          <label class="form-label" for="password">Password : </label>
+          <span> <b style="color: red"> *</b> : </span>
+          <input
+            type="password"
+            class="form-control"
+            width="50%"
+            placeholder="Enter your password here"
+            id="password"
+            name="password"
+            required
+          />
+          <div class="invalid-feedback">
+            Please provide the Correct password
+          </div>
+        </div>
+        <br /><br />
+        <button
+          type="submit"
+          class="btn btn-outline-success mb-5 col-6 offset-3"
+        >
+          Login In
+        </button>
+      </form>
+      <!-- <a href="/auth/google">signup with google</a> -->
+    </div>
+  </div>
+</body>

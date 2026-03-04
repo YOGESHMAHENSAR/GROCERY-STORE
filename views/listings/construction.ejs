@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Construction | Work in Progress</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: #18181b;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Caution Tape Pattern */
+        .caution-tape {
+            background: repeating-linear-gradient(
+                -45deg,
+                #facc15,
+                #facc15 30px,
+                #18181b 30px,
+                #18181b 60px
+            );
+            height: 15px;
+            width: 100%;
+            position: fixed;
+            z-index: 50;
+        }
+        .tape-top { top: 0; left: 0; }
+        .tape-bottom { bottom: 0; left: 0; }
+
+        /* Simple Floating Animation */
+        .float-animation {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <!-- Top and Bottom Warning Lines -->
+    <div class="caution-tape tape-top"></div>
+    <div class="caution-tape tape-bottom"></div>
+
+    <main class="max-w-xl w-full text-center fade-in">
+        
+        <!-- New Visual: Classic Sawhorse Barricade -->
+        <div class="mb-10 flex justify-center float-animation">
+            <svg width="240" height="180" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Barricade Legs -->
+                <path d="M60 160L90 40M180 160L150 40" stroke="#27272a" stroke-width="8" stroke-linecap="round"/>
+                <path d="M40 160L70 40M200 160L170 40" stroke="#52525b" stroke-width="8" stroke-linecap="round"/>
+                
+                <!-- Main Rail -->
+                <rect x="20" y="40" width="200" height="45" rx="2" fill="#facc15" stroke="#18181b" stroke-width="4"/>
+                
+                <!-- Rail Stripes -->
+                <clipPath id="stripes">
+                    <rect x="20" y="40" width="200" height="45" rx="2"/>
+                </clipPath>
+                <g clip-path="url(#stripes)">
+                    <path d="M30 30L70 90M80 30L120 90M130 30L170 90M180 30L220 90" stroke="#18181b" stroke-width="15"/>
+                </g>
+
+                <!-- Connecting Bar -->
+                <rect x="65" y="110" width="110" height="6" fill="#71717a"/>
+                
+                <!-- Safety Cone -->
+                <path d="M160 160L180 90L200 160H160Z" fill="#f97316" stroke="#18181b" stroke-width="3"/>
+                <rect x="168" y="125" width="24" height="6" fill="white"/>
+                <rect x="155" y="160" width="50" height="5" rx="2" fill="#f97316" stroke="#18181b" stroke-width="3"/>
+            </svg>
+        </div>
+
+        <!-- Typography -->
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter italic uppercase leading-none mb-6">
+            PAGE UNDER<br><span class="text-yellow-500">CONSTRUCTION</span>
+        </h1>
+
+        <div class="h-1.5 w-20 bg-zinc-900 mx-auto rounded-full mb-8"></div>
+
+        <p class="text-zinc-500 text-lg md:text-xl font-medium max-w-sm mx-auto leading-relaxed">
+            I'm currently putting in the hard work to upgrade this space. Please check back soon!
+        </p>
+
+        <!-- Status Indicator (Static) -->
+        <div class="mt-12 inline-flex items-center gap-2 px-4 py-2 bg-zinc-100 rounded-full text-zinc-500 text-xs font-bold uppercase tracking-widest">
+            <span class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+            Development In Progress
+        </div>
+
+    </main>
+</body>
+</html>

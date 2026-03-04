@@ -1,0 +1,40 @@
+<%- layout("/layouts/boilerplate") %>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h2 class="mb-4 heading">AVAILABLE PRODUCTS : </h2>
+  <form action="/listings/new" method="get">
+    <!-- <button>ADD Listings</button> -->
+  </form>
+
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
+    <% for(let list of lists) {%>
+        <a href="/listings/<%= list._id %>" class="listing-link">
+            <div class="card col listing-card">
+                <!-- <img src="<%= list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
+                 <img 
+                  src="<%= list.image.url %>?w=600&h=400&c=fill&q=auto&f=auto" 
+                  srcset="
+                    <%= list.image.url %>?w=300&q=auto&f=auto 300w,
+                    <%= list.image.url %>?w=600&q=auto&f=auto 600w,
+                    <%= list.image.url %>?w=1200&q=auto&f=auto 1200w
+                  "
+                  sizes="(max-width: 600px) 300px, (max-width: 1200px) 600px, 1200px"
+                  loading="lazy"
+                  class="card-img-top main_img" style="height: 20rem" alt="..." />
+                <div class="card-img-overlay"></div>
+                <div class="card-body">
+                    <p class="card-text">
+                    <b><%= list.title %></b> <br />
+                    <i class="fas fa-rupee-sign"></i><%=
+                    list.price?.toLocaleString("en-IN") %> 
+                    </p>
+                </div>
+            </div>
+        </a>
+    <% } %>
+  </div>
+</body>
