@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -158,6 +160,10 @@ app.use((req,res,next) =>{
 //     res.send(registeredUser);
 // })
 
+app.get("/",(req,res)=>{
+    res.redirect("/listings");
+})
+
 //all listing routes
 app.use("/listings", listingsRouter);
 
@@ -168,7 +174,7 @@ app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
 
 //not existing routes
-app.get("*a",(req,res,next)=>{
+app.all("*",(req,res,next)=>{
     next(new ExpressError(404, " Page Not Found! You made a request of which page doesn't exist yet."));
 })
 
@@ -182,7 +188,7 @@ app.use((err,req,res,next)=>{
 })
 
 //SERVER STARTING
-let port = 8080;
+let port = process.env.PORT || 8080;
 app.listen(port,"0.0.0.0",()=>{
     console.log(`Listening to server ${port}`)
 })
