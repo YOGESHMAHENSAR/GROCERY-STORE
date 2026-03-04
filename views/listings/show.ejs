@@ -14,8 +14,8 @@
                     <p class="card-text"><b><i class="fas fa-rupee-sign"></i><%= lists.price?.toLocaleString("en-IN") %></b><br></p>
                         <b>Description :</b> <%= lists.description %> <br><br>
                         <div class="row" style="margin-top: -10px;">
-                            <div class="col-6">
-                                <b>Location :</b> <%= lists.location %> 
+                            <div class="col-10">
+                                <b>Imported Location :</b> <%= lists.location %> 
                             </div>    
                         </div>
                     </p>
@@ -43,7 +43,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
                     <form action="/listings/<%= lists._id %>?_method=DELETE" method="post">
-                        <button class="btn btn-danger"> YES [REMOVE PERMANENTLY]</button>
+                        <button class="btn btn-danger"> YES </button>
                     </form>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
                                         <form action="/listings/<%= lists._id %>/reviews/<%= review._id %>?_method=DELETE" method="post">
-                                            <button class="btn btn-danger">YES [REMOVE PERMANENTLY]</button>
+                                            <button class="btn btn-danger">YES </button>
                                         </form>
                                     </div>
                                 </div>
