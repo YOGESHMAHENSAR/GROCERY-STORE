@@ -11,6 +11,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const listingsRouter = require("./routes/listings.js");
 const reviewsRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/user.js");
+const cartRouter = require("./routes/cart.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default; // for storing the session info. of the user
@@ -21,6 +22,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const initData = require("./init/data.js");
+const wrapAsync = require('./utils/wrapAsync.js');
 let app = express();
 // app.use(cookieParser(";098___)()__++==9$%^&*("));
 app.set("view engine","ejs");
@@ -87,40 +89,55 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:8080/auth/google/callback",
+        callbackURL:  "http://localhost:8080/auth/google/callback" || process.env.GOOGLE_CALLBACK_URL,
         passReqToCallback: true
     },
         async (req, accessTokens, refreshTokens, profile, done) => {
             try{
-                const intent = req.query.state;
-                let user = await User.findOne({
-                    $or: [
-                        {googleId: profile.id},
-                        {email: profile.emails[0].value}
-                    ]
-                });
-                //if user exists
-                if(user){
-                    return done(null, user);
+                const intent = req.session.intent || "login";
+                console.log("intent in strategy:", intent); // ← add this
+console.log("session in strategy:", req.session); 
+                const googleEmail = profile.emails && profile.emails[0] && profile.emails[0].value;
+                if(!googleEmail){
+                    return done(null, false, {message: "Could Not retrive email from Google."});
                 }
-                //login but acc not found
-                if(intent === "login"){
-                    return done(null, false,{message: "Account not found. Please sign up first!"});
-                }
-                // if tyr to signup
                 if(intent === "signup"){
                     console.log("entered in the acc create");
-                    let usernameCheck = await User.findOne({username: profile.displayName});
-                    if(usernameCheck){
-                        return done(null, false,{message: "User already Taken Try with different account"});
+                    // let usernameCheck = await User.findOne({username: profile.displayName});
+                    let emailCheck = await User.findOne({email: googleEmail});
+                    if(emailCheck && !emailCheck.googleId){
+                        return done(null, false,{message: "This email is already registered with a password. Please login normally."});
+                    }
+                    if(emailCheck && emailCheck.googleId){
+                        return done(null, false,{message: "Account already exists. Please login instead."});
                     }
                     const newUser = await User.create({
                         googleId: profile.id,
                         username: profile.displayName,
-                        email: profile.emails && profile.emails[0] && profile.emails[0].value
+                        email: googleEmail
                     });
                     return done(null, newUser);
                 }
+
+                if(intent === "login"){
+                    console.log("entered in the login");
+
+                    const existingUser = await User.findOne({ email: googleEmail });
+
+                    // no account found
+                    if(!existingUser){
+                        return done(null, false, { message: "No account found with this email. Please signup first." });
+                    }
+
+                    // registered with password, not Google
+                    if(existingUser && !existingUser.googleId){
+                        return done(null, false, { message: "This email is registered with a password. Please login normally." });
+                    }
+
+                    // all good — log them in
+                    return done(null, existingUser);
+                }
+
             }catch(err){
                 return done(err,null);
             }
@@ -135,7 +152,7 @@ passport.serializeUser(User.serializeUser()); // to save the data of user in ses
 passport.deserializeUser(User.deserializeUser()); // to remove the data of user from the session
 
 //middleware for the flash-connect
-app.use((req,res,next) =>{
+app.use(async (req,res,next) =>{
     res.locals.editMsg = req.flash("edit");
     res.locals.addNewMsg = req.flash("new");
     res.locals.deleteMsg = req.flash("delete");
@@ -146,6 +163,20 @@ app.use((req,res,next) =>{
     res.locals.login = req.flash("login");
     res.locals.signupErr = req.flash("err");
     res.locals.currUser = req.user;
+    res.locals.category = req.query.category || null;//for category selection middleware
+
+    //cart middleware
+    try {                                                    // ← wrap in try-catch
+        if(req.user) {
+            const user = await User.findById(req.user._id);
+            res.locals.cartCount = user ? user.cart.length : 0;  // ← null check on user
+        } else {
+            res.locals.cartCount = 0;
+        }
+    } catch(err) {
+        res.locals.cartCount = 0;                           // ← default to 0 on error
+        console.error("Cart middleware error:", err.message); // ← see exact error
+    }
     
     res.locals.ownerId = (process.env.OWNER_IDS||"").split(",").map(id => id.trim()).filter(Boolean); // Set the owner ID in res.locals
     next();
@@ -173,10 +204,14 @@ app.use("/listings/:id/reviews", reviewsRouter);
 //all user routes
 app.use("/", userRouter);
 
+//all cart routes
+app.use("/", cartRouter);
+
 //not existing routes
 app.all("*any",(req,res,next)=>{
     next(new ExpressError(404, " Page Not Found! You made a request of which page doesn't exist yet."));
 })
+
 
 //for error handling
 app.use((err,req,res,next)=>{

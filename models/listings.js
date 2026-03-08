@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Reviews = require("./reviews.js");
+const { ref } = require("joi");
 
 main().then((res)=>console.log("connection successful"))
 .catch((err)=>console.log("ERROR: ",err));
@@ -37,6 +38,13 @@ const listingSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
+        }
+    ],
+    category:[
+        {
+            type: String,
+            enum: ["Beverages", "Snacks", "Dairy", "Normal"],
+            required: true
         }
     ],
 })

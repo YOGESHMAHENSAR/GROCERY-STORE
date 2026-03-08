@@ -3,8 +3,14 @@ const {listingSchema} = require("../schema.js");
 const ExpressError = require("../utils/ExpressError.js");
 
 module.exports.index = async (req,res)=>{
-    const lists = await List.find({}).sort({ _id: -1 });
-    res.render("listings/index",{lists});
+    const { category } = req.query;
+    let filter = {};
+    if(category){
+        filter = {category: category}
+    }
+    // const allListings = await List.find(filter);
+    const lists = await List.find(filter).sort({ _id: -1 });
+    res.render("listings/index",{lists, category});
 }
 
 module.exports.validate = async (req,res)=>{
@@ -65,6 +71,10 @@ module.exports.show = async (req,res)=>{
         res.render("listings/show",{lists});
     }
 }
+
+// module.exports.cart = async(req,res)=>{
+//     let {id} = req.body;
+// }
 
 module.exports.delete = async (req,res)=>{
     let {id} = req.params;

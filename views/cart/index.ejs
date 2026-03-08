@@ -1,0 +1,67 @@
+<% layout("/layouts/boilerplate") -%>
+<body>
+  <div class="row mt-4">
+    <div class="col-8 offset-2">
+      <h2>My Cart</h2>
+      <br/>
+
+      <% if(cart.length === 0) { %>
+        <p>Your cart is empty. <a href="/listings">Continue Shopping</a></p>
+
+      <% } else { %>
+        <table class="table table-hover table-striped" size="5">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let item of cart) { %>
+                <% if(item.product) {%>
+                    <tr>
+                        <td><%= item.product.title %></td>
+                        <td>₹<%= item.product.price %></td>
+                        <td><%= item.quantity %></td>
+                        <td>₹<%= parseInt(item.product.price) * item.quantity %></td>
+                        <td>
+                            <!-- REMOVE BUTTON GOES HERE -->
+                        <form action="/cart/<%= item.product._id %>?_method=DELETE" method="POST">
+                            <button class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                        </td>
+                    </tr>
+                <% } %>
+            <% } %>
+          </tbody>
+        </table>
+
+        <!-- cart total -->
+        <h5 class="text-end">
+          Grand Total: ₹
+          <%= cart.reduce((sum, item) => sum + parseInt(item.product.price) * item.quantity, 0) %>
+        </h5>
+
+        <!-- place order button -->
+        <div class="text-end mt-3">
+            <div class="row">
+                <div class="col-md-4 me-5">
+                    <a href="/listings" class="btn btn-outline-dark ">Continue Shopping</a>
+                </div>
+                <div class="col-md-4 me-5">
+                    <form action="/listings/review">
+                        <button class="btn btn-success">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+      <% } %>
+        <!-- <form action="/cart/?_method=DELETE" method="POST">
+            <button class="btn btn-outline-danger">Empty Cart</button>
+        </form> -->
+    </div>
+  </div>
+</body>

@@ -31,21 +31,18 @@ if (rangeInput && rangeOutput) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  
-  // Find your form
   const form = document.querySelector('form');
   const loaderOverlay = document.getElementById('loaderOverlay');
   
   if (form && loaderOverlay) {    
     form.addEventListener('submit', function(e) {
-      console.log('Form submitted! Showing loader...');
-      
-      // Show loader
-      loaderOverlay.classList.add('active');
-      
-      // IMPORTANT: If you want to test without actually submitting
-      // Uncomment this line:
-      // e.preventDefault();
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+      }
+      loaderOverlay.classList.add('active');  // ← shows your overlay
     });
   } else {
     console.error('Form or loader overlay not found!');

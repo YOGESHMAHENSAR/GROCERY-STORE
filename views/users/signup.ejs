@@ -11,7 +11,7 @@
             <div class="google-icon-wrapper">
                 <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"/>
             </div>
-            <span class="btn-text">Sign in with Google</span>
+            <span class="btn-text">Sign Up with Google</span>
         </a>
 
         <div class="divider mt-4 mb-3">
@@ -37,18 +37,33 @@
           <div class="invalid-feedback">Please Enter the UserName</div>
         </div>
         <div class="mb-3">
-          <label class="form-label" for="email">E-Mail Id </label
-          ><span> <b style="color: red"> *</b> : </span>
-          <input
-            name="email"
-            class="form-control"
-            id="email"
-            placeholder="Enter the E-Mail Id here"
-            required
-          />
+            <div class="row">
+              <div class="col-md-8">
+                <label class="form-label" for="email">E-Mail Id </label
+                ><span> <b style="color: red"> *</b> : </span>
+                <input
+                  name="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Enter the E-Mail Id here"
+                  required
+                />
+              </div>
+              <div class="col-md-4" style="margin-top: 32px;">
+                <button class="btn btn-outline-dark" type="button" id="sendotpbtn">
+                  Send OTP
+                </button>
+              </div>
+            </div>
           <div class="invalid-feedback">Please provide the valid E-Mail Id</div>
         </div>
-        <div class="">
+        <div class="mb-3">
+          <label for="otp" class="form-label">OTP: </label>
+          <span> <b style="color: red"> *</b> : </span>
+          <input type="text" class="form-control" name="otp" placeholder="PLease Enter OTP here" required>
+          <div class="invalid-feedback">Please Provide the OTP for Vlidation of E-Mail</div>
+        </div>
+        <div class="mb-3">
           <label class="form-label" for="password">Password : </label>
           <span> <b style="color: red"> *</b> : </span>
           <input
@@ -74,3 +89,22 @@
     </div>
   </div>
 </body>
+
+<script>
+  document.getElementById("sendotpbtn").addEventListener('click', async ()=>{
+    const email = document.getElementById("email").value;
+    if(!email) {
+      alert("Please enter your E-mail to get OTP");
+      return;
+    }
+    alert("otp sent!");
+    const response = await fetch('/getotp', {
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email})
+    })
+
+    if(response.ok) alert("OTP SENT !");
+    else alert("Failed to sent otp, try again");
+  })
+</script>

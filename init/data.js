@@ -8,6 +8,7 @@ const sampleListings = [
     },
     price: 850,
     location: "Ratnagiri",
+    category: ""
   },
   {
     title: "Premium Basmati Rice",

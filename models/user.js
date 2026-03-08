@@ -11,7 +11,19 @@ const userSchema = new Schema({
     },
     username:{
        type: String
-    }
+    },
+    cart:[
+            {
+                product: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "List"
+                },
+                quantity: {
+                    type: Number,
+                    default: 1
+                }
+            }
+        ]
 });
 
 userSchema.plugin(passportLocalMongoose);

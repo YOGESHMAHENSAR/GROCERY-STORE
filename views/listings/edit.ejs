@@ -91,16 +91,16 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="loc">Import Location </label
-          ><span> <b style="color: red"> *</b> : </span>
+          <label class="form-label" for="loc">Import Location [Specialty] <i class="fa-solid fa-chess-king" style="color: gold;"></i></label>
+          
+          <!-- <span> <b style="color: red"> *</b> : </span> -->
           <input
             type="text"
             id="col"
             class="form-control"
-            placeholder="Enter location of Origination of Product"
+            placeholder="Enter Imported Location of Product (Optional)"
             value="<%= list.location %>"
             name="listing[location]"
-            required
           />
           <div class="invalid-feedback">
             Please provide the Imported Location

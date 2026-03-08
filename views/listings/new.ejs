@@ -60,7 +60,20 @@
             Please Select image of type: jpeg, png only
           </div>
         </div>
-
+        <div class="row">
+          <div class="mb-3 col-md-4">
+            <label class="form-label" for="price">Select Category </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <select class="form-select" name="listing[category]" id="category" >
+              <option value="" selected disabled>Select Category</option>
+              <option value="Beverages">Beverages</option>
+              <option value="Snacks">Snacks and Sweets</option>
+              <option value="Dairy">Dairy & Eggs</option>
+              <option value="Normal">Daily Use Products</option>
+            </select>
+            <div class="invalid-feedback">Please Provide the valid Price</div>
+          </div>
+        </div>
         <div class="row">
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Price </label
@@ -80,17 +93,16 @@
           </div>
         </div>
         <div class="mb-3">
-          <label class="form-label" for="loc">Imported Location </label
-          ><span> <b style="color: red"> *</b> : </span>
+          <label class="form-label" for="loc">Imported Location (Specialty) <i class="fa-solid fa-chess-king" style="color: gold;"></i></label>
+          <!-- <span> <b style="color: red"> *</b> : </span> -->
           <input
             type="text"
             class="form-control"
             width="50%"
-            placeholder="Enter the Imported location of Product"
+            placeholder="Enter the Imported location of Product (Optional)"
             id="loc"
             name="listing[location]"
-            value="Jothwara, Jaipur"
-            required
+            value=""
           />
           <div class="invalid-feedback">
             Please provide the Valid Imported Location 
@@ -99,9 +111,6 @@
         <div class="new-btn">
           <button
             class="btn btn-outline-dark mb-3 mt-3"
-            onclick="
-              document.getElementById('loaderOverlay').classList.add('active')
-            "
           >
             Add Product
           </button>
@@ -117,3 +126,17 @@
     </div>
   </div>
 </body>
+<script>
+    const form = document.querySelector('.needs-validation');
+    
+    form.addEventListener('submit', (e) => {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return; // ← don't show loader if form is invalid
+        }
+        // form is valid — show loader
+        document.getElementById('loaderOverlay').classList.add('active');
+    });
+</script>

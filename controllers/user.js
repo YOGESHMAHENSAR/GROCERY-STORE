@@ -1,10 +1,15 @@
 const User = require("../models/user.js");
 const passport = require("passport");
-const user = require("../models/user.js");
 
-module.exports.signup = async(req,res)=>{
+module.exports.signup = async(req,res,next)=>{
     try{
-        let{username, email, password} = req.body;
+        let{username, email,otp, password} = req.body;
+
+        if(otp !== req.session.currOtp || email !== req.session.emailOtp){
+            req.flash("err", "Invalid OTP or E-MAIL");
+            return res.redirect("/signup");
+        }
+        console.log("user verified");
         let newUser = new User({email, username});
         let registeredUser = await User.register(newUser, password);
         // console.log(registeredUser);
@@ -15,11 +20,11 @@ module.exports.signup = async(req,res)=>{
             req.flash("signup",`Welcome ${req.body.username} to GROCERY-STORE!`);
             res.redirect("/listings");
         })
+        delete req.session.currOtp;
     }catch(err){
         req.flash("err", err.message);
         res.redirect("/signup");
     }
-    
 }
 
 module.exports.renderSignUpForm = (req,res)=>{
@@ -54,19 +59,4 @@ module.exports.logout = (req,res,next)=>{
         req.flash("signup","Logged Out!");
         res.redirect("/listings");
     })
-}
-
-module.exports.googleUserWelcome = [
-    passport.authenticate("google", { failureRedirect: "/signup", failureFlash: true }),
-    (req, res) => {
-        req.flash("login", `Welcome back ${req.user.username} to GROCERY-STORE !`);
-        res.redirect("/listings");
-    }
-];
-
-module.exports.googleIntent =  (req,res,next)=>{
-        const intent = req.query.intent || "login"; // default to login
-    passport.authenticate("google",{scope: ["profile" ,"email"],
-        state: intent // pass intent to state parameter
-    })(req,res,next);
 }

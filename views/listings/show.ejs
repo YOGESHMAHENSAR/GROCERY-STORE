@@ -13,14 +13,23 @@
                     <!-- <p class="card-text"><b>Owned by: <i class="fa-solid fa-chess-king" style="color: gold;"></i> <i><%# lists.owner.username %></b></i><br> -->  
                     <p class="card-text"><b><i class="fas fa-rupee-sign"></i> : <%= lists.price?.toLocaleString("en-IN") %></b><br></p>
                         <b>Description :</b> <%= lists.description %> <br><br>
-                        <div class="row" style="margin-top: -10px;">
-                            <div class="col-10">
-                                <b>Imported Location :</b> <%= lists.location %> 
-                            </div>    
-                        </div>
+                        <% if(lists.location) {%>
+                            <div class="row" style="margin-top: -10px;">
+                                <div class="col-10">
+                                    <b>Imported Location [Specialty]:</b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %> 
+                                </div>    
+                            </div>
+                        <% } %>
                     </p>
                 </div>
             </div>
+            <%# if(!lists.owners.some(o=>o._id.equals(currUser._id))) {%>
+                <form action="/cart/<%= lists._id %>" method="post">
+                    <button class="btn btn-outline-primary">
+                        <i class="fa-solid fa-cart-shopping"></i>Add To Cart
+                    </button>
+                </form>
+            <%# } %>
             <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
                 <a href="/listings/<%= lists._id %>/edit"><button class="btn btn-outline-dark mb-3" style=" margin-top: -35px;">Edit</button></a>
                 
@@ -110,7 +119,7 @@
                         </div>                        
                         <p class="card-text"><%= review.comment %></p>
                     </div>
-                    <!-- <form action="/listings/<%= lists._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST">
+                    <!-- <form action="/listings/<%# lists._id %>/reviews/<%# review._id %>?_method=DELETE" method="POST">
                         <button class="btn btn-danger mt-2 ">Delete</button>
                     </form> -->
                     

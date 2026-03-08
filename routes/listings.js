@@ -1,4 +1,5 @@
 const express = require("express");
+const List = require("../models/listings.js");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const {isLoggedIn, isOwner, validateListing} = require("../middleware.js");
@@ -7,6 +8,7 @@ const listingController = require("../controllers/listings.js")
 const multer = require("multer");
 
 const {storage} = require("../cloudConfig.js");
+const { findById } = require("../models/user.js");
 
 const upload = multer({storage});
 
@@ -19,6 +21,17 @@ router.get("/profile",isLoggedIn,(req,res)=>{
     const user = req.user.username;
     const mail = req.user.email;
     res.render("listings/profile", {user,mail});
+})
+
+router.get("/:id/cart",async (req,res)=>{
+    let {id} = req.params;
+    const a = 1;
+    let carts = [];
+    let cart = await List.findById(id);
+    if(cart){
+        carts.push(cart);
+    }
+    res.render("listings/cart", {carts});
 })
 
 //NEW FIELD ROUTE
