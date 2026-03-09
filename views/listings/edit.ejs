@@ -46,7 +46,7 @@
         </div>
         <div class="row">
           <div class="mb-3 col-md-6">
-            <label for="img" class="form-label">Image URL : </label>
+            <label for="img" class="form-label">Upload new Image : </label>
             <input
               type="file"
               id="img"
@@ -69,7 +69,20 @@
             </button>
           </div>
         </div>
-
+        <div class="row">
+          <div class="mb-3 col-md-4">
+            <label class="form-label" for="price">Select Category </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <select class="form-select" name="listing[category]" id="category" >
+              <option value="" selected disabled>Select Category</option>
+              <option value="Beverages">Beverages</option>
+              <option value="Snacks">Snacks and Sweets</option>
+              <option value="Dairy">Dairy & Eggs</option>
+              <option value="Normal">Daily Use Products</option>
+            </select>
+            <div class="invalid-feedback">Please Provide the valid Price</div>
+          </div>
+        </div>
         <div class="row">
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Price </label
