@@ -7,8 +7,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 850,
-    location: "Ratnagiri",
-    category: ""
+    category: "Normal"
   },
   {
     title: "Premium Basmati Rice",
@@ -18,7 +17,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 210,
-    location: "Karnal",
+    category: "Normal"
   },
   {
     title: "Paneer",
@@ -28,7 +27,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 280,
-    location: "Chandigarh",
+    category: "Dairy"
   },
   {
     title: "Darjeeling First Flush Tea",
@@ -38,7 +37,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 1500,
-    location: "Darjeeling",
+    category: "Beverages"
   },
   {
     title: "Kashmiri Saffron (Kesar)",
@@ -48,7 +47,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 450,
-    location: "Pampore",
+    category: "Snacks"
   },
   {
     title: "Natural Forest Honey",
@@ -58,7 +57,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 550,
-    location: "Sunderbans",
+    category: "Snacks"
   },
   {
     title: "A2 Desi Cow Ghee",
@@ -68,7 +67,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 1800,
-    location: "Junagadh",
+    category: "Dairy"
   },
   {
     title: "Whole Spice Black Pepper",
@@ -78,7 +77,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 120,
-    location: "Wayanad",
+    category: "Normal"
   },
   {
     title: "Organic Turmeric Powder",
@@ -88,7 +87,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 140,
-    location: "Shillong",
+    category: "Normal"
   },
   {
     title: "Jodhpur Dried Red Chillies",
@@ -98,7 +97,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 90,
-    location: "Jodhpur",
+    category: "Normal"
   },
   {
     title: "Stone-Ground Chakki Atta",
@@ -108,7 +107,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 65,
-    location: "Indore",
+    category: "Normal"
   },
   {
     title: "Green Cardamom (Elaichi)",
@@ -118,7 +117,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 350,
-    location: "Idukki",
+    category: "Normal"
   },
   {
     title: "Fresh Alphonso Mango Pulp",
@@ -128,7 +127,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 320,
-    location: "Mumbai",
+    category: "Beverages"
   },
   {
     title: "Hand-Rolled Papad",
@@ -138,7 +137,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 85,
-    location: "Bikaner",
+    category: "Snacks"
   },
   {
     title: "Golden Cashew Nuts",
@@ -148,7 +147,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 480,
-    location: "Kollam",
+    category: "Snacks"
   },
   {
     title: "Mysore Sandalwood Incense",
@@ -158,7 +157,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 250,
-    location: "Mysuru",
+    category: "Normal"
   },
   {
     title: "Organic Toor Dal",
@@ -168,7 +167,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 175,
-    location: "Gulbarga",
+    category: "Normal"
   },
   {
     title: "Cold Pressed Coconut Oil",
@@ -178,7 +177,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 390,
-    location: "Coimbatore",
+    category: "Normal"
   },
   {
     title: "Nagpur Seedless Oranges",
@@ -188,7 +187,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 120,
-    location: "Nagpur",
+    category: "Normal"
   },
   {
     title: "Assam Orthodox Tea",
@@ -198,7 +197,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 800,
-    location: "Jorhat",
+    category: "Beverages"
   },
   {
     title: "Premium California Almonds",
@@ -208,7 +207,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 950,
-    location: "Delhi",
+    category: "Snacks"
   },
   {
     title: "Pure Palm Jaggery",
@@ -218,7 +217,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 220,
-    location: "Madurai",
+    category: "Normal"
   },
   {
     title: "Farm Fresh Green Apples",
@@ -228,7 +227,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 260,
-    location: "Shimla",
+    category: "Normal"
   },
   {
     title: "Organic Brown Sugar",
@@ -238,7 +237,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 85,
-    location: "Kolhapur",
+    category: "Normal"
   },
   {
     title: "Pink Himalayan Salt",
@@ -248,7 +247,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 110,
-    location: "Amritsar",
+    category: "Normal"
   },
   {
     title: "Premium Pistachios",
@@ -258,7 +257,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 1300,
-    location: "Hyderabad",
+    category: "Snacks"
   },
   {
     title: "Organic Peanuts",
@@ -268,7 +267,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 150,
-    location: "Rajkot",
+    category: "Snacks"
   },
   {
     title: "Fresh Broccoli",
@@ -278,7 +277,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 95,
-    location: "Pune",
+    category: "Normal"
   },
   {
     title: "Saffron Infused Honey",
@@ -288,7 +287,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 750,
-    location: "Ludhiana",
+    category: "Snacks"
   },
   {
     title: "Black Seedless Grapes",
@@ -298,7 +297,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 140,
-    location: "Nashik",
+    category: "Normal"
   },
   {
     title: "Natural Rock Candy (Mishri)",
@@ -308,10 +307,8 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 60,
-    location: "Jaipur",
+    category: "Normal"
   }
 ];
 
-
 module.exports = { data: sampleListings };
-
