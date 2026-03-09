@@ -23,14 +23,15 @@
                     </p>
                 </div>
             </div>
-            <%# if(!lists.owners.some(o=>o._id.equals(currUser._id))) {%>
+            <% if(currUser && !lists.owners.some(o=>o._id.equals(currUser._id))) {%>
                 <form action="/cart/<%= lists._id %>" method="post">
                     <button class="btn btn-outline-primary">
                         <i class="fa-solid fa-cart-shopping"></i>Add To Cart
                     </button>
                 </form>
-            <%# } %>
+            <% } %>
             <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
+                <h6 style="margin-left: 259px;">As owner, cart option <b style="color: red;">not available!</b></h6>
                 <a href="/listings/<%= lists._id %>/edit"><button class="btn btn-outline-dark mb-3" style=" margin-top: -35px;">Edit</button></a>
                 
                 <!-- delete btn -->
@@ -71,15 +72,28 @@
                 </div> -->
                 <div>
                     <!-- <h5>Rating</h5> -->
-                    <label for="rating" class="form-label mt-3">Rating</label>
-                    <input type="range" min="1" max="5" name="review[rating]" id="rating" value="4" class="form-range">
-                    <output for="rating" id="rangeValue" class="highlighted-output" aria-hidden="true"></output>
+                    <fieldset class="starability-heart">
+                        <legend>Rating : <span style="color: red;">*</span> </legend>
+                        <!-- <label for="rating" class="form-label mt-3">Rating</label> -->
+                        <!-- <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." /> -->
+                        <input type="radio" id="first-rate1" name="review[rating]" value="1" required/>
+                        <label for="first-rate1" tooltip="Terrible">1 star</label>
+                        <input type="radio" id="first-rate2" name="review[rating]" value="2" required/>
+                        <label for="first-rate2" title="Not good">2 stars</label>
+                        <input type="radio" id="first-rate3" name="review[rating]" value="3" required/>
+                        <label for="first-rate3" title="Average">3 stars</label>
+                        <input type="radio" id="first-rate4" name="review[rating]" value="4" required/>
+                        <label for="first-rate4" title="Very good">4 stars</label>
+                        <input type="radio" id="first-rate5" name="review[rating]" value="5" required/>
+                        <label for="first-rate5" title="Amazing">5 stars</label>
+                    </fieldset>
+                    <div class="invalid-feedback">Please Provide rating to Submit Response</div>
                 </div>
                 <br>
                 <div>
                     <!-- <h5>Comments</h5> -->
-                    <label for="comment" class="form-label mt-2">Comment <span style="color: red;">*</span> </label>
-                    <textarea name="review[comment]" id="comment" maxlength="400" class="form-control" title="Provide your valuable Feedback in range of 400 words" placeholder="Please Provide your valuable Feedback in 400 words" cols="30" rows="7" required></textarea>
+                    <label for="comment" class="form-label mt-2">Comment : </label>
+                    <textarea name="review[comment]" id="comment" maxlength="400" class="form-control" title="Provide your valuable Feedback in range of 400 words" placeholder="Please Provide your valuable Feedback in 400 words (Optional)" cols="30" rows="7" ></textarea>
                     <div class="invalid-feedback">Please provide the feedback</div>
                 </div>
                 <button class="btn btn-outline-dark mt-3">Subimt Response</button>
@@ -97,24 +111,40 @@
         <% } %>
         <div class="row mt-2">
             <% for(review of lists.reviews){ %>
-                <div class="card col-md-6 ms-2 mt-3" style="width: 26rem; padding: .5rem; margin-left: 20px;">
+                <div class="card col-md-6 ms-4 mt-3" style="width: 26rem; padding: .5rem; margin-left: 30px;">
                     <div class="row">
                         <div class="col-md-3">
                             <img src="../css/demo_user.png" class="card-img-top demo_user" style="border-radius: 50%; height: 63px; width: 63px;" alt="...">
                         </div>
                         <div class="col-md-8">
                             <h6 class="mt-2" style="margin-left: -20px;"><b><%= review.author.username %></b></h6>
-                            <h6 style="margin-left: -20px;">1 years on GROCERY-STORE</h6>
+                            <!-- <h6 style="margin-left: -20px;"><%# (currUser.createdAt - Date.now())  %> on GROCERY-STORE</h6> -->
+                            <h6 style="margin-left: -20px;">Joined 
+                                <%
+                                    const diff = Date.now() - new Date(review.createdAt);
+                                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                    
+                                    let display;
+                                    if(days === 0)       display = "Today";
+                                    else if(days === 1)  display = "Yesterday";
+                                    else if(days < 30)   display = `${days} days ago`;
+                                    else if(days < 365)  display = `${Math.floor(days / 30)} months ago`;
+                                    else                 display = `${Math.floor(days / 365)} years ago`;
+                                %>
+                                <%= display %> on <br>GROCERY-STORE
+                            </h6>
                         </div>
                     </div>
                     <hr>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p>Rating: <%= review.rating %><i class="fa-solid fa-star" style="color: rgb(255, 196, 0);"></i></p>
+                                <!-- <p>Rating: <%# review.rating %><i class="fa-solid fa-star" style="color: rgb(255, 196, 0);"></i></p> -->
+                                <p class="starability-result" data-rating="<%= review.rating %>"></p>
                             </div>
                             <div class="col-md-6">
-                                <p style="font-size: 1rem; margin-left: -100px;"><%= review.createdAt.toLocaleDateString('en-UK') %></p>
+                                <h6>Created at: </h6>
+                                <p style="font-size: 1rem; margin-left: 00px;"><%= review.createdAt.toLocaleDateString('en-UK') %></p>
                             </div>
                         </div>                        
                         <p class="card-text"><%= review.comment %></p>
@@ -124,31 +154,82 @@
                     </form> -->
                     
                     <% if(currUser && currUser._id.equals(review.author._id)) { %>
-                        <button type="button" style="width: 95px;" class="btn btn-sm btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#delete-review-<%= review._id %>">DELETE</button>
-                        <!-- model for permanently delete start -->
-                        <div class="modal fade" id="delete-review-<%= review._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel">REMOVE Review</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Are you sure you want to Remove your Review</b></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
-                                        <form action="/listings/<%= lists._id %>/reviews/<%= review._id %>?_method=DELETE" method="post">
-                                            <button class="btn btn-danger">YES </button>
-                                        </form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" style="width: 100px;" class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#delete-review-<%= review._id %>"><i class="fa-solid fa-trash" style="margin-right: 5px;"></i>DELETE</button>
+                                <!-- model for permanently delete start -->
+                                <div class="modal fade" id="delete-review-<%= review._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">REMOVE Review</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to Remove your Review</b></p>
+                                                <b>Review: </b> <p><%= review.comment %></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+                                                <form action="/listings/<%= lists._id %>/reviews/<%= review._id %>?_method=DELETE" method="post">
+                                                    <button class="btn btn-danger">YES </button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <!-- model ends -->
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" style="width: 95px;" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#edit-review-<%= review._id %>">EDIT</button>
+                                <!-- model for permanently delete start -->
+                                <div class="modal fade" id="edit-review-<%= review._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">EDIT Review</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <!-- modal body begins -->
+                                            <form action="/listings/<%= lists._id %>/reviews/<%= review._id %>?_method=PUT" method="post">
+                                                <div class="modal-body">
+                                                    <div>
+                                                        <!-- <h5>Rating</h5> -->
+                                                        <fieldset class="starability-heart">
+                                                            <legend>Rating : </legend>
+                                                            <input type="radio" id="edit-rate1-<%= review._id %>" name="review[rating]" value="1" <%= (review.rating == '1' ? 'checked' : '') %> />
+                                                            <label for="edit-rate1-<%= review._id %>" tooltip="Terrible">1 star</label>
+                                                            <input type="radio" id="edit-rate2-<%= review._id %>" name="review[rating]" value="2" <%= (review.rating == '2' ? 'checked' : '') %> />
+                                                            <label for="edit-rate2-<%= review._id %>" title="Not good">2 stars</label>
+                                                            <input type="radio" id="edit-rate3-<%= review._id %>" name="review[rating]" value="3" <%= (review.rating == '3' ? 'checked' : '') %> />
+                                                            <label for="edit-rate3-<%= review._id %>" title="Average">3 stars</label>
+                                                            <input type="radio" id="edit-rate4-<%= review._id %>" name="review[rating]" value="4" <%= (review.rating == '4' ? 'checked' : '') %> />
+                                                            <label for="edit-rate4-<%= review._id %>" title="Very good">4 stars</label>
+                                                            <input type="radio" id="edit-rate5-<%= review._id %>" name="review[rating]" value="5" <%= (review.rating == '5' ? 'checked' : '') %> />
+                                                            <label for="edit-rate5-<%= review._id %>" title="Amazing">5 stars</label>
+                                                        </fieldset>
+                                                    </div>
+                                                    <br>
+                                                    <div>
+                                                        <!-- <h5>Comments</h5> -->
+                                                        <label for="comment" class="form-label mt-2">Comment </label>
+                                                        <textarea name="review[comment]" id="comment" maxlength="400" class="form-control" title="Provide your valuable Feedback in range of 400 words" placeholder="Please Provide your valuable Feedback in 400 words (Optional)" cols="30" rows="7" ><%= review.comment %></textarea>
+                                                        <div class="invalid-feedback">Please provide the feedback</div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">BACK</button>
+                                                    <button class="btn btn-outline-success">UPDATE </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- model ends -->
                             </div>
                         </div>
-                        <!-- model ends -->
                     <% } %>
                 </div>
-                
             <% } %>
         </div>
     </div>    

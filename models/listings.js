@@ -47,7 +47,7 @@ const listingSchema = new mongoose.Schema({
             required: true
         }
     ],
-})
+}, { timestamps: true })
 
 listingSchema.post("findOneAndDelete", async(listing)=>{
     if(listing){

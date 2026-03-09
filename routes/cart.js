@@ -5,11 +5,15 @@ const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const {isLoggedIn, isOwner, validateListing} = require("../middleware.js");
 
-router.get("/cart", isLoggedIn, async (req, res, next) => {
+router.get("/cart", async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id).populate("cart.product");
         
-        const cart = user.cart.filter(item => item.product !== null);        
+        const cart = user.cart.filter(item => item.product !== null);   
+        if(cart.lenght === 0) {
+            res.flash("warning", "Please First add a Product to view Cart");
+            res.redirect("/listings");
+        }     
         res.render("cart/index", { cart });
     } catch(err) {
         console.error("GET cart error:", err.message);
@@ -19,7 +23,7 @@ router.get("/cart", isLoggedIn, async (req, res, next) => {
 
 // add item to cart
 
-router.post("/cart/:id", isLoggedIn, async (req, res) => {
+router.post("/cart/:id", async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
         const productId = req.params.id;
@@ -45,7 +49,7 @@ router.post("/cart/:id", isLoggedIn, async (req, res) => {
     }
 });
 
-router.delete("/cart/:id",isLoggedIn ,async(req,res)=>{
+router.delete("/cart/:id",async(req,res)=>{
     await User.findByIdAndUpdate(req.user._id,{
         $pull: {cart: {product: req.params.id}} //remove by product id
     });

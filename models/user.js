@@ -12,6 +12,15 @@ const userSchema = new Schema({
     username:{
        type: String
     },
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+    },
+    role: {
+        type: String,
+        enum: ["Customer", "Owner"],
+        default: "Customer"
+    },
     cart:[
             {
                 product: {
@@ -24,7 +33,7 @@ const userSchema = new Schema({
                 }
             }
         ]
-});
+},{ timestamps: true });
 
 userSchema.plugin(passportLocalMongoose);
 

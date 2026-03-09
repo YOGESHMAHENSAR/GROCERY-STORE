@@ -18,9 +18,9 @@ const initDb = async()=>{
     await User.deleteMany({});
 
     // create a couple of owner users and register them
-    const owner1 = new User({ username: "YOGESH_SINGH", email: "abc@gmail.com" });
+    const owner1 = new User({ username: "YOGESH_SINGH", email: "abc@gmail.com" ,role: "Owner"});
     await User.register(owner1, "1111");
-    const owner2 = new User({ username: "Manish", email: "manish@gmail.com" });
+    const owner2 = new User({ username: "Manish", email: "manish@gmail.com" ,role: "Owner"});
     await User.register(owner2, "1111");
 
     const ownerIds = [owner1._id, owner2._id]; // both will be owners of each listing

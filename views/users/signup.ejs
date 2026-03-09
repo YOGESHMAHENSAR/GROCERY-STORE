@@ -91,20 +91,26 @@
 </body>
 
 <script>
-  document.getElementById("sendotpbtn").addEventListener('click', async ()=>{
+  // in your signup.ejs or boilerplate JS
+document.getElementById("sendotpbtn").addEventListener('click', async () => {
     const email = document.getElementById("email").value;
-    if(!email) {
-      alert("Please enter your E-mail to get OTP");
-      return;
-    }
-    alert("otp sent!");
+    // console.log("email value:", email);         // ← add this
+    // console.log("about to fetch /getotp");      // ← add this
+    
     const response = await fetch('/getotp', {
-      method: "POST",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email})
-    })
-
-    if(response.ok) alert("OTP SENT !");
-    else alert("Failed to sent otp, try again");
-  })
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    
+    // console.log("response status:", response.status);  // ← add this
+    const data = await response.json();
+    // console.log("response data:", data);               // ← add this
+    
+    // if(response.ok) {
+    //     showMsg("success", "OTP Sent!");
+    // } else {
+    //     showMsg("danger", data.message);  // ← show actual error
+    // }
+});
 </script>

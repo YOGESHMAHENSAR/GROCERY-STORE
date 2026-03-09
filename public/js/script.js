@@ -18,18 +18,6 @@
   })
 })()
 
-//script for the review range output
-
-const rangeInput = document.getElementById('rating');
-const rangeOutput = document.getElementById('rangeValue');
-
-if (rangeInput && rangeOutput) {
-  rangeOutput.textContent = rangeInput.value;
-  rangeInput.addEventListener('input', function() {
-    rangeOutput.textContent = this.value;
-  });
-}
-
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form');
   const loaderOverlay = document.getElementById('loaderOverlay');
