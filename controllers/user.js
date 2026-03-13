@@ -1,6 +1,6 @@
 const User = require("../models/user.js");
 const passport = require("passport");
-const mergeGuestCart = require("../utils/mergecart.js");
+// const mergeGuestCart = require("../utils/mergecart.js");
 
 module.exports.signup = async(req,res,next)=>{
     try{
