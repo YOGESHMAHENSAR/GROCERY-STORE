@@ -6,7 +6,10 @@ const userController = require("../controllers/user.js")
 const wrapAsync = require("../utils/wrapAsync.js")
 const passport = require("passport");
 
-const transporter = require("../utils/mailer.js")
+const sendOTP = require('../utils/mailer.js'); // your mailer file
+
+const transporter = require("../utils/mailer.js");
+const { date } = require("joi");
 
 //local auth
 
@@ -16,28 +19,26 @@ router.route("/signup")
     .get(userController.renderSignUpForm)
     .post(wrapAsync(userController.signup));
 
-router.post("/getotp", async(req, res) => {
-    try {
-        console.log("req.body:", req.body);
-        const { email } = req.body;
-        console.log("email:", email);
 
-        const otp = Math.floor(1000 + Math.random() * 9000);
-        req.session.currOtp = otp.toString();
-        req.session.emailOtp = email;
 
-        const info = await transporter.sendMail({
-            from: '"YOGESH SINGH" <yogajm8@gmail.com>',
-            to: email,
-            subject: 'Welcome - GROCERY STORE',
-            html: `<h3>Your OTP for GROCERY STORE is: <b>${otp}</b></h3>`,
-        });
-        console.log("mail sent:", info.response);
-        res.status(200).json({ message: "OTP sent Successfully" });
-    } catch(err) {
-        console.error("sendMail error:", err.message);  // ← now this will print
-        res.status(500).json({ message: err.message });
+router.post('/getotp', async (req, res) => {
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
+
+    const sent = await sendOTP(email, otp);
+
+    if (!sent) {
+        return res.json({ success: false, message: "Failed to send OTP" });
     }
+
+    // store OTP in session
+    req.session.otp = otp;
+    req.session.expiryOtp = Date.now() + 5 * 60 * 1000; //session form for the expiry of otp (time in mili_second)
+    req.session.save((err) =>{
+        if(err) res.json({success: false, message: "ERROR: SESSION ERROR"})
+        else res.json({ success: true, message: "OTP sent successfully"})
+    })
+    req.session.otpEmail = email;
 });
 
 // login for local

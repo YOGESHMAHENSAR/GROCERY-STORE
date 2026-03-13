@@ -6,30 +6,67 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6 offset-2">
-            <div class="card listing-card">
-                <img src="<%= lists.image.url %>" class="card-img-top show-img" style="width: 82%;" alt="listImg">
-                <div class="card-body" style="margin-top: -12px;"><br>
-                    <!-- <p class="card-text"><b>Owned by: <i class="fa-solid fa-chess-king" style="color: gold;"></i> <i><%# lists.owner.username %></b></i><br> -->  
-                    <p class="card-text"><b><i class="fas fa-rupee-sign"></i> : <%= lists.price?.toLocaleString("en-IN") %></b><br></p>
-                        <b>Description :</b> <%= lists.description %> <br><br>
-                        <% if(lists.location) {%>
-                            <div class="row" style="margin-top: -10px;">
-                                <div class="col-10">
-                                    <b>Imported Location [Specialty]:</b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %> 
-                                </div>    
-                            </div>
-                        <% } %>
-                    </p>
+        <div class="col-6 offset-2" style="width: 82%;">
+            <div class="card listing-card" style="border-radius: 15px; padding: 2px;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="<%= lists.image.url %>" class="card-img-top show-img" alt="listImg">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body" style="margin-top: -12px;"><br>
+                            <!-- <p class="card-text"><b>Owned by: <i class="fa-solid fa-chess-king" style="color: gold;"></i> <i><%# lists.owner.username %></b></i><br> -->  
+                            <p class="card-text mt-3"><b><i class="fas fa-rupee-sign"></i> : <%= lists.sellingPrice?.toLocaleString("en-IN") %></b><br></p>
+                                <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <b>Cost-Price: </b> <%= lists.costPrice %> 
+                                        </div>
+                                        <div class="col-md-4">
+                                            <b>Selling-Price: </b> <%= lists.sellingPrice %>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <b>Tax-on-Product: </b> <%= lists.Tax %>
+                                        </div>
+                                    </div>
+                                    <br>
+                                <% } %>
+                                
+                                <b>Description :</b> <%= lists.description %> <br><br>
+                                <% if(lists.location) {%>
+                                    <div class="row" style="margin-top: -10px;">
+                                        <div class="col-10">
+                                            <b>Imported Location [Specialty]:</b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %> 
+                                        </div>    
+                                    </div>
+                                <% } %>
+                                <br>
+                                <br>
+                                <% if(!currUser || !lists.owners.some(o=>o._id.equals(currUser._id))) {%>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <form action="/cart/<%= lists._id %>" method="post">
+                                                <button class="btn btn-outline-primary" style="margin-top: -50px;">
+                                                    <i class="fa-solid fa-cart-shopping"></i>Add To Cart
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <!-- <div class="col-md-6">
+                                            <form action="/cart/<%# cart.product._id %>?_method=PUT" method="POST">
+                                                <input type="hidden" value="plus" name="action">
+                                                <button id="plus" class="btn btn-outline-primary"><i class="fa-solid fa-square-plus" style="font-size: 1.3rem; margin-left: 25px;"></i></button> 
+                                            </form>
+                                            <form action="/cart/<%# cart.product._id %>?_method=PUT" method="POST">
+                                                <input type="hidden" name="action" value="minus">
+                                                <button id="minus" class="btn btn-outline-danger"><i class="fa-solid fa-square-minus" style="font-size: 1.3rem; margin-left: 5px;"></i></button> 
+                                            </form>
+                                        </div> -->
+                                    </div>
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <% if(currUser && !lists.owners.some(o=>o._id.equals(currUser._id))) {%>
-                <form action="/cart/<%= lists._id %>" method="post">
-                    <button class="btn btn-outline-primary">
-                        <i class="fa-solid fa-cart-shopping"></i>Add To Cart
-                    </button>
-                </form>
-            <% } %>
             <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
                 <h6 style="margin-left: 259px;">As owner, cart option <b style="color: red;">not available!</b></h6>
                 <a href="/listings/<%= lists._id %>/edit"><button class="btn btn-outline-dark mb-3" style=" margin-top: -35px;">Edit</button></a>

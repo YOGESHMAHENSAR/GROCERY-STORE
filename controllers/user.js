@@ -1,26 +1,36 @@
 const User = require("../models/user.js");
 const passport = require("passport");
+const mergeGuestCart = require("../utils/mergeCart.js");
 
 module.exports.signup = async(req,res,next)=>{
     try{
         let{username, email,otp, password} = req.body;
 
-        if(otp !== req.session.currOtp || email !== req.session.emailOtp){
+        if(otp != req.session.otp || email !== req.session.otpEmail){
             req.flash("err", "Invalid OTP or E-MAIL");
             return res.redirect("/signup");
         }
+
+        if(Date.now() > req.session.expiryOtp){
+            req.flash("err", `OTP time expires. Send OTP again to SignUp.`);
+            return res.redirect("/signup");
+        }
+
         console.log("user verified");
         let newUser = new User({email, username});
         let registeredUser = await User.register(newUser, password);
         // console.log(registeredUser);
-        req.login(registeredUser,(err)=>{ // for keep login after the signup
+        req.login(registeredUser,async (err)=>{ // for keep login after the signup
             if(err){
                 return next(err);
             }
+            await mergeGuestCart(req);
             req.flash("signup",`Welcome ${req.body.username} to GROCERY-STORE!`);
             res.redirect("/listings");
         })
-        delete req.session.currOtp;
+        delete req.session.otp; // delete the otp saved in the session
+        delete req.session.otpEmail; // delete the saved email in the session
+        delete req.session.expiryOtp; // delete the expiryOtp saved in the session
     }catch(err){
         req.flash("err", err.message);
         res.redirect("/signup");
@@ -39,8 +49,9 @@ module.exports.renderLoginForm = (req,res)=>{
 // local authentication handler
 module.exports.localLogin = [
     passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }),
-    (req, res) => {
+    async (req, res) => {
         try {
+            await mergeGuestCart(req);
             req.flash("login", `Welcome back ${req.user.username} to GROCERY-STORE !`);
             const redirectUrl = res.locals.redirectUrl || "/listings";
             res.redirect(redirectUrl);

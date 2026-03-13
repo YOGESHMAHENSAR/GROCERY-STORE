@@ -1,4 +1,5 @@
 const List = require("../models/listings.js");
+const User = require("../models/user.js");
 const {listingSchema} = require("../schema.js");
 const ExpressError = require("../utils/ExpressError.js");
 
@@ -61,6 +62,12 @@ module.exports.update = async (req,res)=>{
 
 module.exports.show = async (req,res)=>{
     let {id} = req.params;
+    let cart = [];
+    if(req.user){
+        const user = await User.findById(req.user._id).populate("cart.product");
+        cart = user.cart.filter(item => item.product !== null); 
+    }
+    
     let lists = await List.findById(id)
       .populate({path: "reviews",  populate: {path: "author"}})
       .populate("owners");
@@ -68,7 +75,7 @@ module.exports.show = async (req,res)=>{
         req.flash("error", "Product You requested for Does not Exist");
         res.redirect("/listings");
     }else{
-        res.render("listings/show",{lists});
+        res.render("listings/show",{lists, cart});
     }
 }
 

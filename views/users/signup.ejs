@@ -21,6 +21,9 @@
 
         </div>
       </div>
+      <!-- flash msg div start -->
+      <div id="flash-msg" style="display:none;" class="col-8 offset-2 mt-2"></div>
+      <!-- flash msg div ends -->
       <form action="/signup" method="post" class="needs-validation" novalidate>
         <div class="mb-3 mt-3">
           <label class="form-label" for="username">UserName </label
@@ -53,6 +56,15 @@
                 <button class="btn btn-outline-dark" type="button" id="sendotpbtn">
                   Send OTP
                 </button>
+                <!-- span tag for the timer in the btn itself -->
+                <span id="resend-section" style="display:none;">
+                  <span id="countdown" style="color:gray; font-size: 0.9rem;">
+                      Resend in <b id="timer">30</b>s
+                  </span>
+                  <button type="button" id="resendOtpBtn" class="btn btn-sm btn-outline-warning" style="display:none;">
+                      Resend OTP
+                  </button>
+              </span>
               </div>
             </div>
           <div class="invalid-feedback">Please provide the valid E-Mail Id</div>
@@ -85,32 +97,97 @@
           Sign Up
         </button>
       </form>
-      <!-- <a href="/auth/google">signup with google</a> -->
+      <div>
+        <a href="./login?">Already have an Account!</a>
+      </div>
     </div>
   </div>
 </body>
 
 <script>
-  // in your signup.ejs or boilerplate JS
-document.getElementById("sendotpbtn").addEventListener('click', async () => {
-    const email = document.getElementById("email").value;
-    // console.log("email value:", email);         // ← add this
-    // console.log("about to fetch /getotp");      // ← add this
-    
-    const response = await fetch('/getotp', {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-    });
-    
-    // console.log("response status:", response.status);  // ← add this
-    const data = await response.json();
-    // console.log("response data:", data);               // ← add this
-    
-    // if(response.ok) {
-    //     showMsg("success", "OTP Sent!");
-    // } else {
-    //     showMsg("danger", data.message);  // ← show actual error
-    // }
-});
+    // flash message function
+    function showFlash(message, type = "success") {
+        const flash = document.getElementById("flash-msg");
+        flash.style.position = "fixed";  // fixed to screen
+        flash.style.top = "100px";        // below navbar
+        flash.style.right = "10px";       // left corner
+        flash.style.zIndex = "9999";     // above everything
+        flash.style.width = "450px";
+        flash.style.textAlign = "center";
+        flash.style.fontWeight = "500";
+        flash.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        flash.style.display = "block";
+        setTimeout(() => {
+            flash.style.display = "none";
+        }, 5000);
+    }
+
+    // countdown timer function
+    let countdownInterval;
+    function startCountdown() {
+        let seconds = 30;
+        const timerEl     = document.getElementById("timer");
+        const countdownEl = document.getElementById("countdown");
+        const mainBtn = document.getElementById("sendotpbtn");
+        const resendBtn   = document.getElementById("resendOtpBtn");
+        const resendSec   = document.getElementById("resend-section");
+
+        resendSec.style.display   = "inline";
+        countdownEl.style.display = "inline";
+        mainBtn.style.display = "none",
+        resendBtn.style.display   = "none";
+
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            seconds--;
+            timerEl.innerText = seconds;
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                countdownEl.style.display = "none";
+                resendBtn.style.display   = "inline";
+            }
+        }, 1000);// spped of the counter to decrease the 30 sec time
+    }
+
+    // main OTP sender function
+    async function sendOTP() {
+        const email = document.getElementById("email").value;
+        const username = document.querySelector("#username").value;
+
+        if (!username) {
+            showFlash("Please enter your Username to Validate E-Mail", "danger");
+            return;
+        }
+
+        if (!email) {
+            showFlash("Please enter your email first!", "danger");
+            return;
+        }
+
+        const response = await fetch('/getotp', {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showFlash(`OTP sent successfully to your email! <br> E-Mail: <b>${email}</b> ✅`, "success");
+            startCountdown(); // start 30s countdown
+        } else {
+            showFlash(data.message || "Failed to send OTP!", "danger");
+        }
+    }
+
+    // Get OTP button
+    document.getElementById("sendotpbtn").addEventListener('click', sendOTP);
+
+    // Resend OTP button
+    document.getElementById("resendOtpBtn").addEventListener('click', sendOTP);
 </script>

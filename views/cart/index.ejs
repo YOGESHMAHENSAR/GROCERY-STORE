@@ -1,67 +1,144 @@
 <% layout("/layouts/boilerplate") -%>
-<body>
-  <div class="row mt-4">
-    <div class="col-8 offset-2">
-      <h2>My Cart</h2>
-      <br/>
+<!-- CART PAGE HTML -->
+<div class="container py-5">
 
-      <% if(cart.length === 0) { %>
-        <p>Your cart is empty. <a href="/listings">Continue Shopping</a></p>
+    <!-- title -->
+    <h2 class="cart-title">🛒 My Cart</h2>
+    <p class="cart-subtitle"><%= cart.length %> item(s) in your cart</p>
 
-      <% } else { %>
-        <table class="table table-hover table-striped" size="5">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% for(let item of cart) { %>
-                <% if(item.product) {%>
-                    <tr>
-                        <td><%= item.product.title %></td>
-                        <td>₹<%= item.product.price %></td>
-                        <td><%= item.quantity %></td>
-                        <td>₹<%= parseInt(item.product.price) * item.quantity %></td>
-                        <td>
-                            <!-- REMOVE BUTTON GOES HERE -->
-                        <form action="/cart/<%= item.product._id %>?_method=DELETE" method="POST">
-                            <button class="btn btn-danger btn-sm">Remove</button>
-                        </form>
-                        </td>
-                    </tr>
-                <% } %>
-            <% } %>
-          </tbody>
-        </table>
-
-        <!-- cart total -->
-        <h5 class="text-end">
-          Grand Total: ₹
-          <%= cart.reduce((sum, item) => sum + parseInt(item.product.price) * item.quantity, 0) %>
-        </h5>
-
-        <!-- place order button -->
-        <div class="text-end mt-3">
-            <div class="row">
-                <div class="col-md-4 me-5">
-                    <a href="/listings" class="btn btn-outline-dark ">Continue Shopping</a>
-                </div>
-                <div class="col-md-4 me-5">
-                    <form action="/listings/review">
-                        <button class="btn btn-success">Place Order</button>
-                    </form>
-                </div>
-            </div>
+    <% if(cart.length === 0) { %>
+        <div class="empty-cart">
+            <div style="font-size:4rem; margin-bottom:16px;">🛍️</div>
+            <h5 style="color:#374151; font-weight:700;">Your cart is empty</h5>
+            <p style="font-size:0.85rem;">Add some products to get started</p>
+            <a href="/listings" class="btn-continue mt-3 d-inline-block text-decoration-none">Continue Shopping</a>
         </div>
-      <% } %>
-        <!-- <form action="/cart/?_method=DELETE" method="POST">
-            <button class="btn btn-outline-danger">Empty Cart</button>
-        </form> -->
+
+    <% } else { %>
+
+    <!-- table -->
+    <div class="cart-table mb-4">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let item of cart) { %>
+                <tr id="cart-item-<%= item.product._id %>">
+                    <td>
+                        <div class="product-name"><%= item.product.title %></div>
+                        <div class="product-badge">✓ In Stock</div>
+                    </td>
+                    <td>
+                        <span class="price-tag">₹<%= item.product.sellingPrice %></span>
+                    </td>
+                    <td>
+                        <div class="qty-wrapper">
+                            <!-- minus -->
+                            <form action="/cart/<%= item.product._id %>?_method=PUT" method="post" style="margin:0;">
+                                <input type="hidden" name="action" value="minus">
+                                <button type="submit" class="qty-btn qty-btn-minus">
+                                    <i class="fa-solid fa-minus" style="font-size:0.7rem;"></i>
+                                </button>
+                            </form>
+
+                            <span class="qty-number" id="qty-<%= item.product._id %>">
+                                <%= item.quantity %>
+                            </span>
+
+                            <!-- plus -->
+                            <form action="/cart/<%= item.product._id %>?_method=PUT" method="post" style="margin:0;">
+                                <input type="hidden" name="action" value="plus">
+                                <button type="submit" class="qty-btn qty-btn-plus">
+                                    <i class="fa-solid fa-plus" style="font-size:0.7rem;"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="item-total">
+                            ₹<%= parseInt(item.product.sellingPrice) * item.quantity %>
+                        </span>
+                    </td>
+                    <td>
+                        <form action="/cart/<%= item.product._id %>?_method=DELETE" method="post">
+                            <button type="submit" class="remove-btn">
+                                <i class="fa-solid fa-trash-can me-1"></i>Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
     </div>
-  </div>
-</body>
+
+    <!-- bottom row -->
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+
+        <!-- continue shopping -->
+        <a href="/listings" class="text-decoration-none">
+            <button class="btn-continue">
+                <i class="fa-solid fa-arrow-left me-2"></i>Continue Shopping
+            </button>
+        </a>
+
+        <!-- grand total box -->
+        <div class="grand-total-box">
+            <%
+                let subTotal  = cart.reduce((sum, item) => sum + parseInt(item.product.sellingPrice) * item.quantity, 0);
+                let totalTax  = cart.reduce((sum, item) => {
+                    let itemTotal = parseInt(item.product.sellingPrice) * item.quantity;
+                    let taxRate   = parseFloat(item.product.Tax) / 100;
+                    return sum + (itemTotal * taxRate);
+                }, 0);
+                let grandTotal = subTotal + totalTax;
+            %>
+            <div class="grand-total-label">
+                <i class="fa-solid fa-receipt"></i> Grand Total
+            </div>
+            <div class="grand-total-row">
+                <span>Subtotal</span>
+                <span>₹ <%= subTotal %></span>
+            </div>
+            <div class="grand-total-row">
+                <span>Tax</span>
+                <span>₹ <%= totalTax.toFixed(2) %></span>
+            </div>
+            <div class="grand-total-divider"></div>
+            <div class="grand-total-final">
+                ₹ <%= grandTotal.toFixed(2) %>
+            </div>
+            <div class="grand-total-note">Inclusive of all taxes</div>
+        </div>
+
+    </div>
+
+    <!-- place order -->
+    <div class="d-flex justify-content-end mt-4">
+        <!-- <form action="/order" method="post"> -->
+          <!-- <a href="listings/privacy" style="text-decoration: none;"> -->
+            <% if(!currUser) {%>
+                <form action="/login" method="get">
+                    <button type="submit" class="btn-place-order">
+                        <i class="fa-solid fa-bag-shopping me-2"></i>Login to Place Order
+                    </button>
+                </form>
+            <% } %>
+            <% if(currUser) {%>
+                <button type="button" id="pay-btn" class="btn-place-order" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
+                    <i class="fa-solid fa-bag-shopping me-2"></i>Place Order
+                </button>
+            <% } %>
+        <!-- </form> -->
+        <!-- </a> -->
+    </div>
+
+    <% } %>
+</div>

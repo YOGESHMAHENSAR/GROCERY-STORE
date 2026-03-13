@@ -36,3 +36,75 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('Form or loader overlay not found!');
   }
 });
+
+//open the payment model of the razorpay
+document.addEventListener("DOMContentLoaded", ()=>{
+  const btn = document.getElementById("pay-btn")
+  if(!btn) return;
+  const key = btn.getAttribute("data-key");
+  const Total  = document.querySelector(".grand-total-final");
+
+  btn.addEventListener("click", async ()=> {
+    console.log("btn was clicked");
+    const amount = parseFloat(Total.innerText.replace("₹", "").trim());
+
+    //create order on backend
+    const orderRes = await fetch("/create-order",{
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ amount }),
+    })
+
+    const orderData = await orderRes.json();
+
+    if(!orderData.success){
+      alert("Order Creation Failed!");
+      return;
+    }
+
+    //open razorpay popup
+    const options = {
+      key: key,
+      amount: orderData.order.amount,
+      currency: "INR",
+      name: "GROCERY-STORE",
+      description: "ORDER-PAYMENT",
+      image: "/css/grocery-image.png",
+      order_id: orderData.order.id,
+
+      //after successful payement
+
+      handler: async function(response) {
+          const verifyRes  = await fetch('/verify-payment', {
+              method:  "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                  razorpay_order_id:   response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature:  response.razorpay_signature
+              })
+          });
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.success) {
+              window.location.href = "/order-success"; // ✅ redirect
+          } else {
+              alert("Payment verification failed!");
+          }
+      },
+      prefill: {
+          name:  "<%= currUser.username %>",
+          email: "<%= currUser.email %>"
+      },
+
+      theme: { color: "#4f46e5" }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', (response) => {
+        alert("Payment failed: " + response.error.description);
+    });
+
+    rzp.open();
+  })
+});

@@ -15,10 +15,10 @@
     <!-- <button>ADD Listings</button> -->
   </form>
 
-  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
+  <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
     <% for(let list of lists) {%>
         <a href="/listings/<%= list._id %>" class="listing-link">
-            <div class="card col listing-card">
+            <div class="card col listing-card" style="border-radius: 17px;">
                 <!-- <img src="<%# list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
                  <img 
                   src="<%= list.image.url %>?w=600&h=400&c=fill&q=auto&f=auto" 
@@ -27,15 +27,33 @@
                     <%= list.image.url %>?w=600&q=auto&f=auto 600w,
                     <%= list.image.url %>?w=1200&q=auto&f=auto 1200w
                   "
-                  sizes="(max-width: 600px) 300px, (max-width: 1200px) 600px, 1200px"
+                  sizes="(max-width: 600px) 200px, (max-width: 1200px) 600px, 1200px"
                   loading="lazy"
-                  class="card-img-top main_img" style="height: 20rem" alt="..." />
-                <div class="card-img-overlay"></div>
-                <div class="card-body">
+                  class="card-img-top main_img" style="height: 11rem; padding: 2px;" alt="..." />
+                <!-- <div class="card-img-overlay" ></div> -->
+                <div class="card-body ms-2" >
                     <p class="card-text">
-                    <b><%= list.title %></b> <br />
-                    <i class="fas fa-rupee-sign"></i><b> : <%=
-                    list.price?.toLocaleString("en-IN") %> </b>
+                      <b><%= list.title %></b> <br />
+                      <div class="row">
+                        <div class="col-md-6">
+                          <i class="fas fa-rupee-sign"></i><b> : <%=list.sellingPrice?.toLocaleString("en-IN") %> </b>
+                        </div>
+                      </div>
+                      <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
+                          <div class="row mt-3">
+                              <form action="/cart/<%= lists._id %>" method="post">
+                                  <button class="btn btn-outline-warning" tooltip="Add To Cart" style="margin-top: -50px; margin-left: 130px; ">
+                                      <i class="fa-solid fa-cart-shopping"></i>
+                                  </button>
+                              </form>
+                               <!-- <div style="margin-left: 130px; font-size: 14px;margin-top: -20px;">CART<span style="color: red; "><b>*</b></span></div> -->
+                          </div>
+                      <% } %>
+                      <!-- Review show in front only betterment of the UI/UX -->
+                      <!-- <div class="col-md-6">
+                        Rating: <b> : <%#list.reviews.rating %> </b>
+                      </div> -->
+                      
                     </p>
                 </div>
             </div>

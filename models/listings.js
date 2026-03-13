@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Reviews = require("./reviews.js");
-const { ref } = require("joi");
+const { ref, required } = require("joi");
 
 main().then((res)=>console.log("connection successful"))
 .catch((err)=>console.log("ERROR: ",err));
@@ -40,6 +40,18 @@ const listingSchema = new mongoose.Schema({
             ref: "User"
         }
     ],
+    costPrice: {
+        type: String,
+        required: true
+    },
+    sellingPrice: {
+        type: String,
+        required: true
+    },
+    Tax: {
+        type: String,
+        required: true
+    },
     category:[
         {
             type: String,

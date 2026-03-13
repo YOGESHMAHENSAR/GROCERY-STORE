@@ -12,6 +12,7 @@ const listingsRouter = require("./routes/listings.js");
 const reviewsRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/user.js");
 const cartRouter = require("./routes/cart.js");
+const paymentRouter = require("./routes/PAYMENT.JS");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default; // for storing the session info. of the user
@@ -69,7 +70,7 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie:{
         expires: Date.now() + 7*24*60*60*1000,
-        maxAge: 7*24*60*60*1000,
+        maxAge: 24*60*60*1000,
         httpOnly: true
     }
 }
@@ -167,11 +168,13 @@ app.use(async (req,res,next) =>{
 
     //cart middleware
     try {                                                    // ← wrap in try-catch
-        if(req.user) {
+        if (req.user) {
+            // Logged in user — count from DB
             const user = await User.findById(req.user._id);
-            res.locals.cartCount = user ? user.cart.length : 0;  // ← null check on user
+            res.locals.cartCount = user ? user.cart.length : 0;
         } else {
-            res.locals.cartCount = 0;
+            // for Guest — count from session
+            res.locals.cartCount = (req.session.cart || []).length;
         }
     } catch(err) {
         res.locals.cartCount = 0;                           // ← default to 0 on error
@@ -206,6 +209,9 @@ app.use("/", userRouter);
 
 //all cart routes
 app.use("/", cartRouter);
+
+//all payment routes
+app.use("/", paymentRouter);
 
 //not existing routes
 app.all("*any",(req,res,next)=>{

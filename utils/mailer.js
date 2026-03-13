@@ -1,14 +1,32 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.MAILER_MAIL,
-        pass: process.env.MAILER_TOKEN
-    },
-    socketOptions: { family: 4 } //forces for IPv4
-});
+const sendOTP = async (toEmail, otp) => {
+    try {
+        const { error } = await resend.emails.send({
+            from: '"YOGESH SINGH" <onboarding@resend.dev>',  // free tier, no domain needed
+            to: toEmail,
+            subject: `OTP - for SignUp at <b>GROCERY-STORE</b>`,
+            html: `
+                <h2>GROCERY-STORE</h2>
+                <p>Your OTP code is:</p>
+                <h1 style="color: green;">${otp}</h1>
+                <p>This OTP is valid for 5 minutes. <b>Do Not Share</b> with anyone.</p>
+            `
+        });
 
-module.exports = transporter;
+        if (error) {
+            console.error("Resend error:", error);
+            return false;
+        }
+
+        console.log("OTP sent ✅");
+        return true;
+
+    } catch (err) {
+        console.error("sendOTP error:", err.message);
+        return false;
+    }
+};
+
+module.exports = sendOTP;

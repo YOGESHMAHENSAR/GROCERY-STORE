@@ -25,6 +25,7 @@
           <a href="/cart" class="nav-link d-flex align-items-center flex-columns ms-3">
             <i class="fa-solid fa-cart-arrow-down" style="font-size: 1.35rem; color: rgb(149, 62, 241)"></i>
             <span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Cart</span>
+            <strong class="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-primary" style="margin: 5px ;"><%= cartCount %></strong>
             <% if(locals.cartCount > 0) { %>
               <span class="badge bg-danger"><%= cartCount %></span>
             <% } %>

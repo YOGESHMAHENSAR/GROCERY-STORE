@@ -83,23 +83,63 @@
             <div class="invalid-feedback">Please Provide the valid Price</div>
           </div>
         </div>
+        <div class="divider mt-4 mb-3">
+          <span style="margin-left: 330px; color: rgb(137, 132, 132); font-weight: 700; font-size: 20px;"><u>Cost Section</u></span>
+          <!-- <hr> -->
+        </div>
+        <br>
         <div class="row">
           <div class="mb-3 col-md-4">
-            <label class="form-label" for="price">Price </label
+            <label class="form-label" for="price">Cost Price </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
               type="text"
-              id="price"
-              class="form-control"
-              placeholder="Enter price of Product"
               min="0"
-              ;
+              class="form-control"
+              width="50%"
+              value="<%= lists.costPrice %>"
+              placeholder="Enter Cost price of Product"
+              id="costPrice"
+              name="listing[costPrice]"
               oninput="if (this.value < 0) this.value = 0;"
-              value="<%= list.price %>"
-              name="listing[price]"
               required
             />
-            <div class="invalid-feedback">Please provide the valid Price</div>
+            <div class="invalid-feedback">Please Provide the valid Cost Price</div>
+          </div>
+          <div class="mb-3 col-md-4">
+            <label class="form-label" for="price">Tax on Product: </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="text"
+              min="0"
+              class="form-control"
+              width="50%"
+              value="<%= lists.Tax %>"
+              placeholder="Enter price of Tax on Product"
+              id="price"
+              name="listing[Tax]"
+              oninput="if (this.value < 0) this.value = 0;"
+              required
+            />
+            <div class="invalid-feedback">Please Provide the valid Selling Price</div>
+          </div>
+          <div class="mb-3 col-md-4">
+            <label class="form-label" for="price">Selling Price (Display to User) </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="text"
+              min="0"
+              class="form-control"
+              width="50%"
+              value="<%= lists.sellingPrice %>"
+              placeholder="Enter Selling price of Product"
+              id="sellingPrice"
+              name="listing[sellingPrice]"
+              oninput="if (this.value < 0) this.value = 0;"
+              required
+            />
+            <div class="mt-2 ms-3" style="font-size: 13px;">This should include your <b>Profit</b><span style="color: red;">*</span></div>
+            <div class="invalid-feedback">Please Provide the valid Selling Price</div>
           </div>
         </div>
 
