@@ -75,7 +75,7 @@ router.post("/cart/:id", async (req, res) => {
         }
 
         req.flash("success", "Item added to cart!");
-        res.redirect(`/listings/${productId}`);
+        res.redirect(`/listings`);
     } catch (err) {
         console.error("ERROR:", err.message);
         req.flash("error", err.message);

@@ -17,8 +17,8 @@
 
   <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
     <% for(let list of lists) {%>
-        <a href="/listings/<%= list._id %>" class="listing-link">
-            <div class="card col listing-card" style="border-radius: 17px;">
+        <!-- <a href="/listings/<%# list._id %>" class=""> -->
+            <div class="card col listing-card listing-link" style="border-radius: 17px; cursor: pointer;" onclick="window.location='/listings/<%= list._id %>'"">
                 <!-- <img src="<%# list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
                  <img 
                   src="<%= list.image.url %>?w=600&h=400&c=fill&q=auto&f=auto" 
@@ -41,8 +41,8 @@
                       </div>
                       <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
                           <div class="row mt-3">
-                              <form action="/cart/<%= lists._id %>" method="post">
-                                  <button class="btn btn-outline-warning" tooltip="Add To Cart" style="margin-top: -50px; margin-left: 130px; ">
+                              <form action="/cart/<%= list._id %>" method="post">
+                                  <button  class="btn btn-outline-warning" tooltip="Add To Cart" style="margin-top: -50px; margin-left: 130px; ">
                                       <i class="fa-solid fa-cart-shopping"></i>
                                   </button>
                               </form>
@@ -57,7 +57,7 @@
                     </p>
                 </div>
             </div>
-        </a>
+        <!-- </a> -->
     <% } %>
   </div>
 </body>

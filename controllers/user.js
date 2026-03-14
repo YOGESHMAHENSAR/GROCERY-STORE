@@ -1,41 +1,48 @@
 const User = require("../models/user.js");
 const passport = require("passport");
-// const mergeGuestCart = require("../utils/mergecart.js");
+const mergeGuestCart = require("../utils/mergecart.js");
 
-module.exports.signup = async(req,res,next)=>{
-    try{
-        let{username, email,otp, password} = req.body;
+module.exports.signup = async (req, res, next) => {
+    try {
+        let { username, email, otp, password } = req.body;
 
-        if(otp != req.session.otp || email !== req.session.otpEmail){
+        if (otp != req.session.otp || email !== req.session.otpEmail) {
             req.flash("err", "Invalid OTP or E-MAIL");
             return res.redirect("/signup");
         }
 
-        if(Date.now() > req.session.expiryOtp){
+        if (Date.now() > req.session.expiryOtp) {
             req.flash("err", `OTP time expires. Send OTP again to SignUp.`);
             return res.redirect("/signup");
         }
 
-        console.log("user verified");
-        let newUser = new User({email, username});
+        // ✅ Save guest cart BEFORE registering
+        const guestCart = req.session.cart || [];
+
+        let newUser = new User({ email, username });
         let registeredUser = await User.register(newUser, password);
-        // console.log(registeredUser);
-        req.login(registeredUser,async (err)=>{ // for keep login after the signup
-            if(err){
-                return next(err);
-            }
+
+        req.login(registeredUser, async (err) => {
+            if (err) return next(err);
+
+            // ✅ Restore guest cart after passport regenerates session
+            req.session.cart = guestCart;
+
             await mergeGuestCart(req);
-            req.flash("signup",`Welcome ${req.body.username} to GROCERY-STORE!`);
+            req.flash("signup", `Welcome ${username} to GROCERY-STORE!`);
             res.redirect("/listings");
-        })
-        delete req.session.otp; // delete the otp saved in the session
-        delete req.session.otpEmail; // delete the saved email in the session
-        delete req.session.expiryOtp; // delete the expiryOtp saved in the session
-    }catch(err){
+        });
+
+        // ✅ Move these INSIDE req.login or they run before it finishes
+        delete req.session.otp;
+        delete req.session.otpEmail;
+        delete req.session.expiryOtp;
+
+    } catch (err) {
         req.flash("err", err.message);
         res.redirect("/signup");
     }
-}
+};
 
 module.exports.renderSignUpForm = (req,res)=>{
     // res.send("form");
@@ -48,17 +55,27 @@ module.exports.renderLoginForm = (req,res)=>{
 
 // local authentication handler
 module.exports.localLogin = [
-    passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }),
-    async (req, res) => {
-        try {
-            await mergeGuestCart(req);
-            req.flash("login", `Welcome back ${req.user.username} to GROCERY-STORE !`);
-            const redirectUrl = res.locals.redirectUrl || "/listings";
-            res.redirect(redirectUrl);
-        } catch (err) {
-            req.flash("err", err.message);
-            res.redirect("/login");
-        }
+    (req, res, next) => {
+        // ✅ Save guest cart BEFORE passport wipes the session
+        const guestCart = req.session.cart || [];
+        
+        passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }, 
+        async (err, user, info) => {
+            if (err) return next(err);
+            if (!user) return res.redirect("/login");
+            
+            req.login(user, async (err) => {
+                if (err) return next(err);
+                
+                // ✅ Restore guest cart after passport regenerates session
+                req.session.cart = guestCart;
+                
+                await mergeGuestCart(req);
+                req.flash("login", `Welcome back ${req.user.username} to GROCERY-STORE!`);
+                const redirectUrl = res.locals.redirectUrl || "/listings";
+                res.redirect(redirectUrl);
+            });
+        })(req, res, next);
     }
 ];
 
