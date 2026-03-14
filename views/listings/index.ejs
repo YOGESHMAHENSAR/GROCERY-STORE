@@ -18,7 +18,7 @@
   <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
     <% for(let list of lists) {%>
         <!-- <a href="/listings/<%# list._id %>" class=""> -->
-            <div class="card col listing-card listing-link" style="border-radius: 17px; cursor: pointer;" onclick="window.location='/listings/<%= list._id %>'"">
+            <div class="card listing-card listing-link" style="border-radius: 17px; width: 13rem; height: 18rem; margin-left: .5rem; cursor: pointer;" onclick="window.location='/listings/<%= list._id %>'">
                 <!-- <img src="<%# list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
                  <img 
                   src="<%= list.image.url %>?w=600&h=400&c=fill&q=auto&f=auto" 
@@ -29,7 +29,7 @@
                   "
                   sizes="(max-width: 600px) 200px, (max-width: 1200px) 600px, 1200px"
                   loading="lazy"
-                  class="card-img-top main_img" style="height: 11rem; padding: 2px;" alt="..." />
+                  class="card-img-top main_img" style="height: 10rem; padding: 2px;" alt="..." />
                 <!-- <div class="card-img-overlay" ></div> -->
                 <div class="card-body ms-2" >
                     <p class="card-text">
@@ -42,7 +42,8 @@
                       <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
                           <div class="row mt-3">
                               <form action="/cart/<%= list._id %>" method="post">
-                                  <button  class="btn btn-outline-warning" tooltip="Add To Cart" style="margin-top: -50px; margin-left: 130px; ">
+                                  <input type="hidden" name="returnTo" value="/listings?category=<%= category %>">
+                                  <button type="submit" class="btn btn-outline-warning" title="Add To Cart" style="margin-top: -50px; margin-left: 130px; ">
                                       <i class="fa-solid fa-cart-shopping"></i>
                                   </button>
                               </form>

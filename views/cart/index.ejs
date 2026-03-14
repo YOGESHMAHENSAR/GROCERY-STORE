@@ -78,17 +78,20 @@
             </tbody>
         </table>
     </div>
-
     <!-- bottom row -->
-    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
         <!-- continue shopping -->
-        <a href="/listings" class="text-decoration-none">
+        <a href="/listings" class="text-decoration-none" style="margin-left: 5rem;">
             <button class="btn-continue">
                 <i class="fa-solid fa-arrow-left me-2"></i>Continue Shopping
             </button>
         </a>
-
+        <a href="/listings" class="text-decoration-none " >
+            <button class="btn-continue ms-5">
+                <i class="fa-regular fa-truck me-2"></i>Track Placed Orders
+            </button>
+        </a>
         <!-- grand total box -->
         <div class="grand-total-box">
             <%
@@ -117,8 +120,8 @@
             </div>
             <div class="grand-total-note">Inclusive of all taxes</div>
         </div>
-
     </div>
+   
 
     <!-- place order -->
     <div class="d-flex justify-content-end mt-4">
@@ -130,11 +133,24 @@
                         <i class="fa-solid fa-bag-shopping me-2"></i>Login to Place Order
                     </button>
                 </form>
-            <% } %>
-            <% if(currUser) {%>
-                <button type="button" id="pay-btn" class="btn-place-order" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
-                    <i class="fa-solid fa-bag-shopping me-2"></i>Place Order
-                </button>
+            <% } else { %>
+                <% 
+                    const hasAddress = currentUser && 
+                        currentUser.address && 
+                        currentUser.address.city && 
+                        currentUser.address.street && 
+                        currentUser.address.pincode
+                %>
+                 <p class="mt-2 me-3 d-inline">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
+                <% if(hasAddress) {%>
+                    <button type="button" id="pay-btn" class="btn-place-order" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
+                        <i class="fa-solid fa-bag-shopping me-2"></i>Place Order
+                    </button>
+                <% } else {%>
+                    <a href="/profile/address" class="btn btn-place-order" style="text-decoration: none;">
+                        <i class="fa-solid fa-bag-shopping me-2"></i>Add Address to Place Order
+                    </a>
+                <% } %>
             <% } %>
         <!-- </form> -->
         <!-- </a> -->

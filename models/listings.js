@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Reviews = require("./reviews.js");
-const { ref, required } = require("joi");
 
 main().then((res)=>console.log("connection successful"))
 .catch((err)=>console.log("ERROR: ",err));

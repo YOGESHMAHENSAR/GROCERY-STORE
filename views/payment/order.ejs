@@ -1,0 +1,58 @@
+<%- layout("/layouts/boilerplate") -%>
+<div style="max-width: 800px; margin: 2rem auto; padding: 0 1rem;">
+    <h3 class="mb-4">My Orders</h3>
+
+    <% if(orders.length === 0) { %>
+        <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 16px;">
+            <p style="color: #6b7280;">No orders placed yet!</p>
+            <a href="/listings" class="btn btn-success">Start Shopping</a>
+        </div>
+    <% } %>
+
+    <% for(let order of orders) { %>
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <div>
+                    <p style="margin: 0; font-size: 13px; color: #6b7280;">Order ID</p>
+                    <p style="margin: 0; font-weight: 500; font-size: 14px;"><%= order.orderId %></p>
+                </div>
+                <div>
+                    <p style="margin: 0; font-size: 13px; color: #6b7280;">Date</p>
+                    <p style="margin: 0; font-size: 14px;">
+                        <%= order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : 'N/A' %>
+                    </p>
+                </div>
+                <div>
+                    <!-- ✅ Status badge color based on status -->
+                    <% const statusColor = {
+                        Confirmed: "#dbeafe",
+                        Shipped: "#fef9c3",
+                        Delivered: "#dcfce7",
+                    } %>
+                    <span style="font-size: 12px; padding: 4px 12px; border-radius: 20px; background: '<%= statusColor[order.status] %>';">
+                        <%= order.status %>
+                    </span>
+                </div>
+                <div>
+                    <p style="margin: 0; font-size: 13px; color: #6b7280;">Total</p>
+                    <p style="margin: 0; font-weight: 600;">₹<%= order.totalAmount.toLocaleString("en-IN") %></p>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                <% for(let item of order.items) { %>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px;">
+                        <img src="<%= item.product.image.url %>" 
+                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" alt="">
+                        <div>
+                            <p style="margin: 0; font-size: 14px;"><%= item.product.title %></p>
+                            <p style="margin: 0; font-size: 13px; color: #6b7280;">Qty: <%= item.quantity %> × ₹<%= item.price.toLocaleString("en-IN") %></p>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+        </div>
+    <% } %>
+</div>

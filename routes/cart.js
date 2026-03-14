@@ -7,10 +7,11 @@ const router = express.Router();
 router.get("/cart", async (req, res, next) => {
     try {
         let cart = [];
-
+        let currentUser = "";
         if (req.user) {
             const user = await User.findById(req.user._id).populate("cart.product");
             cart = user.cart.filter(item => item.product !== null);
+            currentUser = user; 
         } else {
             const sessionCart = req.session.cart || [];
             console.log("Guest session cart:", sessionCart);
@@ -27,11 +28,11 @@ router.get("/cart", async (req, res, next) => {
         }
 
         if (cart.length === 0) {
-            req.flash("warning", "Please first add a product to view cart!");
+            req.flash("warning", "Please Add a product to view cart!");
             return res.redirect("/listings");
         }
 
-        res.render("cart/index", { cart });
+        res.render("cart/index", { cart, currentUser });
     } catch (err) {
         next(err);
     }
@@ -40,6 +41,7 @@ router.get("/cart", async (req, res, next) => {
 // ─── ADD TO CART ──────────────────────────────────────────────
 router.post("/cart/:id", async (req, res) => {
     const productId = req.params.id;
+    const returnTo = req.body.returnTo || "/listings";
     try {
         if (req.user) {
             // ✅ Logged in — save to DB
@@ -75,7 +77,7 @@ router.post("/cart/:id", async (req, res) => {
         }
 
         req.flash("success", "Item added to cart!");
-        res.redirect(`/listings`);
+        res.redirect(returnTo);
     } catch (err) {
         console.error("ERROR:", err.message);
         req.flash("error", err.message);

@@ -15,14 +15,31 @@ const razorpay = new Razorpay({
 })
 
 //Add order success page
-router.get('/order-success', async(req, res) => {
-    try{
-        const order = await User.findOne({user: req.user._id}).
-                    sort({createdAt: -1}).populate("items.product");
-        res.render('payment/order-success', {order});
-    }
-    catch(err){
-        res.redirect("/listings")
+router.get('/order-success', isLoggedIn, async (req, res) => {
+    try {
+        const orderId = req.session.lastOrderId;
+        console.log("lastOrderId from session:", orderId); // debug
+
+        if (!orderId) {
+            req.flash("error", "No recent order found!");
+            return res.redirect("/listings");
+        }
+
+        const order = await Order.findById(orderId).populate("items.product");
+        console.log("order found:", order); // debug
+
+        if (!order) {
+            req.flash("error", "Order not found!");
+            return res.redirect("/listings");
+        }
+
+        // ✅ Clear session after using it
+        delete req.session.lastOrderId;
+
+        res.render('payment/order-success', { order });
+    } catch (err) {
+        console.error("Order success error:", err.message);
+        res.redirect("/listings");
     }
 });
 
@@ -82,7 +99,13 @@ router.post("/verify-payment", async(req,res)=>{
         await order.save();
         await User.findByIdAndUpdate(req.user._id, {cart: []});
 
-        res.json({success: true, message: "Payement Verified!"});
+        req.session.lastOrderId = order._id.toString();
+        await new Promise((resolve, reject) => {
+            req.session.save(err => err ? reject(err) : resolve());
+        });
+
+        res.json({ success: true, message: "Payment Verified!" });
+
 
     }catch(err){
         res.json({success: false, message: err.message});
@@ -95,7 +118,7 @@ router.get("/orders", async (req, res) => {
         const orders = await Order.find({ user: req.user._id })
             .sort({ createdAt: -1 }) // ✅ newest first
             .populate("items.product");
-        res.render("2/orders", { orders });
+        res.render("payment/order", { orders });
     } catch (err) {
         res.redirect("/listings");
     }

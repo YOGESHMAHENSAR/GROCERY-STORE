@@ -7,7 +7,7 @@ module.exports.isLoggedIn = (req,res,next)=>{
     // console.log(req);
     if(!req.isAuthenticated()){
         req.session.redirectUrl = req.originalUrl;
-        req.flash("err", "PLease login to make a new Listing");
+        req.flash("err", "PLease login to make to Place order");
         return res.redirect("/login");
     }
     next();
@@ -58,6 +58,17 @@ module.exports.isReviewOwner = async (req,res,next)=>{
     if(!review.author.equals(res.locals.currUser._id)){
         req.flash("error", "You Are not the author of this comment.");
         return res.redirect(`/listings/${id}`); //takes you to the same page which shows edit button
+    }
+    next();
+}
+
+//is owner role means => user not allowed to do tasks of the owner of the website
+
+module.exports.isOwnerRole = async(req,res,next)=>{
+    const isowner = List.owners && List.owners.some(o => o.equals(res.locals.currUser._id));
+    if(res.locals.currUser && !isowner){
+        req.flash("error", "You don't have permission to access this page!");
+        return res.redirect("/listings");
     }
     next();
 }

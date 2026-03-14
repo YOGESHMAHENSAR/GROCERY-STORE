@@ -12,6 +12,24 @@ const userSchema = new Schema({
     username:{
        type: String
     },
+    address:{
+        street:{
+            type: String,
+            default: ""
+        },
+        city:{
+            type: String,
+            default: ""
+        },
+        state: {
+            type: String,
+            default: ""
+        }, 
+        pincode: {
+            type: Number,
+            default: ""
+        }
+    },
     createdAt: {
         type: Date,
         default: Date.now(),

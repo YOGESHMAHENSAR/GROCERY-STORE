@@ -51,6 +51,7 @@
                   placeholder="Enter the E-Mail Id here"
                   required
                 />
+                <div class="invalid-feedback">Please Enter your E-mail</div>
               </div>
               <div class="col-md-4" style="margin-top: 32px;">
                 <button class="btn btn-outline-dark" type="button" id="sendotpbtn">
@@ -75,6 +76,35 @@
           <input type="text" class="form-control" name="otp" placeholder="PLease Enter OTP here" required>
           <div class="invalid-feedback">Please Provide the OTP for Vlidation of E-Mail</div>
         </div>
+        <!-- <%# if(! currUser.address) {%> -->
+          <div class="mb-3">
+              <label class="form-label">Street Address</label>
+              <input type="text" name="street" class="form-control" 
+                   placeholder="Enter Street Address (Optional)">
+              <div class="invalid-feedback">Please enter street address</div>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">City</label>
+              <input type="text" name="city" class="form-control"
+                    placeholder="Enter City Name (Optional)">
+              <div class="invalid-feedback">Please enter city</div>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">State</label>
+              
+              <input type="text" name="state" class="form-control"
+                   placeholder="Enter State Name (Optional)">
+              <div class="invalid-feedback">Please enter state</div>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Pincode</label>
+              <span> <b style="color: red"> *</b> : </span>
+              <input type="text" name="pincode" class="form-control" 
+                  pattern="[0-9]{6}" maxlength="6"
+                   required>
+              <div class="invalid-feedback">Please enter valid 6-digit pincode</div>
+          </div>
+        <%# } %>
         <div class="mb-3">
           <label class="form-label" for="password">Password : </label>
           <span> <b style="color: red"> *</b> : </span>
@@ -90,16 +120,19 @@
           <div class="invalid-feedback">Please provide the password</div>
         </div>
         <br /><br />
-        <button
-          type="submit"
-          class="btn btn-outline-success mb-5 col-6 offset-3"
-        >
-          Sign Up
-        </button>
+        <div class="d-flex justify-content-center">
+          <button
+              type="submit"
+              class="btn btn-outline-success mb-5 col-6 "
+              style="width: 13rem;"
+            >
+              Sign Up
+          </button>
+          <button class="btn btn-outline-warning mb-5 col-6 offset-1">
+            <a href="./login?" style="text-decoration: none; color: black;">Already have an Account!</a>
+          </button>
+        </div>
       </form>
-      <div>
-        <a href="./login?">Already have an Account!</a>
-      </div>
     </div>
   </div>
 </body>

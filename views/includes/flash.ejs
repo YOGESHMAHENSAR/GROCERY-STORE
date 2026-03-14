@@ -69,3 +69,11 @@
     <i class="fa-solid fa-check mt-1 me-1"></i><%= login %> 
   </div>
 <% } %>
+
+<!-- flash msg for Warning  -->
+<% if(warning && warning.length){ %>
+  <div class="flash-msg d-flex justify-content-end alert alert-danger position-fixed top-0 end-0 m-3 shadow"
+  style="font-weight: 700; text-align: center; color: white; background-color: rgb(189, 162, 5); z-index: 1050;">
+    <i class="fa-solid fa-check mt-1 me-1"></i><%= warning %> 
+  </div>
+<% } %>

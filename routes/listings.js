@@ -2,7 +2,7 @@ const express = require("express");
 const List = require("../models/listings.js");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const {isLoggedIn, isOwner, validateListing} = require("../middleware.js");
+const {isLoggedIn,isOwnerRole, isOwner, validateListing} = require("../middleware.js");
 const listingController = require("../controllers/listings.js")
 
 const multer = require("multer");
@@ -14,13 +14,14 @@ const upload = multer({storage});
 
 router.route("/")
     .get(wrapAsync(listingController.index)) //show all listing
-    .post(isLoggedIn,validateListing,upload.single("listing[image]") ,wrapAsync(listingController.validate)) //new field route post req
+    .post(isOwnerRole, isLoggedIn,validateListing,upload.single("listing[image]") ,wrapAsync(listingController.validate)) //new field route post req
 
 //PROFILE
 router.get("/profile",isLoggedIn,(req,res)=>{
     const user = req.user.username;
     const mail = req.user.email;
-    res.render("listings/profile", {user,mail});
+    const add = req.user.address
+    res.render("listings/profile", {user,mail, add});
 })
 
 router.get("/:id/cart",async (req,res)=>{
@@ -35,7 +36,7 @@ router.get("/:id/cart",async (req,res)=>{
 })
 
 //NEW FIELD ROUTE
-router.get("/new",isLoggedIn,(req,res)=>{
+router.get("/new", isOwnerRole,isLoggedIn,(req,res)=>{
     res.render("listings/new");
 })
 
@@ -54,11 +55,11 @@ router.get("/details",(req,res)=>{
 })
 
 //EDIT
-router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm))
+router.get("/:id/edit",isOwnerRole,isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm))
 
 router.route("/:id")
-    .put(isLoggedIn,isOwner,validateListing,upload.single("listing[image]") ,wrapAsync(listingController.update)) // update route
+    .put(isOwnerRole,isLoggedIn,isOwner,validateListing,upload.single("listing[image]") ,wrapAsync(listingController.update)) // update route
     .get(wrapAsync(listingController.show))// SHOW INTERNAL LISTING INFORMATION
-    .delete(isLoggedIn,isOwner,wrapAsync(listingController.delete))// Deleting listing
+    .delete(isOwnerRole,isLoggedIn,isOwner,wrapAsync(listingController.delete))// Deleting listing
 
 module.exports = router;
