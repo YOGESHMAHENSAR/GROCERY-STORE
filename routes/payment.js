@@ -1,5 +1,3 @@
-import orders from "razorpay/dist/types/orders.js";
-
 const express = require("express");
 const List = require("../models/listings.js");
 const User = require("../models/user.js");
@@ -97,7 +95,7 @@ router.get("/orders", async (req, res) => {
         const orders = await Order.find({ user: req.user._id })
             .sort({ createdAt: -1 }) // ✅ newest first
             .populate("items.product");
-        res.render("payment/orders", { orders });
+        res.render("2/orders", { orders });
     } catch (err) {
         res.redirect("/listings");
     }
