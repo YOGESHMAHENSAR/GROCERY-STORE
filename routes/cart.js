@@ -27,10 +27,10 @@ router.get("/cart", async (req, res, next) => {
             }
         }
 
-        if (cart.length === 0) {
-            req.flash("warning", "Please Add a product to view cart!");
-            return res.redirect("/listings");
-        }
+        // if (cart.length === 0) {
+        //     req.flash("warning", "Please Add a product to view cart!");
+        //     return res.redirect("/listings");
+        // }
 
         res.render("cart/index", { cart, currentUser });
     } catch (err) {
@@ -73,10 +73,10 @@ router.post("/cart/:id", async (req, res) => {
                 req.session.save(err => err ? reject(err) : resolve());
             });
 
-            console.log("Guest cart saved:", req.session.cart);
+            // console.log("Guest cart saved:", req.session.cart);
         }
 
-        req.flash("success", "Item added to cart!");
+        req.flash("login", "Item added to cart!");
         res.redirect(returnTo);
     } catch (err) {
         console.error("ERROR:", err.message);

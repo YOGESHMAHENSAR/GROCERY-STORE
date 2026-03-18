@@ -61,8 +61,14 @@ module.exports.localLogin = [
         
         passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }, 
         async (err, user, info) => {
-            if (err) return next(err);
-            if (!user) return res.redirect("/login");
+            if (err) {
+                // req.flash("error",err.message);
+                return next(err);
+            }
+            if (!user) {
+                req.flash("error", info?.message);
+                return res.redirect("/login");
+            }
             
             req.login(user, async (err) => {
                 if (err) return next(err);

@@ -36,7 +36,7 @@ router.get("/:id/cart",async (req,res)=>{
 })
 
 //NEW FIELD ROUTE
-router.get("/new", isOwnerRole,isLoggedIn,(req,res)=>{
+router.get("/new",isLoggedIn,(req,res)=>{
     res.render("listings/new");
 })
 

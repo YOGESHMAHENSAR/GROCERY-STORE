@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Reviews = require("./reviews.js");
 
-main().then((res)=>console.log("connection successful"))
+main().then()
 .catch((err)=>console.log("ERROR: ",err));
 
 async function main(){

@@ -47,8 +47,8 @@ main().then((res)=>{
 
 async function main(){
     await mongoose.connect(dbUrl);
-    console.log("Database Host:", mongoose.connection.host); 
-    console.log("Database Name:", mongoose.connection.name);
+    // console.log("Database Host:", mongoose.connection.host); 
+    // console.log("Database Name:", mongoose.connection.name);
 }
 
 const store = MongoStore.create({
@@ -144,7 +144,7 @@ console.log("session in strategy:", req.session);
             }
         }
     ));
-    console.log("GoogleStrategy registered");
+    // console.log("GoogleStrategy registered");
 } else {
     console.warn("GoogleStrategy not registered: missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET");
 }

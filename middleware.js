@@ -65,10 +65,29 @@ module.exports.isReviewOwner = async (req,res,next)=>{
 //is owner role means => user not allowed to do tasks of the owner of the website
 
 module.exports.isOwnerRole = async(req,res,next)=>{
-    const isowner = List.owners && List.owners.some(o => o.equals(res.locals.currUser._id));
-    if(res.locals.currUser && !isowner){
+    let { id } = req.params;
+    const listing = await List.findById(id);
+    const isowner = listing.owners && listing.owners.some(o => o.equals(res.locals.currUser._id));
+    if(!isowner){
         req.flash("error", "You don't have permission to access this page!");
         return res.redirect("/listings");
     }
     next();
+}
+
+module.exports.isAnyOwner = async(req,res,next)=>{
+    try{
+        const list = await List.findOne({
+            owners: res.locals.currUser._id
+        });
+
+        if(!list){
+            req.flash("error","You don't have permission to access this page!");
+            return res.redirect("/listings");
+        }
+        next();
+    }catch(err){
+        req.flash("error", "Something went wrong.");
+        return res.redirect("/listings");
+    }
 }

@@ -87,7 +87,7 @@
                 <i class="fa-solid fa-arrow-left me-2"></i>Continue Shopping
             </button>
         </a>
-        <a href="/listings" class="text-decoration-none " >
+        <a href="/orders" class="text-decoration-none " >
             <button class="btn-continue ms-5">
                 <i class="fa-regular fa-truck me-2"></i>Track Placed Orders
             </button>
@@ -114,9 +114,13 @@
                 <span>Tax</span>
                 <span>₹ <%= totalTax.toFixed(2) %></span>
             </div>
+            <div class="grand-total-row">
+                <span>Platform Fee</span>
+                <span>₹ 10</span>
+            </div>
             <div class="grand-total-divider"></div>
             <div class="grand-total-final">
-                ₹ <%= grandTotal.toFixed(2) %>
+                ₹ <%= (grandTotal + 10).toFixed(2) %>
             </div>
             <div class="grand-total-note">Inclusive of all taxes</div>
         </div>
