@@ -4,7 +4,7 @@ const User = require("../models/user.js");
 const Order = require("../models/order.js");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const {isLoggedIn} = require("../middleware.js");
+const {isLoggedIn, isAnyOwner} = require("../middleware.js");
 
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
@@ -119,6 +119,22 @@ router.get("/orders", async (req, res) => {
             .sort({ createdAt: -1 }) // ✅ newest first
             .populate("items.product");
         res.render("payment/order", { orders });
+    } catch (err) {
+        res.redirect("/listings");
+    }
+});
+
+//order page route for the owner so that he can deliver the order and mark it as done.
+router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
+    try {
+        const orders = await Order.find()
+            .sort({ createdAt: -1 }) // ✅ newest first
+            .populate({
+                path: "items.product",
+                match: {_id: {$exists: true}}
+            })
+            .populate("user", "username email ")
+        res.render("payment/order-delivery", { orders });
     } catch (err) {
         res.redirect("/listings");
     }
