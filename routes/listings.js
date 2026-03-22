@@ -2,7 +2,7 @@ const express = require("express");
 const List = require("../models/listings.js");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const {isLoggedIn,isOwnerRole, isOwner, validateListing} = require("../middleware.js");
+const {isLoggedIn,isOwnerRole, isOwner, validateListing, isAnyOwner} = require("../middleware.js");
 const listingController = require("../controllers/listings.js")
 
 const multer = require("multer");
@@ -14,7 +14,7 @@ const upload = multer({storage});
 
 router.route("/")
     .get(wrapAsync(listingController.index)) //show all listing
-    .post(isOwnerRole, isLoggedIn,validateListing,upload.single("listing[image]") ,wrapAsync(listingController.validate)) //new field route post req
+    .post(isLoggedIn,validateListing,upload.single("listing[image]") ,wrapAsync(listingController.validate)) //new field route post req
 
 //PROFILE
 router.get("/profile",isLoggedIn,(req,res)=>{
@@ -36,7 +36,7 @@ router.get("/:id/cart",async (req,res)=>{
 })
 
 //NEW FIELD ROUTE
-router.get("/new",isLoggedIn,(req,res)=>{
+router.get("/new",isLoggedIn,isAnyOwner, (req,res)=>{
     res.render("listings/new");
 })
 

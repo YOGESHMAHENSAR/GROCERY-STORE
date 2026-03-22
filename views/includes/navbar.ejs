@@ -9,8 +9,8 @@
         <a class="nav-link <%= !category ? 'active' : '' %> d-flex flex-columns align-items-center"  aria-current="page" href="/listings">
           <i class="fa-solid fa-house" style="font-size: 1.35rem; color: rgb(185, 86, 86)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Home</span>
         </a>
-        <a class="nav-link <%= !category === 'Normal' ? 'active' : '' %> d-flex flex-columns align-items-center"  aria-current="page" href="/listings?category=Normal">
-          <i class="fa-solid fa-bag-shopping" style="font-size: 1.35rem; color: rgb(223, 112, 146)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">General</span>
+        <a class="nav-link <%= !category === 'Grocery' ? 'active' : '' %> d-flex flex-columns align-items-center"  aria-current="page" href="/listings?category=Grocery">
+          <i class="fa-solid fa-bag-shopping" style="font-size: 1.35rem; color: rgb(223, 112, 146)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Grocery</span>
         </a>
         <a class="nav-link <%= category === 'Beverages' ? 'active' : '' %> d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings?category=Beverages">
           <i class="fa-solid fa-bread-slice" style="font-size: 1.35rem; color: rgb(229, 140, 45)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Beverages</span>

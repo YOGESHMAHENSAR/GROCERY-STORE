@@ -10,7 +10,7 @@ router.get("/cart", async (req, res, next) => {
         let currentUser = "";
         if (req.user) {
             const user = await User.findById(req.user._id).populate("cart.product");
-            cart = user.cart.filter(item => item.product !== null);
+            cart = user.cart.filter(item => item.product !== null).reverse();
             currentUser = user; 
         } else {
             const sessionCart = req.session.cart || [];
@@ -76,6 +76,11 @@ router.post("/cart/:id", async (req, res) => {
             // console.log("Guest cart saved:", req.session.cart);
         }
 
+        if(!req.session.addedToCart) req.session.addedToCart = [];
+        if(!req.session.addedToCart.includes(productId)){
+            req.session.addedToCart.push(productId);
+        }
+
         req.flash("login", "Item added to cart!");
         res.redirect(returnTo);
     } catch (err) {
@@ -86,74 +91,101 @@ router.post("/cart/:id", async (req, res) => {
 });
 
 // ─── INCREMENT / DECREMENT ────────────────────────────────────
-router.put("/cart/:id", async (req, res) => {
+// router.put("/cart/:id", async (req, res) => {
+//     const productId = req.params.id;
+//     try {
+//         const { action } = req.body;
+
+//         if (req.user) {
+//             // ✅ Logged in
+//             const user = await User.findById(req.user._id);
+//             const cartItem = user.cart.find(item =>
+//                 item.product.toString() === productId
+//             );
+
+//             if (!cartItem) {
+//                 req.flash("error", "Item not found in cart!");
+//                 return res.redirect("/cart");
+//             }
+
+//             if (action === "plus") {
+//                 cartItem.quantity++;
+//             } else if (action === "minus") {
+//                 if (cartItem.quantity <= 1) {
+//                     user.cart = user.cart.filter(item =>
+//                         item._id.toString() !== cartItem._id.toString()
+//                     );
+//                     req.flash("warning", "Item removed from cart!");
+//                     await user.save();
+//                     return res.redirect("/cart");
+//                 } else {
+//                     cartItem.quantity--;
+//                 }
+//             }
+//             await user.save();
+//         } else {
+//             // ✅ Guest
+//             if (!req.session.cart) return res.redirect("/cart");
+
+//             const existingItem = req.session.cart.find(
+//                 item => item.product === productId
+//             );
+
+//             if (!existingItem) {
+//                 req.flash("error", "Item not found in cart!");
+//                 return res.redirect("/cart");
+//             }
+
+//             if (action === "plus") {
+//                 existingItem.quantity++;
+//             } else if (action === "minus") {
+//                 if (existingItem.quantity <= 1) {
+//                     req.session.cart = req.session.cart.filter(
+//                         item => item.product !== productId
+//                     );
+//                     req.flash("warning", "Item removed from cart!");
+//                 } else {
+//                     existingItem.quantity--;
+//                 }
+//             }
+
+//             await new Promise((resolve, reject) => {
+//                 req.session.save(err => err ? reject(err) : resolve());
+//             });
+//         }
+
+//         res.redirect("/cart");
+//     } catch (err) {
+//         console.error("ERROR:", err.message);
+//         req.flash("error", err.message);
+//         res.redirect("/cart");
+//     }
+// });
+
+router.patch("/cart/:id/quantity", async (req, res) => {
     const productId = req.params.id;
+    const { quantity } = req.body;
+
+    if (quantity < 1 || quantity > 3) {
+        return res.json({ success: false, message: "Invalid quantity" });
+    }
+
     try {
-        const { action } = req.body;
-
         if (req.user) {
-            // ✅ Logged in
             const user = await User.findById(req.user._id);
-            const cartItem = user.cart.find(item =>
-                item.product.toString() === productId
-            );
-
-            if (!cartItem) {
-                req.flash("error", "Item not found in cart!");
-                return res.redirect("/cart");
-            }
-
-            if (action === "plus") {
-                cartItem.quantity++;
-            } else if (action === "minus") {
-                if (cartItem.quantity <= 1) {
-                    user.cart = user.cart.filter(item =>
-                        item._id.toString() !== cartItem._id.toString()
-                    );
-                    req.flash("warning", "Item removed from cart!");
-                    await user.save();
-                    return res.redirect("/cart");
-                } else {
-                    cartItem.quantity--;
-                }
-            }
+            const item = user.cart.find(i => i.product.toString() === productId);
+            if (item) item.quantity = quantity;
             await user.save();
         } else {
-            // ✅ Guest
-            if (!req.session.cart) return res.redirect("/cart");
-
-            const existingItem = req.session.cart.find(
-                item => item.product === productId
-            );
-
-            if (!existingItem) {
-                req.flash("error", "Item not found in cart!");
-                return res.redirect("/cart");
-            }
-
-            if (action === "plus") {
-                existingItem.quantity++;
-            } else if (action === "minus") {
-                if (existingItem.quantity <= 1) {
-                    req.session.cart = req.session.cart.filter(
-                        item => item.product !== productId
-                    );
-                    req.flash("warning", "Item removed from cart!");
-                } else {
-                    existingItem.quantity--;
-                }
-            }
-
+            const item = req.session.cart?.find(i => i.product === productId);
+            if (item) item.quantity = quantity;
             await new Promise((resolve, reject) => {
                 req.session.save(err => err ? reject(err) : resolve());
             });
         }
-
-        res.redirect("/cart");
-    } catch (err) {
-        console.error("ERROR:", err.message);
-        req.flash("error", err.message);
-        res.redirect("/cart");
+        res.json({ success: true });
+    } catch(err) {
+        res.json({ success: false, message: err.message });
     }
 });
 
@@ -176,7 +208,11 @@ router.delete("/cart/:id", async (req, res) => {
             });
         }
 
-        req.flash("success", "Item removed from cart!");
+        if(req.session.addedToCart){
+            req.session.addedToCart = req.session.addedToCart.filter(id => id!==productId);
+        }
+
+        req.flash("login", "Item removed from cart!");
         res.redirect("/cart");
     } catch (err) {
         console.error("ERROR:", err.message);

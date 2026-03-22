@@ -13,6 +13,8 @@
   "author": "yogesh_bhaiyaa_bolo",
   "license": "ISC",
   "dependencies": {
+    "@mapbox/mapbox-sdk": "^0.16.2",
+    "axios": "^1.13.6",
     "cloudinary": "^2.9.0",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^6.0.0",

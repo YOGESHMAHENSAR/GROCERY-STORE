@@ -108,3 +108,24 @@ document.addEventListener("DOMContentLoaded", ()=>{
     rzp.open();
   })
 });
+
+
+//for tax prefitted in the select box of the category
+    const categoryTax = {
+      "Beverages": 12,
+      "Snacks": 18,
+      "Dairy": 2,
+      "Grocery": 5
+    }
+
+    function setTax(category){
+      const tax = categoryTax[category];// selects the category and have the tax value
+      document.getElementById("taxField").value = tax; //update tax value as the category is selected.
+    }
+
+    // to make it loaded on the edit page automatically;
+
+    document.addEventListener("DOMContentLoaded",()=>{
+      const category = document.getElementById("taxFiled").value;
+      if(category) setTax(category);
+    })

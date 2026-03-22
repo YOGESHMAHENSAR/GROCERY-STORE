@@ -12,7 +12,7 @@
                     <div class="col-md-6">
                         <img src="<%= lists.image.url %>" class="card-img-top show-img" alt="listImg">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" >
                         <div class="card-body" style="margin-top: -12px;"><br>
                             <!-- <p class="card-text"><b>Owned by: <i class="fa-solid fa-chess-king" style="color: gold;"></i> <i><%# lists.owner.username %></b></i><br> -->  
                             <p class="card-text mt-3"><b><i class="fas fa-rupee-sign"></i> : <%= lists.sellingPrice?.toLocaleString("en-IN") %></b><br></p>
@@ -22,20 +22,25 @@
                                             <b>Cost-Price: </b> <%= lists.costPrice %> 
                                         </div>
                                         <div class="col-md-4">
-                                            <b>Selling-Price: </b> <%= lists.sellingPrice %>
+                                            <b>Profit Margin : </b> <%= lists.margin %>%
                                         </div>
                                         <div class="col-md-4">
-                                            <b>Tax-on-Product: </b> <%= lists.Tax %>
+                                            <b>Tax: </b> <%= lists.Tax %>%
+                                        </div>
+                                        <%# lists.sellingPrice = (lists.costPrice * (1+ lists.margin)) * (1+ lists.Tax) %>
+                                        <div class="col-md-4">
+                                            <b>Selling-Price: </b> <%= lists.sellingPrice %>
                                         </div>
                                     </div>
                                     <br>
                                 <% } %>
                                 
                                 <b>Description :</b> <%= lists.description %> <br><br>
+                                <b>Category :</b> <%= lists.category %> <br><br>
                                 <% if(lists.location) {%>
                                     <div class="row" style="margin-top: -10px;">
                                         <div class="col-10">
-                                            <b>Imported Location [Specialty]:</b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %> 
+                                            <b>Special Feature [USP] : </b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %> 
                                         </div>    
                                     </div>
                                 <% } %>
@@ -44,12 +49,19 @@
                                 <% if(!currUser || !lists.owners.some(o=>o._id.equals(currUser._id))) {%>
                                     <div class="row mt-3">
                                         <div class="col-md-6">
+                                            <% const alreadyAdded = addedToCart && addedToCart.includes(lists._id.toString()) %>
+                                            <% if(alreadyAdded) {%>
+                                                <a href="/cart" class="btn btn-outline-primary">
+                                                    <i class="fa-solid fa-cart-shopping"></i>View Cart
+                                                </a>
+                                            <% } else { %>
                                             <form action="/cart/<%= lists._id %>" method="post">
                                                 <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
                                                 <button class="btn btn-outline-primary" style="margin-top: -50px;">
                                                     <i class="fa-solid fa-cart-shopping"></i>Add To Cart
                                                 </button>
                                             </form>
+                                            <% } %>
                                         </div>
                                         <!-- <div class="col-md-6">
                                             <form action="/cart/<%# cart.product._id %>?_method=PUT" method="POST">

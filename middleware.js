@@ -7,7 +7,7 @@ module.exports.isLoggedIn = (req,res,next)=>{
     // console.log(req);
     if(!req.isAuthenticated()){
         req.session.redirectUrl = req.originalUrl;
-        req.flash("err", "PLease login to make to Place order");
+        req.flash("error", "PLease login to make to Place order");
         return res.redirect("/login");
     }
     next();

@@ -199,14 +199,14 @@ app.get("/",(req,res)=>{
     res.redirect("/listings");
 })
 
+//all user routes
+app.use("/", userRouter);
+
 //all listing routes
 app.use("/listings", listingsRouter);
 
 //all review routes
 app.use("/listings/:id/reviews", reviewsRouter);
-
-//all user routes
-app.use("/", userRouter);
 
 //all cart routes
 app.use("/", cartRouter);

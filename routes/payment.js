@@ -35,6 +35,7 @@ router.get('/order-success', isLoggedIn, async (req, res) => {
 
         // ✅ Clear session after using it
         delete req.session.lastOrderId;
+        req.session.addedToCart = []; //to clear the whole addedToCart so that we can see the cart btn as usual.
 
         res.render('payment/order-success', { order });
     } catch (err) {

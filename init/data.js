@@ -7,7 +7,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 850,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Premium Basmati Rice",
@@ -17,7 +17,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 210,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Paneer",
@@ -77,7 +77,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 120,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Organic Turmeric Powder",
@@ -87,7 +87,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 140,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Jodhpur Dried Red Chillies",
@@ -97,7 +97,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 90,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Stone-Ground Chakki Atta",
@@ -107,7 +107,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 65,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Green Cardamom (Elaichi)",
@@ -117,7 +117,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 350,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Fresh Alphonso Mango Pulp",
@@ -157,7 +157,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 250,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Organic Toor Dal",
@@ -167,7 +167,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 175,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Cold Pressed Coconut Oil",
@@ -177,7 +177,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 390,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Nagpur Seedless Oranges",
@@ -187,7 +187,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 120,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Assam Orthodox Tea",
@@ -217,7 +217,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 220,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Farm Fresh Green Apples",
@@ -227,7 +227,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 260,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Organic Brown Sugar",
@@ -237,7 +237,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 85,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Pink Himalayan Salt",
@@ -247,7 +247,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 110,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Premium Pistachios",
@@ -277,7 +277,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 95,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Saffron Infused Honey",
@@ -297,7 +297,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 140,
-    category: "Normal"
+    category: "Grocery"
   },
   {
     title: "Natural Rock Candy (Mishri)",
@@ -307,7 +307,7 @@ const sampleListings = [
       filename: "listingimage",
     },
     price: 60,
-    category: "Normal"
+    category: "Grocery"
   }
 ];
 

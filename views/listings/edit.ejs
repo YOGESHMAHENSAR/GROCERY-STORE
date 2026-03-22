@@ -73,12 +73,12 @@
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Select Category </label
             ><span> <b style="color: red"> *</b> : </span>
-            <select class="form-select" name="listing[category]" id="category" >
+            <select class="form-select" name="listing[category]" id="category" onchange="setTax(this.value)" >
               <option value="" selected disabled>Select Category</option>
-              <option value="Beverages">Beverages</option>
-              <option value="Snacks">Snacks and Sweets</option>
-              <option value="Dairy">Dairy & Eggs</option>
-              <option value="Normal">Daily Use Products</option>
+              <option value="Beverages" <%= lists.category == 'Beverages' ? 'selected': '' %> >Beverages (12% Tax)</option>
+              <option value="Snacks" <%= lists.category == 'Snacks' ? 'selected': '' %> >Snacks and Sweets (18% Tax)</option>
+              <option value="Dairy" <%= lists.category == 'Dairy' ? 'selected': '' %> >Dairy & Eggs (2% Tax)</option>
+              <option value="Grocery" <%= lists.category == 'Grocery' ? 'selected': '' %> >Grocery (5% Tax)</option>
             </select>
             <div class="invalid-feedback">Please Provide the valid Price</div>
           </div>
@@ -93,7 +93,7 @@
             <label class="form-label" for="price">Cost Price </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
-              type="text"
+              type="number"
               min="0"
               class="form-control"
               width="50%"
@@ -110,41 +110,42 @@
             <label class="form-label" for="price">Tax on Product: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
-              type="text"
+              type="number"
               min="0"
               class="form-control"
               width="50%"
               value="<%= lists.Tax %>"
-              placeholder="Enter price of Tax on Product"
-              id="price"
+              placeholder="Select Category for Tax"
+              id="taxField"
               name="listing[Tax]"
               oninput="if (this.value < 0) this.value = 0;"
               required
+              readonly
             />
             <div class="invalid-feedback">Please Provide the valid Selling Price</div>
           </div>
           <div class="mb-3 col-md-4">
-            <label class="form-label" for="price">Selling Price (Display to User) </label
+            <label class="form-label" for="price">Profit Margin: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
-              type="text"
+              type="number"
               min="0"
               class="form-control"
               width="50%"
-              value="<%= lists.sellingPrice %>"
+              value="<%= lists.margin %>"
               placeholder="Enter Selling price of Product"
               id="sellingPrice"
-              name="listing[sellingPrice]"
+              name="listing[margin]"
               oninput="if (this.value < 0) this.value = 0;"
               required
             />
-            <div class="mt-2 ms-3" style="font-size: 13px;">This should include your <b>Profit</b><span style="color: red;">*</span></div>
+            <div class="mt-2" style="font-size: 13px;">Profit Margin is Considered in <b>Percentage</b><span style="color: red;">*</span></div>
             <div class="invalid-feedback">Please Provide the valid Selling Price</div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="loc">Import Location [Specialty] <i class="fa-solid fa-chess-king" style="color: gold;"></i></label>
+          <label class="form-label" for="loc">Special Feature [USP] : <i class="fa-solid fa-chess-king" style="color: gold;"></i></label>
           
           <!-- <span> <b style="color: red"> *</b> : </span> -->
           <input

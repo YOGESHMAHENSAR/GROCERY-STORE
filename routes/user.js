@@ -5,6 +5,9 @@ const {saveRedirectUrl, isLoggedIn} = require("../middleware.js");
 const userController = require("../controllers/user.js")
 const wrapAsync = require("../utils/wrapAsync.js")
 const passport = require("passport");
+const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapToken = process.env.MAP_TOKEN;
+const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 const sendOTP = require('../utils/mailer.js'); // your mailer file
 
@@ -79,7 +82,16 @@ router.get("/auth/google/callback",
 
 //for address of the user
 
-router.get("/profile/address", isLoggedIn,(req,res)=>{
+router.get("/profile/address", isLoggedIn, async (req,res)=>{
+    // let response = await geocodingClient.reverseGeocode({
+    //     query: [75.7878, 26.9196 ]
+    //     // longitude: -73.990593,
+    //     // latitude: 40.740121
+    // })
+    // .send();
+
+    // console.log(response.body.features);
+    // res.send("done!");
     res.render("users/address");
 })
 
@@ -93,6 +105,43 @@ router.post("/profile/address", async(req,res)=>{
         req.flash("error", err.message);
         res.redirect("/profile/address");
      }
+})
+
+router.post("/profile/address/detect",isLoggedIn, async (req,res)=>{
+    console.log("req.body: ", req.body);
+    const {lat, lng} = req.body;
+    console.log("recieved: ", lat,lng);
+
+    if(!lat || !lng){
+        console.log("missing cordes");
+        return res.json({success: false, message: "Co-ordinates missing"});
+    }
+    try{
+        const geoResponse = await geocodingClient.reverseGeocode({
+            query: [parseFloat(lng), parseFloat(lat)]
+        }).send();
+
+        const features = geoResponse.body.features;
+
+        if(!features || features.length === 0){
+            return res.json({success: false, message: "Address Not Found!"});
+        }
+
+        const context = features[0].context;
+
+        const address = {
+            street: features[0].text || "",
+            pincode: context.find(c => c.id.startsWith("postcode"))?.text || "",
+            city: context.find(c => c.id.startsWith("place"))?.text || "",
+            state: context.find(c => c.id.startsWith("region"))?.text || "",
+        }
+
+        res.json({success: true, address});
+
+    }catch(err){
+        console.log(err);
+        res.json({success: false, message: err.message});
+    }
 })
 
 module.exports = router;

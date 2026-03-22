@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Reviews = require("./reviews.js");
+const { string, required } = require("joi");
 
 main().then()
 .catch((err)=>console.log("ERROR: ",err));
@@ -45,6 +46,9 @@ const listingSchema = new mongoose.Schema({
     },
     sellingPrice: {
         type: String,
+    },
+    margin:{
+        type: String,
         required: true
     },
     Tax: {
@@ -54,7 +58,7 @@ const listingSchema = new mongoose.Schema({
     category:[
         {
             type: String,
-            enum: ["Beverages", "Snacks", "Dairy", "Normal"],
+            enum: ["Beverages", "Snacks", "Dairy", "Grocery"],
             required: true
         }
     ],

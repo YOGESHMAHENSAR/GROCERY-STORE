@@ -23,7 +23,7 @@
                 <tr>
                     <th>Product</th>
                     <th>Price</th>
-                    <th>Quantity</th>
+                    <th>Quantity [Max Quantity 3<span style="color: red;">*</span>]</th>
                     <th>Total</th>
                     <th>Action</th>
                 </tr>
@@ -36,33 +36,37 @@
                         <div class="product-badge">✓ In Stock</div>
                     </td>
                     <td>
-                        <span class="price-tag">₹<%= item.product.sellingPrice %></span>
+                        <span class="price-tag" id="price-<%= item.product._id %>"
+                        data-price="<%= item.product.sellingPrice %>"
+                        data-tax="<%= item.product.Tax %>">
+                            ₹<%= item.product.sellingPrice %>
+                        </span>
                     </td>
                     <td>
                         <div class="qty-wrapper">
                             <!-- minus -->
-                            <form action="/cart/<%= item.product._id %>?_method=PUT" method="post" style="margin:0;">
+                            <!-- <form action="/cart/<%# item.product._id %>?_method=PUT" method="post" style="margin:0;"> -->
                                 <input type="hidden" name="action" value="minus">
-                                <button type="submit" class="qty-btn qty-btn-minus">
+                                <button type="button" onclick="chnageQty(`<%= item.product._id %>`, -1, this)" class="qty-btn qty-btn-minus">
                                     <i class="fa-solid fa-minus" style="font-size:0.7rem;"></i>
                                 </button>
-                            </form>
+                            <!-- </form> -->
 
                             <span class="qty-number" id="qty-<%= item.product._id %>">
                                 <%= item.quantity %>
                             </span>
 
                             <!-- plus -->
-                            <form action="/cart/<%= item.product._id %>?_method=PUT" method="post" style="margin:0;">
+                            <!-- <form action="/cart/<%= item.product._id %>?_method=PUT" method="post" style="margin:0;"> -->
                                 <input type="hidden" name="action" value="plus">
-                                <button type="submit" class="qty-btn qty-btn-plus">
+                                <button type="button" onclick="chnageQty(`<%= item.product._id %>`, 1, this)" class="qty-btn qty-btn-plus">
                                     <i class="fa-solid fa-plus" style="font-size:0.7rem;"></i>
                                 </button>
-                            </form>
+                            <!-- </form> -->
                         </div>
                     </td>
                     <td>
-                        <span class="item-total">
+                        <span class="item-total" id="item-total-<%= item.product._id %>">
                             ₹<%= parseInt(item.product.sellingPrice) * item.quantity %>
                         </span>
                     </td>
@@ -108,18 +112,18 @@
             </div>
             <div class="grand-total-row">
                 <span>Subtotal</span>
-                <span>₹ <%= subTotal %></span>
+                <span id="subtotal">₹ <%= subTotal %></span>
             </div>
             <div class="grand-total-row">
                 <span>Tax</span>
-                <span>₹ <%= totalTax.toFixed(2) %></span>
+                <span id="tax">₹ <%= totalTax.toFixed(2) %></span>
             </div>
             <div class="grand-total-row">
                 <span>Platform Fee</span>
                 <span>₹ 10</span>
             </div>
             <div class="grand-total-divider"></div>
-            <div class="grand-total-final">
+            <div class="grand-total-final" id="grandTotal">
                 ₹ <%= (grandTotal + 10).toFixed(2) %>
             </div>
             <div class="grand-total-note">Inclusive of all taxes</div>
@@ -162,3 +166,5 @@
 
     <% } %>
 </div>
+
+<script src="/js/cart.js"></script>

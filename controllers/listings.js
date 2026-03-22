@@ -11,7 +11,8 @@ module.exports.index = async (req,res)=>{
     }
     // const allListings = await List.find(filter);
     const lists = await List.find(filter).sort({ _id: -1 });
-    res.render("listings/index",{lists, category});
+    const addedToCart = req.session.addedToCart || [];
+    res.render("listings/index",{lists, category, addedToCart});
 }
 
 module.exports.validate = async (req,res)=>{
@@ -23,6 +24,10 @@ module.exports.validate = async (req,res)=>{
      if (process.env.OWNER_IDS) {
         newListing.owners = process.env.OWNER_IDS.split(',').map(id => id.trim());
     }
+    const {costPrice, margin, Tax} = req.body.listing;
+    newListing.sellingPrice = (
+        parseFloat(costPrice) * (1+parseFloat(margin) /100) * (1+parseFloat(Tax)/100)
+    ).toFixed(2);
     await newListing.save();
     req.flash("new", `New Product Added Successfully`);
     res.redirect("/listings");
@@ -41,6 +46,13 @@ module.exports.renderEditForm = async (req,res)=>{
 }
 
 module.exports.update = async (req,res)=>{
+    console.log("req.body.listing: ", req.body.listing);
+    const {costPrice, margin, Tax} = req.body.listing;
+
+    req.body.listing.sellingPrice = (
+        parseFloat(costPrice) * (1+parseFloat(margin) /100) * (1+parseFloat(Tax)/100)
+    ).toFixed(2);
+
     let result = listingSchema.validate(req.body);
     if(result.error){
         throw new ExpressError(400, result.error);
@@ -67,7 +79,7 @@ module.exports.show = async (req,res)=>{
         const user = await User.findById(req.user._id).populate("cart.product");
         cart = user.cart.filter(item => item.product !== null); 
     }
-    
+    const addedToCart = req.session.addedToCart || [];
     let lists = await List.findById(id)
       .populate({path: "reviews",  populate: {path: "author"}})
       .populate("owners");
@@ -75,7 +87,7 @@ module.exports.show = async (req,res)=>{
         req.flash("error", "Product You requested for Does not Exist");
         res.redirect("/listings");
     }else{
-        res.render("listings/show",{lists, cart});
+        res.render("listings/show",{lists, cart, addedToCart});
     }
 }
 

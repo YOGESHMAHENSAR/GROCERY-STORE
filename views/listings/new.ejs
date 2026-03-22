@@ -64,27 +64,40 @@
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Select Category </label
             ><span> <b style="color: red"> *</b> : </span>
-            <select class="form-select" name="listing[category]" id="category" >
+            <select
+              class="form-select"
+              name="listing[category]"
+              id="category"
+              onchange="setTax(this.value)"
+            >
               <option value="" selected disabled>Select Category</option>
-              <option value="Beverages">Beverages</option>
-              <option value="Snacks">Snacks and Sweets</option>
-              <option value="Dairy">Dairy & Eggs</option>
-              <option value="Normal">Daily Use Products</option>
+              <option value="Beverages">Beverages (12% Tax)</option>
+              <option value="Snacks">Snacks and Sweets (18% Tax)</option>
+              <option value="Dairy">Dairy & Eggs (2% Tax)</option>
+              <option value="Grocery">Grocery (5% Tax)</option>
             </select>
             <div class="invalid-feedback">Please Provide the valid Price</div>
           </div>
         </div>
         <div class="divider mt-4 mb-3">
-          <span style="margin-left: 330px; color: rgb(137, 132, 132); font-weight: 700; font-size: 20px;"><u>Cost Section</u></span>
+          <span
+            style="
+              margin-left: 330px;
+              color: rgb(137, 132, 132);
+              font-weight: 700;
+              font-size: 20px;
+            "
+            ><u>Cost Section</u></span
+          >
           <!-- <hr> -->
         </div>
-        <br>
+        <br />
         <div class="row">
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Cost Price </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
-              type="text"
+              type="number"
               min="0"
               class="form-control"
               width="50%"
@@ -94,64 +107,71 @@
               oninput="if (this.value < 0) this.value = 0;"
               required
             />
-            <div class="invalid-feedback">Please Provide the valid Cost Price</div>
+            <div class="invalid-feedback">
+              Please Provide the valid Cost Price
+            </div>
           </div>
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Tax on Product: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
-              type="text"
+              type="number"
               min="0"
               class="form-control"
               width="50%"
-              placeholder="Enter price of Tax on Product"
-              id="price"
+              placeholder="Select Category for Tax"
+              id="taxField"
               name="listing[Tax]"
               oninput="if (this.value < 0) this.value = 0;"
               required
+              readonly
             />
-            <div class="invalid-feedback">Please Provide the valid Selling Price</div>
+            <div class="invalid-feedback">
+              Please Provide the valid Selling Price
+            </div>
           </div>
           <div class="mb-3 col-md-4">
-            <label class="form-label" for="price">Selling Price (Display to User) </label
+            <label class="form-label" for="price"
+              >Profit Margin: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
-              type="text"
+              type="number"
               min="0"
               class="form-control"
               width="50%"
-              placeholder="Enter Selling price of Product"
-              id="sellingPrice"
-              name="listing[sellingPrice]"
+              placeholder="Enter Margin Percentage"
+              id="margin"
+              name="listing[margin]"
               oninput="if (this.value < 0) this.value = 0;"
               required
             />
-            <div class="mt-2 ms-3" style="font-size: 13px;">This should include your <b>Profit</b><span style="color: red;">*</span></div>
-            <div class="invalid-feedback">Please Provide the valid Selling Price</div>
+            <div class="mt-2" style="font-size: 13px;">Profit Margin is Considered in <b>Percentage</b><span style="color: red;">*</span></div>
+            <div class="invalid-feedback">
+              Please Provide the valid Selling Price
+            </div>
           </div>
         </div>
         <div class="mb-3">
-          <label class="form-label" for="loc">Imported Location (Specialty) <i class="fa-solid fa-chess-king" style="color: gold;"></i></label>
+          <label class="form-label" for="loc"
+            >Special Feature [USP] :
+            <i class="fa-solid fa-chess-king" style="color: gold"></i
+          ></label>
           <!-- <span> <b style="color: red"> *</b> : </span> -->
           <input
             type="text"
             class="form-control"
             width="50%"
-            placeholder="Enter the Imported location of Product (Optional)"
+            placeholder="Enter the USP of Product (Optional)"
             id="loc"
             name="listing[location]"
             value=""
           />
           <div class="invalid-feedback">
-            Please provide the Valid Imported Location 
+            Please provide the Valid Imported Location
           </div>
         </div>
         <div class="new-btn">
-          <button
-            class="btn btn-outline-dark mb-3 mt-3"
-          >
-            Add Product
-          </button>
+          <button class="btn btn-outline-dark mb-3 mt-3">Add Product</button>
         </div>
         <br /><br />
       </form>
@@ -165,16 +185,16 @@
   </div>
 </body>
 <script>
-    const form = document.querySelector('.needs-validation');
-    
-    form.addEventListener('submit', (e) => {
-        if (!form.checkValidity()) {
-            e.preventDefault();
-            e.stopPropagation();
-            form.classList.add('was-validated');
-            return; // ← don't show loader if form is invalid
-        }
-        // form is valid — show loader
-        document.getElementById('loaderOverlay').classList.add('active');
-    });
+  const form = document.querySelector(".needs-validation");
+
+  form.addEventListener("submit", (e) => {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      form.classList.add("was-validated");
+      return; // ← don't show loader if form is invalid
+    }
+    // form is valid — show loader
+    document.getElementById("loaderOverlay").classList.add("active");
+  });
 </script>
