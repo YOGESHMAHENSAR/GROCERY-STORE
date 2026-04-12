@@ -52,12 +52,16 @@ function updateCalculation() {
         totalTax += itemTotal * tax;
 
         const itemTotalEl = document.getElementById(`item-total-${productId}`);
-        if (itemTotalEl) itemTotalEl.innerText = `₹${itemTotal}`;
+        if (itemTotalEl) itemTotalEl.innerText = `₹${itemTotal.toFixed(2)}`;
     });
 
     const grandTotal = subTotal + totalTax + 10;
+    const sgst = totalTax / 2;
+    const cgst = totalTax / 2;
 
-    document.getElementById("subtotal").innerText   = `₹${subTotal}`;
+    document.getElementById("subtotal").innerText   = `₹${subTotal.toFixed(2)}`;
     document.getElementById("tax").innerText        = `₹${totalTax.toFixed(2)}`;
+    document.getElementById("cgst").innerText        = `₹${cgst.toFixed(2)}`;
+    document.getElementById("sgst").innerText        = `₹${sgst.toFixed(2)}`;
     document.getElementById("grandTotal").innerText = `₹${grandTotal.toFixed(2)}`;
 }

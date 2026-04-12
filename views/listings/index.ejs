@@ -18,7 +18,9 @@
   <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
     <% for(let list of lists) {%>
         <!-- <a href="/listings/<%# list._id %>" class=""> -->
-            <div class="card listing-card listing-link" style="border-radius: 17px; width: 13rem; height: 18rem; margin-left: .5rem; cursor: pointer;" onclick="window.location='/listings/<%= list._id %>'">
+            <div class="card listing-card listing-link" 
+            style="border-radius: 17px; width: 13rem; height: 18rem; margin-left: .5rem; cursor: pointer;" 
+            onclick="window.location='/listings/<%= list._id %>'">
                 <!-- <img src="<%# list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
                  <img 
                   src="<%= list.image.url %>?w=600&h=400&c=fill&q=auto&f=auto" 
@@ -33,26 +35,29 @@
                 <!-- <div class="card-img-overlay" ></div> -->
                 <div class="card-body ms-2" >
                     <p class="card-text">
-                      <b><%= list.title %></b> <br />
+                      <b ><%= list.title %></b> <br />
                       <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12" style="margin-top: -10px;">
                           <i class="fas fa-rupee-sign"></i><b> : <%=list.sellingPrice?.toLocaleString("en-IN") %> </b>
                         </div>
                       </div>
                       <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
-                          <div class="row mt-3" onclick="event.stopPropagation()">
+                          <div class="row mt-3">
                             <% const alreadyAdded = addedToCart && addedToCart.includes(list._id.toString()); %>
                             <% if(alreadyAdded) {%>
-                              <a href="/cart" class="btn btn-outline-primary">
+                              <a href="/cart" class="btn btn-outline-success" style="margin-top: -9px;margin: auto;width: 9rem;" onclick="event.stopPropagation()">
                                 <i class="fa-solid fa-cart-shopping"></i> View Cart
                               </a>
                             <% } else { %>
-                              <form action="/cart/<%= list._id %>" method="post" onsubmit="showLoader(this)">
+                              <!-- <form action="/cart/<%# list._id %>" method="post" onsubmit="showLoader(this)"> -->
                                   <input type="hidden" name="returnTo" value="/listings?category=<%= category %>">
-                                  <button type="submit" data-id="<%= list._id %>" data-category="<%= category %>" class="btn btn-outline-primary" title="Add To Cart" style="margin-top: -50px; margin-left: 130px; ">
+                                  <button type="button" data-id="<%= list._id %>" data-category="<%= category %>" 
+                                    class="btn btn-outline-primary add-to-cart-btn" title="Add To Cart"
+                                    style="margin-top: -13px;margin-left: 115px;width: 4rem;"
+                                    onclick="addToCart(event, '<%= list._id %>', '<%= category %>')">
                                       <i class="fa-solid fa-cart-shopping"></i>
                                   </button>
-                              </form>
+                              <!-- </form> -->
                             <% } %>
                                <!-- <div style="margin-left: 130px; font-size: 14px;margin-top: -20px;">CART<span style="color: red; "><b>*</b></span></div> -->
                           </div>
@@ -68,71 +73,53 @@
         <!-- </a> -->
     <% } %>
   </div>
-  <script>
+  <!-- <script>
     function showLoader(event){
       const btn = event.querySelector(".btn");
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
     }
-  </script>
-  <!-- <script>
-    // const btn = document.getElementById("cartBtn");
-    // btn.addEventListener("click", () => {
-    //   console.log("btn clicked");
-    // })
-
-    // form.addEventListener("submit", (e)=>{
-    //   e.preventDefault();
-    // })
-    async function addToCart(event, form, listId, category) {
-
+  </script> -->
+  <script>
+    async function addToCart(event, id, category) {
       event.stopPropagation();
-      event.preventDefault();
+      const btn = event.target.closest(".add-to-cart-btn");
 
-      const btn = form.querySelector("button");
+      const url = `/cart/${id}/fetch`;
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
 
-      try{
-        console.log("listId = ",listId);
-        const response = await fetch(`/cart/${listId}`,{
+      try {
+        const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json"},
-          body: JSON.stringify({returnTo: `/listings?category=${category}`})
-        })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ returnTo: `/listings?category=${category}` })
+        });
 
         const data = await response.json();
 
-        if(data.success){
-          localStorage.setItem(`cart_${listId}`, "added");
-          replaceWithAnchor(btn);
-        }else{
+        if (response.ok) {
+          const a = document.createElement("a");
+          a.href = "/cart";
+          a.className = "btn btn-outline-success";
+          a.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>View Cart`;
+          a.style.width = "9rem";
+          a.style.margin = "auto";
+          a.style.marginTop = "-9px";
+          a.onclick = (e) => e.stopPropagation(); // Block card click
+          btn.replaceWith(a);
+
+          const badge = document.getElementById("cart-count");
+          if (badge) badge.textContent = data.cartCount;
+        } else {
+          alert(data.error || "Failed to add item to cart");
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>`;
         }
-      }
-      catch(err){
-        console.log("ERROR: ",err);
+      } catch (err) {
         btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>`;
+        btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>`;
       }
     }
-
-    function replaceWithAnchor(btn){
-      const anchor = document.createElement("a");
-      anchor.href = "/cart";
-      anchor.className = btn.className;
-      anchor.style.cssText = btn.style.cssText;
-      anchor.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> View Cart`;
-      anchor.onclick = (e) => e.stopPropagation(); // ✅ stop card click
-      btn.replaceWith(anchor);
-    }
-    document.addEventListener("DOMContentLoaded", ()=>{
-      document.querySelectorAll("[data-id]").forEach(btn=>{
-        if(localStorage.getItem(`cart_${btn.dataset.id}`) === "added"){
-          replaceWithAnchor(btn);
-        }
-      })
-    })
-  </script> -->
+  </script>
 </body>

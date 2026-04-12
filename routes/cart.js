@@ -43,6 +43,7 @@ router.post("/cart/:id", async (req, res) => {
     const productId = req.params.id;
     const returnTo = req.body.returnTo || "/listings";
     try {
+        let cartCount = 0;
         if (req.user) {
             // ✅ Logged in — save to DB
             const user = await User.findById(req.user._id);
@@ -55,6 +56,7 @@ router.post("/cart/:id", async (req, res) => {
                 user.cart.push({ product: productId, quantity: 1 });
             }
             await user.save();
+            cartCount = user.cart.length;
         } else {
             // ✅ Guest — save to session
             if (!req.session.cart) req.session.cart = [];
@@ -72,6 +74,7 @@ router.post("/cart/:id", async (req, res) => {
             await new Promise((resolve, reject) => {
                 req.session.save(err => err ? reject(err) : resolve());
             });
+            cartCount = req.session.cart.length;
 
             // console.log("Guest cart saved:", req.session.cart);
         }
@@ -81,12 +84,79 @@ router.post("/cart/:id", async (req, res) => {
             req.session.addedToCart.push(productId);
         }
 
+        // ✅ Force session save for addedToCart tracking
+        await new Promise((resolve, reject) => {
+            req.session.save(err => err ? reject(err) : resolve());
+        });
+
         req.flash("login", "Item added to cart!");
         res.redirect(returnTo);
+        // res.json({success: true, message: "Item Added to Cart", cartCount}); // cartcount passed as the varible 
     } catch (err) {
         console.error("ERROR:", err.message);
         req.flash("error", err.message);
         res.redirect(`/listings/${productId}`);
+        // res.status(400).json({error: err.message});
+    }
+});
+router.post("/cart/:id/fetch", async (req, res) => {
+    const productId = req.params.id;
+    const returnTo = req.body.returnTo || "/listings";
+    try {
+        let cartCount = 0;
+        if (req.user) {
+            // ✅ Logged in — save to DB
+            const user = await User.findById(req.user._id);
+            const existingItem = user.cart.find(item =>
+                item.product.toString() === productId
+            );
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                user.cart.push({ product: productId, quantity: 1 });
+            }
+            await user.save();
+            cartCount = user.cart.length;
+        } else {
+            // ✅ Guest — save to session
+            if (!req.session.cart) req.session.cart = [];
+
+            const existingItem = req.session.cart.find(
+                item => item.product === productId
+            );
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                req.session.cart.push({ product: productId, quantity: 1 });
+            }
+
+            // ✅ Force session save — critical for guests
+            await new Promise((resolve, reject) => {
+                req.session.save(err => err ? reject(err) : resolve());
+            });
+            cartCount = req.session.cart.length;
+
+            // console.log("Guest cart saved:", req.session.cart);
+        }
+
+        if(!req.session.addedToCart) req.session.addedToCart = [];
+        if(!req.session.addedToCart.includes(productId)){
+            req.session.addedToCart.push(productId);
+        }
+
+        // ✅ Force session save for addedToCart tracking
+        await new Promise((resolve, reject) => {
+            req.session.save(err => err ? reject(err) : resolve());
+        });
+
+        // req.flash("login", "Item added to cart!");
+        // res.redirect(returnTo);
+        res.json({success: true, message: "Item Added to Cart", cartCount}); // cartcount passed as the varible 
+    } catch (err) {
+        console.error("ERROR:", err.message);
+        // req.flash("error", err.message);
+        // res.redirect(`/listings/${productId}`);
+        res.status(400).json({error: err.message});
     }
 });
 

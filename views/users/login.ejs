@@ -26,7 +26,7 @@
           </div>
         </div>
       </div>
-      <form action="/login" method="post" class="needs-validation" novalidate>
+      <form action="/login" method="post" id="loginForm" class="needs-validation" novalidate>
         <div class="mb-3 mt-3">
           <label class="form-label" for="username">UserName </label
           ><span> <b style="color: red"> *</b> : </span>
@@ -71,7 +71,18 @@
           </button>
         </div>
       </form>
+      <div class="loader-overlay" id="loginLoaderOverlay">
+        <div class="loader-container">
+          <div class="loader"></div>
+          <p class="loader-text">Taking you In ... </p>
+        </div>
+      </div>
       <!-- <a href="/auth/google">signup with google</a> -->
     </div>
   </div>
+  <script>
+    document.querySelector("#loginForm").addEventListener("submit", function () {
+      document.querySelector("#loginLoaderOverlay").style.display = "flex";
+    });
+  </script>
 </body>

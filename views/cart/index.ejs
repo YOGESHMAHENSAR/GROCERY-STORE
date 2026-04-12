@@ -4,7 +4,7 @@
 
     <!-- title -->
     <h2 class="cart-title">🛒 My Cart</h2>
-    <p class="cart-subtitle"><%= cart.length %> item(s) in your cart</p>
+    <p class="cart-subtitle"><b><%= cart.length %> item(s)</b> in your cart</p>
 
     <% if(cart.length === 0) { %>
         <div class="empty-cart">
@@ -67,7 +67,7 @@
                     </td>
                     <td>
                         <span class="item-total" id="item-total-<%= item.product._id %>">
-                            ₹<%= parseInt(item.product.sellingPrice) * item.quantity %>
+                            ₹<%= parseInt(item.product.sellingPrice).toFixed(2) * item.quantity %>
                         </span>
                     </td>
                     <td>
@@ -106,16 +106,26 @@
                     return sum + (itemTotal * taxRate);
                 }, 0);
                 let grandTotal = subTotal + totalTax;
+                let cgst = totalTax/2;
+                let sgst = totalTax/2;
             %>
             <div class="grand-total-label">
                 <i class="fa-solid fa-receipt"></i> Grand Total
             </div>
             <div class="grand-total-row">
                 <span>Subtotal</span>
-                <span id="subtotal">₹ <%= subTotal %></span>
+                <span id="subtotal">₹ <%= subTotal.toFixed(2) %></span>
             </div>
             <div class="grand-total-row">
-                <span>Tax</span>
+                <span>CGST</span>
+                <span id="cgst">₹ <%= cgst.toFixed(2) %></span>
+            </div>
+            <div class="grand-total-row">
+                <span>SGST</span>
+                <span id="sgst">₹ <%= sgst.toFixed(2) %></span>
+            </div>
+            <div class="grand-total-row">
+                <span>Total Tax</span>
                 <span id="tax">₹ <%= totalTax.toFixed(2) %></span>
             </div>
             <div class="grand-total-row">

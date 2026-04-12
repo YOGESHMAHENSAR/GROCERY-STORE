@@ -8,6 +8,7 @@ const {isLoggedIn, isAnyOwner} = require("../middleware.js");
 
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const { findByIdAndUpdate } = require("../models/reviews.js");
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -70,8 +71,11 @@ router.post("/verify-payment", async(req,res)=>{
     try{
         const{razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body; // deconstruct the crucial info
 
+        // Ensure razorpay_order_id is a string
+        const orderId = razorpay_order_id.id || razorpay_order_id;
+
         //signature created on our  own side.
-        const body = razorpay_order_id + "|" + razorpay_payment_id;
+        const body = orderId + "|" + razorpay_payment_id;
         const expected = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(body).digest("hex");
 
         //compare both the signature
@@ -93,7 +97,7 @@ router.post("/verify-payment", async(req,res)=>{
                 sum + item.product.sellingPrice * item.quantity
             ,0),
             paymentId: razorpay_payment_id,
-            orderId: razorpay_order_id,
+            orderId: orderId,
             address: user.address
         })
 
@@ -140,5 +144,22 @@ router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
         res.redirect("/listings");
     }
 });
+
+router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
+    try{
+        const orderId = req.params.id;
+        const {status} = req.body;
+        const order = await Order.findOneAndUpdate({orderId: orderId}, {status},{new: true});
+
+        if(!order){
+            res.json({success: false, message: "404 order Not found"});
+        }else{
+            res.json({success:true, message: "Order status Updated", status: order.status});
+        }
+    }
+    catch(e){
+        res.json({success: false, message: e.message});
+    }
+})
 
 module.exports = router;

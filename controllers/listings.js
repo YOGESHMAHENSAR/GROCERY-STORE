@@ -11,7 +11,16 @@ module.exports.index = async (req,res)=>{
     }
     // const allListings = await List.find(filter);
     const lists = await List.find(filter).sort({ _id: -1 });
-    const addedToCart = req.session.addedToCart || [];
+    
+    // ✅ For logged-in users, get cart from database; for guests, use session
+    let addedToCart = [];
+    if(req.user) {
+        const user = await User.findById(req.user._id);
+        addedToCart = user.cart.map(item => item.product.toString());
+    } else {
+        addedToCart = req.session.addedToCart || [];
+    }
+    
     res.render("listings/index",{lists, category, addedToCart});
 }
 
@@ -75,11 +84,19 @@ module.exports.update = async (req,res)=>{
 module.exports.show = async (req,res)=>{
     let {id} = req.params;
     let cart = [];
+    let addedToCart = [];
     if(req.user){
         const user = await User.findById(req.user._id).populate("cart.product");
-        cart = user.cart.filter(item => item.product !== null); 
+        cart = user.cart.filter(item => item.product !== null);
+        addedToCart = user.cart.map(item => item.product._id.toString());
+    } else {
+        const sessionCart = req.session.cart || [];
+        cart = sessionCart.map(item => ({
+            product: item.product,
+            quantity: item.quantity
+        }));
+        addedToCart = req.session.addedToCart || [];
     }
-    const addedToCart = req.session.addedToCart || [];
     let lists = await List.findById(id)
       .populate({path: "reviews",  populate: {path: "author"}})
       .populate("owners");

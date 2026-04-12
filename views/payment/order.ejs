@@ -1,6 +1,14 @@
 <%- layout("/layouts/boilerplate") -%>
 <div style="max-width: 800px; margin: 2rem auto; padding: 0 1rem;">
-    <h3 class="mb-4">My Orders</h3>
+    <div class="row">
+        <div class="col-md-12">
+          <h3 class="mb-4">My Orders</h3>  
+        </div>
+        <!-- <div class="col-md-4">
+            <h3>Quantity: <%# req.session.cart.length %></h3>
+        </div> -->
+    </div>
+    
 
     <% if(orders.length === 0) { %>
         <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 16px;">

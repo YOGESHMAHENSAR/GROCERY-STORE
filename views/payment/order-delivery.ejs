@@ -1,7 +1,31 @@
 <%- layout("/layouts/boilerplate") -%>
 <div style="max-width: 800px; margin: 1rem; padding: 0 1rem;">
-    <h3 class="mb-4">To Be DELIVERED: </h3>
-
+    <div class="row">
+        <div class="col-md-4">
+            <h4 class="mb-4">Total Orders: <%= orders.length %></h3>
+        </div>
+        <div class="col-md-2">
+            <h5 class="mb-4"><b style="color: rgb(209, 161, 17);">Pending :</b>
+                <span id="count-pending">
+                    <%= orders.filter(o => o.status === "Pending").length %> 
+                </span> 
+            </h5>
+        </div>
+        <div class="col-md-3">
+            <h5 class="mb-4"><b style="color: rgb(82, 238, 100);">Confirmed :</b> 
+                <span id="count-confirm">
+                    <%= orders.filter(o => o.status === "Confirmed").length %>
+                </span>
+            </h5>
+        </div>
+        <div class="col-md-2">
+            <h5 class="mb-4"><b style="color: rgb(80, 92, 225);">Placed :</b>
+                <span id="count-place">
+                    <%= orders.filter(o => o.status === "Placed").length %>
+                </span>  
+            </h5>
+        </div>
+    </div>
     <% if(orders.length === 0) { %>
         <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 16px;">
             <p style="color: #6b7280;">NO-THING TO DELIVER YET! <br> <b><span style="color: red;">WAIT</span></b> FOR CUSTOMER TO ORDER. </p>
@@ -53,10 +77,10 @@
                                 <!-- ✅ Status badge color based on status -->
                                 <% const statusColor = {
                                     Confirmed: "#dbeafe",
-                                    Shipped: "#fef9c3",
+                                    Pending: "#fef9c3",
                                     Delivered: "#dcfce7",
                                 } %>
-                                <span style="font-size: 12px; padding: 4px 12px; border-radius: 20px; background: '<%= statusColor[order.status] %>';">
+                                <span data-id="<%= order.orderId %>" style="font-size: 12px; padding: 4px 12px; border-radius: 20px; background: #fef9c3;">
                                     <%= order.status %>
                                 </span>
                             </div>
@@ -79,7 +103,28 @@
                                 </div>
                             <% } %>
                         </div>
-                        <p class="mt-3"> <b>ADDRESS:</b> <%= order.address.street %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %> </p>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mt-3"> <b>ADDRESS:</b> <%= order.address.street %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %> </p>
+                            </div>
+                            <% if (order.status === "Pending") {%>
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-primary" data-id="<%= order.orderId %>" id="order-confirmed">Order Confirm</button>
+                                </div>
+                            <% } %>
+                            <% if(order.status === "Confirmed" ) {%>
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-danger" data-id="<%= order.orderId %>" id="order-placed">Order Placed</button>
+                                </div>
+                            <% } %>
+                            <% if(order.status === "Placed") {%>
+                                <div class="col-md-4">
+                                    <h3 style="color: brown;">Order Placed</h3>
+                                </div>
+                            <% } %>
+
+                        </div>
+                        
                     </div>
                 <% } %>
             </div>
@@ -107,3 +152,82 @@
         
     <% } %>
 </div>
+
+<script>    
+    document.addEventListener("click", async function (e){
+        const orderConfirmed = e.target.closest("#order-confirmed");
+        if(orderConfirmed){
+            const orderId = orderConfirmed.dataset.id;
+            await updateOrderStatus(orderId, "Confirmed", orderConfirmed);
+            return;
+        }
+        const orderPlaced = e.target.closest("#order-placed");
+        if(orderPlaced){
+            const orderId = orderPlaced.dataset.id;
+            await updateOrderStatus(orderId, "Placed", orderPlaced);
+            return;
+        }
+    })
+
+    async function updateOrderStatus(orderId, status, btn){
+        console.log("sending orderId:", orderId);
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+        try{
+            let response = await fetch(`/order/${orderId}/status`,{
+                method: "PATCH",
+                body: JSON.stringify({status}),
+                headers: {"Content-Type": "application/json"}
+            })
+
+            const data = await response.json();
+
+            if(response.ok && data.success){
+                const badge = document.querySelector(`span[data-id="${orderId}"]`);
+                if(badge){
+                    badge.textContent = data.status;
+                    if(data.status === "Confirmed") badge.style.background = "#dbeafe";
+                    else if(data.status === "Placed") badge.style.background = "#dcfce7";
+                }
+
+                btn.style.display = "none"; // hide current button
+                const pendingCount = document.querySelector("#count-pending");
+                const confirmCount = document.querySelector("#count-confirm");
+                const placedCount = document.querySelector("#count-place");
+
+                // ✅ inject next button based on new status
+                if(data.status === "Confirmed"){
+                    const div = document.createElement("div");
+                    if(pendingCount) pendingCount.textContent = parseInt(pendingCount.textContent) - 1;
+                    if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) + 1;
+                    div.className = "col-md-4";
+                    div.innerHTML = `
+                            <button class="btn btn-outline-danger" data-id="${orderId}" id="order-placed">
+                                Order Placed
+                            </button>
+                    `;
+                    btn.parentElement.replaceWith(div); // add to same row as confirm btn
+                } else if(data.status === "Placed"){
+                    const div = document.createElement("div");
+                    if(placedCount) placedCount.textContent = parseInt(placedCount.textContent) + 1;
+                    if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) - 1;
+                    div.className = "col-md-4";
+                    div.innerHTML = `<h3 style="color: brown;">Order Placed</h3>`;
+                    btn.parentElement.replaceWith(div);
+                }
+            }
+            else {
+                alert(data.message || "Failed to update order status");
+                console.log(data.message);
+                btn.disabled = false;
+                btn.innerHTML = status === "Confirmed" ? "Order Confirm" : "Order Placed";
+            }
+        }catch(e){
+            console.error("Error updating order status:", e);
+            alert("An error occurred while updating the order status");
+            btn.disabled = false;
+            btn.innerHTML = status === "Confirmed" ? "Order Confirm" : "Order Placed";
+        }
+    }
+</script>

@@ -12,8 +12,8 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Confirmed", "Delivered"],
-        default: "Confirmed"
+        enum: ["Confirmed", "Placed", "Pending"],
+        default: "Pending"
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -126,6 +126,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     // to make it loaded on the edit page automatically;
 
     document.addEventListener("DOMContentLoaded",()=>{
-      const category = document.getElementById("taxFiled").value;
+      const category = document.getElementById("taxField");
       if(category) setTax(category);
     })
