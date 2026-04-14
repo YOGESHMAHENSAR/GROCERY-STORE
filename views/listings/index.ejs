@@ -31,6 +31,13 @@
             color: red;
         }
     </style>
+    <div class="col-md-4 mb-4">
+        <label for="search" class="form-label"><b>Search: </b></label>
+        <input type="text" id="search" style="margin-top: -38px; margin-left: 72px; width: 348px;" class="form-control" placeholder="Search By Name, Category, Price, Stock">
+    </div>
+    <div id="no-result" style="display:none; text-align:center; margin-top:2rem;">
+        <h5 style="color: #6b7280;">No products found for "<span id="search-term"></span>"</h5>
+    </div>
 
   <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
     <% for(let list of lists) {%>
@@ -114,6 +121,29 @@
     }
   </script> -->
   <script>
+    document.getElementById("search").addEventListener("input", function() {
+        const searchValue = this.value.toLowerCase().trim();
+        const rows = document.querySelectorAll(".listing-card");
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const title = row.textContent.toLowerCase();
+
+            if(title.includes(searchValue)) {
+                visibleCount++;
+                row.style.display = "";      // ✅ show row
+            } else {
+                row.style.display = "none";  // ✅ hide row
+            }
+        });
+
+        const noresult = document.getElementById("no-result");
+        document.getElementById("search-term").textContent = searchValue;
+        if(visibleCount === 0 && searchValue !== ""){
+          noresult.style.display = "block"; // show the text
+        }else{
+          noresult.style.display = "none"; //hide the text
+        }
+    });
     async function addToCart(event, id, category) {
       event.stopPropagation();
       const btn = event.target.closest(".add-to-cart-btn");
