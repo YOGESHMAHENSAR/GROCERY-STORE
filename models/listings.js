@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Reviews = require("./reviews.js");
-const { string, required } = require("joi");
+const { string, required, boolean } = require("joi");
 
 main().then()
 .catch((err)=>console.log("ERROR: ",err));
@@ -54,6 +54,11 @@ const listingSchema = new mongoose.Schema({
     Tax: {
         type: String,
         required: true
+    },
+    inStock: {
+        type: Boolean,
+        required: true,
+        default: true
     },
     category:[
         {

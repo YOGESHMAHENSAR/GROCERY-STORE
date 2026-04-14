@@ -19,7 +19,7 @@ const razorpay = new Razorpay({
 router.get('/order-success', isLoggedIn, async (req, res) => {
     try {
         const orderId = req.session.lastOrderId;
-        console.log("lastOrderId from session:", orderId); // debug
+        // console.log("lastOrderId from session:", orderId); // debug
 
         if (!orderId) {
             req.flash("error", "No recent order found!");
@@ -27,7 +27,7 @@ router.get('/order-success', isLoggedIn, async (req, res) => {
         }
 
         const order = await Order.findById(orderId).populate("items.product");
-        console.log("order found:", order); // debug
+        // console.log("order found:", order); // debug
 
         if (!order) {
             req.flash("error", "Order not found!");
@@ -159,6 +159,33 @@ router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
     }
     catch(e){
         res.json({success: false, message: e.message});
+    }
+})
+
+//Invoice
+router.get("/orders/:id/invoice",isLoggedIn, async (req,res)=>{
+    try{
+        const order = await Order.findOne({ orderId: req.params.id }).populate("user").populate("items.product");
+        res.render("listings/invoice", {order});
+    }catch(e){
+        req.flash("error","Error in Inventory");
+        res.redirect("/listings");
+    }
+})
+
+//Invoice
+router.get("/orders/:id/invoice",isLoggedIn, async (req,res)=>{
+    try{
+        const order = await Order.findOne({ orderId: req.params.id })
+            .populate("user")
+            .populate({
+                path: "items.product",
+                populate: { path: "owners" }  // Populate owners for store details
+            });
+        res.render("listings/invoice", {order});
+    }catch(e){
+        req.flash("error","Error generating invoice");
+        res.redirect("/listings");
     }
 })
 

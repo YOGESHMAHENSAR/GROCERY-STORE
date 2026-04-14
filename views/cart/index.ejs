@@ -161,12 +161,15 @@
                 %>
                  <p class="mt-2 me-3 d-inline">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
                 <% if(hasAddress) {%>
-                    <button type="button" id="pay-btn" class="btn-place-order" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
+                    <a href="/profile/address" class="btn btn-verify-address" style="text-decoration: none;">
+                        <i class="fa-solid fa-location-dot me-2"></i>Verify Address
+                    </a>
+                    <button type="button" id="pay-btn" class="ms-3 btn-place-order" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
                         <i class="fa-solid fa-bag-shopping me-2"></i>Place Order
                     </button>
                 <% } else {%>
-                    <a href="/profile/address" class="btn btn-place-order" style="text-decoration: none;">
-                        <i class="fa-solid fa-bag-shopping me-2"></i>Add Address to Place Order
+                    <a href="/profile/address" class="btn btn-verify-address" style="text-decoration: none;">
+                        <i class="fa-solid fa-location-dot me-2"></i>Add Address to Place Order
                     </a>
                 <% } %>
             <% } %>

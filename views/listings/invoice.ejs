@@ -1,0 +1,146 @@
+<!-- invoice.ejs -->
+<% layout("/layouts/boilerplate") %>
+
+<style>
+    @media print {
+        body * { visibility: hidden; }
+        #invoice, #invoice * { visibility: visible; }
+        #invoice { position: absolute; top: 0; left: 0; width: 100%; }
+
+        #print-btn, #downloadbtn { display: none; }
+
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .box {
+            background: rgb(249, 215, 220) !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+    .box{
+        border: 1px solid black;
+        border-radius: 24px;
+        background: rgb(249, 215, 220) !important;
+        max-width: 300px;
+        padding: 12px;
+    }
+    .download{
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+
+<div id="invoice" style="max-width:1200px; margin:auto; padding:2rem;">
+    <% const invoiceId = "INV-" + new Date(order.createdAt).getMonth() + "-" + new Date(order.createdAt).getFullYear() + "-" + order.orderId.slice(-6).toUpperCase(); %>
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <img src="/css/grocery-image.png" style="width: 150px;  border-radius: 32px; height: 130px;" alt="logo">
+        </div>
+        <div class="col-md-8  mt-3">
+            <h2><b>Invoice Number: </b> <%= invoiceId %></h2>
+            <h3><b>Order ID:</b> <%= order.orderId %></h3>
+        </div>
+    </div>
+    <div class="download">
+        <p>Date: <%= new Date(order.createdAt).toLocaleDateString("en-IN") %></p>
+         <div class="text-right">
+            <button id="downloadbtn" onclick="window.print()" class="btn btn-primary">Download PDF</button>
+        </div>
+    </div>
+    
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="col-md-10">
+                <h3>Shipped To: </h3>
+                <div class="ship mt-2">
+                    <p><b>Address:</b> <%= order.address.street %>, <%= order.address.city %>, <%= order.address.state %> - <%= order.address.pincode %></p>
+                    <p><b>Payment ID: </b><%= order.paymentId %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3>Billing To: </h3>
+            <div class="info">
+                <p><b>Name:</b> <%= order.user.username %></p>
+                <p><b>Email:</b> <%= order.user.email %></p>
+            </div>
+        </div>
+    </div>
+    <div class="row ">
+        <h3>Store Details: </h3>
+        <div class="store">
+            <p><b>Store Name:</b> Grocery Store</p>
+            <h6><b>Store Address:</b> Maharaja Gate Sripur, Bikaner, Rajasthan </h6>
+            <!-- Add more details if available, e.g., email, address -->
+        </div>
+    </div>
+    <hr>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% let total = 0; %>
+            <% for(let item of order.items) { %>
+                <% let itemTotal = parseFloat(item.price) * item.quantity; total += itemTotal; %>
+                <tr>
+                    <td><%= item.product.title %></td>
+                    <td><%= item.quantity %></td>
+                    <td>₹<%= item.price %></td>
+                    <td>₹<%= itemTotal %></td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+    <hr>
+    <%
+        let subTotal  = order.items.reduce((sum, item) => sum + parseFloat(item.product.sellingPrice) * item.quantity, 0);
+        let totalTax  = order.items.reduce((sum, item) => {
+            let itemTotal = parseFloat(item.product.sellingPrice) * item.quantity;
+            let taxRate   = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+            return sum + (itemTotal * taxRate);
+        }, 0);
+        let grandTotal = subTotal + totalTax;
+        let cgst = totalTax/2;
+        let sgst = totalTax/2;
+    %>
+    <div class="d-flex justify-content-end total-cost mt-4 mb-3">
+        <div class="box" style="width: 300px;">
+            <div class="d-flex justify-content-between">
+                <span><b>Subtotal</b></span>
+                <span>₹ <%= subTotal.toFixed(2) %></span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span><b>CGST</b></span>
+                <span>₹ <%= cgst.toFixed(2) %></span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span><b>SGST</b></span>
+                <span>₹ <%= sgst.toFixed(2) %></span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span><b>Total Tax</b></span>
+                <span>₹ <%= totalTax.toFixed(2) %></span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span><b>Platform Fee</b></span>
+                <span>₹ 10</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between font-weight-bold">
+                <span><b>Final Total</b></span>
+                <span>₹ <%= (grandTotal + 10).toFixed(2) %></span>
+            </div>
+            <p class="text-right mt-2" style="font-size: 12px;">Inclusive of all taxes <span style="color: red;">*</span></p>
+        </div>
+    </div>    
+</div>

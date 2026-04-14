@@ -783,6 +783,23 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(79,70,229,0.45);
 }
+.btn-verify-address {
+    background: linear-gradient(135deg, #e5b846, #b59b25);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 32px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    box-shadow: 0 4px 14px rgba(201, 106, 42, 0.35);
+    letter-spacing: 0.01em;
+}
+.btn-verify-address:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(255, 123, 235, 0.45);
+}
 
 /* empty cart */
 .empty-cart {

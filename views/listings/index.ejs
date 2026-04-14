@@ -14,6 +14,23 @@
   <form action="/listings/new" method="get">
     <!-- <button>ADD Listings</button> -->
   </form>
+  <style>
+        .stock-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .stock-status.in-stock {
+            background: #dcfce7;
+            color: green;
+        }
+        .stock-status.out-stock {
+            background: #fee2e2;
+            color: red;
+        }
+    </style>
 
   <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
     <% for(let list of lists) {%>
@@ -41,24 +58,40 @@
                           <i class="fas fa-rupee-sign"></i><b> : <%=list.sellingPrice?.toLocaleString("en-IN") %> </b>
                         </div>
                       </div>
+                      <% if(currUser && list.owners.some(o => o._id.equals(currUser._id))){ %>
+                      <div class="col-md-8 mt-3">
+                        <span id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
+                            <%= list.inStock ? "In Stock" : "Out of Stock" %>
+                        </span>
+                      </div>
+                      <% } %>
                       <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
                           <div class="row mt-3">
-                            <% const alreadyAdded = addedToCart && addedToCart.includes(list._id.toString()); %>
-                            <% if(alreadyAdded) {%>
-                              <a href="/cart" class="btn btn-outline-success" style="margin-top: -9px;margin: auto;width: 9rem;" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-cart-shopping"></i> View Cart
-                              </a>
-                            <% } else { %>
-                              <!-- <form action="/cart/<%# list._id %>" method="post" onsubmit="showLoader(this)"> -->
-                                  <input type="hidden" name="returnTo" value="/listings?category=<%= category %>">
-                                  <button type="button" data-id="<%= list._id %>" data-category="<%= category %>" 
-                                    class="btn btn-outline-primary add-to-cart-btn" title="Add To Cart"
-                                    style="margin-top: -13px;margin-left: 115px;width: 4rem;"
-                                    onclick="addToCart(event, '<%= list._id %>', '<%= category %>')">
-                                      <i class="fa-solid fa-cart-shopping"></i>
-                                  </button>
-                              <!-- </form> -->
-                            <% } %>
+                            <div class="col-md-8">
+                              <span id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
+                                  <%= list.inStock ? "In Stock" : "Out of Stock" %>
+                              </span>
+                            </div>
+                            <div class="col-md-2">
+                              <% const alreadyAdded = addedToCart && addedToCart.includes(list._id.toString()); %>
+                              <% if(alreadyAdded) {%>
+                                <a href="/cart" class="btn btn-outline-success" style="width: 4rem;margin: -31px auto auto;margin-left: -28px;" onclick="event.stopPropagation()">
+                                  <i class="fa-solid fa-cart-shopping"></i> View Cart
+                                </a>
+                              <% } else { %>
+                                <!-- <form action="/cart/<%# list._id %>" method="post" onsubmit="showLoader(this)"> -->
+                                    <input type="hidden" name="returnTo" value="/listings?category=<%= category %>">
+                                    <% if(list.inStock) {%>
+                                      <button type="button" data-id="<%= list._id %>" data-category="<%= category %>" 
+                                        class="btn btn-outline-primary add-to-cart-btn" title="Add To Cart"
+                                        style="margin-top: -3px;margin-left: -22px;width: 4rem;"
+                                        onclick="addToCart(event, '<%= list._id %>', '<%= category %>')">
+                                          <i class="fa-solid fa-cart-shopping"></i>
+                                      </button>
+                                    <% } %>
+                                <!-- </form> -->
+                              <% } %>
+                            </div>
                                <!-- <div style="margin-left: 130px; font-size: 14px;margin-top: -20px;">CART<span style="color: red; "><b>*</b></span></div> -->
                           </div>
                       <% } %>
@@ -103,9 +136,9 @@
           a.href = "/cart";
           a.className = "btn btn-outline-success";
           a.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>View Cart`;
-          a.style.width = "9rem";
-          a.style.margin = "auto";
-          a.style.marginTop = "-9px";
+          a.style.width = "4rem";
+          a.style.margin = "-31px auto auto";
+          a.style.marginLeft = "-28px";
           a.onclick = (e) => e.stopPropagation(); // Block card click
           btn.replaceWith(a);
 

@@ -55,7 +55,7 @@ module.exports.renderEditForm = async (req,res)=>{
 }
 
 module.exports.update = async (req,res)=>{
-    console.log("req.body.listing: ", req.body.listing);
+    // console.log("req.body.listing: ", req.body.listing);
     const {costPrice, margin, Tax} = req.body.listing;
 
     req.body.listing.sellingPrice = (

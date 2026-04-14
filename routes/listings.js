@@ -40,6 +40,35 @@ router.get("/new",isLoggedIn,isAnyOwner, (req,res)=>{
     res.render("listings/new");
 })
 
+//Inventroy
+router.get("/inventory",isAnyOwner,isLoggedIn, async (req,res)=>{
+    try{
+        const lists = await List.find({});
+        res.render("listings/inventory", {lists});
+    }catch(e){
+        req.flash("error","Error in Inventory");
+        res.redirect("/listings");
+    }
+})
+
+router.patch("/inventory/:id/stock", isAnyOwner, isLoggedIn, async (req,res)=>{
+    try{
+        const {inStock} = req.body;
+        const listing = await List.findByIdAndUpdate(
+            req.params.id, //finds the product on the basis of the productId
+            {inStock}, // save current inStock value either true or false to the db
+            {new: true} // return the updated value
+        );
+        if(!listing) return res.status(404).json({success: false, message: "404 Product not found"});
+        res.json({success: true, message: "Stock Updated", inStock: listing.inStock})
+        // here the inStock: listing.inStock here the updated inStock value will be sent to the frontend 
+    }
+    catch(e){
+        res.json({success: false, message: e.message});
+    }
+
+})
+
 // Construction page (MUST come before /:id routes)
 router.get("/review",(req,res)=>{
     res.render("listings/construction");

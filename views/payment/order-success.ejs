@@ -15,9 +15,36 @@
                         <span>₹<%= (item.price * item.quantity).toLocaleString("en-IN") %></span>
                     </div>
                 <% } %>
+                <%
+                    let subTotal  = order.items.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
+                    let totalTax  = order.items.reduce((sum, item) => {
+                        let itemTotal = parseFloat(item.price) * item.quantity;
+                        let taxRate   = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+                        return sum + (itemTotal * taxRate);
+                    }, 0);
+                    let grandTotal = subTotal + totalTax + 10;
+                    let cgst = totalTax/2;
+                    let sgst = totalTax/2;
+                %>
                 <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
-                    <span>Total</span>
-                    <span>₹<%= order.totalAmount.toLocaleString("en-IN") %></span>
+                    <span>Sub-Total</span>
+                    <span>₹<%= subTotal.toFixed(2) %></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
+                    <span>CGST</span>
+                    <span id="cgst">₹<%= cgst.toFixed(2) %></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
+                    <span>SGST</span>
+                    <span id="sgst">₹<%= sgst.toFixed(2) %></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
+                    <span>Total-Tax</span>
+                    <span>₹<%= totalTax.toFixed(2) %></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
+                    <span>Grand-Total</span>
+                    <span>₹<%= grandTotal.toFixed(2) %></span>
                 </div>
             </div>
 
@@ -30,6 +57,7 @@
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center;">
+                <a href="/orders/<%= order.orderId %>/invoice" class="btn btn-outline-dark">Download Invoice</a>
                 <a href="/orders" class="btn btn-outline-dark">View All Orders</a>
                 <a href="/listings" class="btn btn-success">Continue Shopping</a>
             </div>

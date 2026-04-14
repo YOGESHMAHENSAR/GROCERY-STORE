@@ -1,5 +1,22 @@
 <% layout("/layouts/boilerplate") -%>
 <body>
+    <style>
+        .stock-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .stock-status.in-stock {
+            background: #dcfce7;
+            color: green;
+        }
+        .stock-status.out-stock {
+            background: #fee2e2;
+            color: red;
+        }
+    </style>
     <div class="row">
         <div class="col-8 offset-2 mb-1">
             <h2 class="mt-1">Product : <b><%= lists.title %></b></h2>
@@ -44,10 +61,20 @@
                                         </div>    
                                     </div>
                                 <% } %>
+                                <div class="col-md-8">
+                                    <span id="status-<%= lists._id %>" class="stock-status <%= lists.inStock ? 'in-stock' : 'out-stock' %>">
+                                        <%= lists.inStock ? "In Stock" : "Out of Stock" %>
+                                    </span>
+                                </div>
+                                <% if(!lists.inStock) {%>
+                                    <span class="mt-2" style="font-size: .8rem; font-weight: 600;">
+                                        We will Bring it Right Back in <b>STOCK</b><b style="color: red;">*</b>
+                                    </span>
+                                <% } %>
                                 <br>
                                 <br>
                                 <% if(!currUser || !lists.owners.some(o=>o._id.equals(currUser._id))) {%>
-                                    <div class="row mt-3">
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <% const alreadyAdded = addedToCart && addedToCart.includes(lists._id.toString()) %>
                                             <% if(alreadyAdded) {%>
@@ -55,12 +82,14 @@
                                                     <i class="fa-solid fa-cart-shopping"></i>View Cart
                                                 </a>
                                             <% } else { %>
-                                            <form action="/cart/<%= lists._id %>" method="post" id="cart-form">
-                                                <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
-                                                <button class="btn btn-outline-primary" style="margin-top: -50px;">
-                                                    <i class="fa-solid fa-cart-shopping"></i>Add To Cart
-                                                </button>
-                                            </form>
+                                            <% if(lists.inStock) {%>
+                                                <form action="/cart/<%= lists._id %>" method="post" id="cart-form">
+                                                    <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
+                                                    <button class="btn btn-outline-primary" style="margin-top: -50px;">
+                                                        <i class="fa-solid fa-cart-shopping"></i>Add To Cart
+                                                    </button>
+                                                </form>
+                                            <% } %>
                                             <div class="loader-overlay" id="cartLoaderOverlay">
                                                 <div class="loader-container">
                                                     <div class="loader"></div>

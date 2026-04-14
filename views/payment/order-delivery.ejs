@@ -1,10 +1,10 @@
 <%- layout("/layouts/boilerplate") -%>
-<div style="max-width: 800px; margin: 1rem; padding: 0 1rem;">
+<div style="max-width: 866px; margin: 1rem; padding: 0 1rem;">
     <div class="row">
-        <div class="col-md-4">
-            <h4 class="mb-4">Total Orders: <%= orders.length %></h3>
+        <div class="col-md-3">
+            <h4 class="mb-4">Total Orders : <%= orders.length %></h3>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <h5 class="mb-4"><b style="color: rgb(209, 161, 17);">Pending :</b>
                 <span id="count-pending">
                     <%= orders.filter(o => o.status === "Pending").length %> 
@@ -18,8 +18,8 @@
                 </span>
             </h5>
         </div>
-        <div class="col-md-2">
-            <h5 class="mb-4"><b style="color: rgb(80, 92, 225);">Placed :</b>
+        <div class="col-md-3">
+            <h5 class="mb-4"><b style="color: rgb(80, 92, 225);">Delivered :</b>
                 <span id="count-place">
                     <%= orders.filter(o => o.status === "Placed").length %>
                 </span>  
@@ -37,13 +37,19 @@
         <% 
             let totalSellingSum = orders.reduce((orderSum, order)=> {
                 return orderSum + order.items.reduce((itemSum, item)=> {
-                    return itemSum + (parseInt(item.product.sellingPrice) * item.quantity);
+                    const price = parseFloat(item.product?.sellingPrice?.toString().replace(/[^\d.-]/g, '')) || 0;
+                    const taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+                    const priceWithTax = price * (1 + taxRate);
+                    return itemSum + (priceWithTax * item.quantity);
                 },0);
             },0);
 
             let totalCostSum = orders.reduce((orderSum, order)=>{
                 return orderSum + order.items.reduce((itemSum, item)=>{
-                    return itemSum + (parseInt(item.product.costPrice) * item.quantity);
+                    const price = parseFloat(item.product?.costPrice?.toString().replace(/[^\d.-]/g, '')) || 0;
+                    const taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+                    const priceWithTax = price * (1 + taxRate);
+                    return itemSum + (priceWithTax * item.quantity);
                 },0)
             },0)
 
@@ -85,10 +91,18 @@
                                 </span>
                             </div>
                             <% let sum = 0 %>
+                            <% 
+                                let orderSubTotal = order.items.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
+                                let orderTax = order.items.reduce((sum, item) => {
+                                    let itemTotal = parseFloat(item.price) * item.quantity;
+                                    let taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+                                    return sum + (itemTotal * taxRate);
+                                }, 0);
+                                let orderGrandTotal = orderSubTotal + orderTax + 10;
+                            %>
                             <div>
                                 <p style="margin: 0; font-size: 13px; color: #6b7280;">Total</p>
-                                <p style="margin: 0; font-weight: 600;">₹<%= order.totalAmount.toLocaleString("en-IN") %></p>
-                                <% sum += order.totalAmount.toLocaleString("en-IN") %>
+                                <p style="margin: 0; font-weight: 600;">₹<%= orderGrandTotal.toFixed(2) %></p>
                             </div>
                         </div>
                         <div style="border-top: 1px solid #f3f4f6; padding-top: 1rem;">
@@ -119,7 +133,7 @@
                             <% } %>
                             <% if(order.status === "Placed") {%>
                                 <div class="col-md-4">
-                                    <h3 style="color: brown;">Order Placed</h3>
+                                    <h3 style="color: brown;">Order Delivered</h3>
                                 </div>
                             <% } %>
 
@@ -130,7 +144,6 @@
             </div>
             <div class="col-md-2" >
                  <%# for(order of orders) {%>
-
                 <div class="grand-total-box" style="margin-left: 18rem; position: fixed ;">
                     <div class="grand-total-row">
                         <span>Total Selling Price</span>
@@ -170,7 +183,7 @@
     })
 
     async function updateOrderStatus(orderId, status, btn){
-        console.log("sending orderId:", orderId);
+        // console.log("sending orderId:", orderId);
 
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;

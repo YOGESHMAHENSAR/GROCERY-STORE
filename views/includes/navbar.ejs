@@ -23,7 +23,7 @@
         </a>
          <% if(!currUser || !ownerId.includes(currUser._id.toString())) {%>
           <a href="/cart" class="nav-link d-flex align-items-center flex-columns ms-3">
-            <i class="fa-solid fa-cart-arrow-down" style="font-size: 1.35rem; color: rgb(149, 62, 241)"></i>
+            <i class="fa-solid fa-cart-arrow-down" style="font-size: 1.35rem; color: rgb(149, 62, 241)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Cart</span>
             <!-- <span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Cart</span> -->
             <strong id="cart-count" class="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-primary" style="margin: 5px ;"><%= cartCount %></strong>
             <% if(locals.cartCount > 0) { %>
@@ -32,8 +32,11 @@
           </a>
         <% } %>
         <% if(currUser && ownerId.includes(currUser._id.toString())) {%>
-          <a class="nav-link d-flex flex-columns align-items-center ms-5" href="/listings/new">
+          <a class="nav-link d-flex flex-columns align-items-center" href="/listings/new">
             <i class="fa-solid fa-cart-plus" style="font-size: 1.35rem; color: rgb(0, 72, 255)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Add Products</span>
+          </a>
+          <a class="nav-link d-flex flex-columns align-items-center" href="/listings/inventory">
+            <i class="fa-solid fa-boxes-stacked" style="font-size: 1.35rem; color: rgb(106, 90, 10)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Inventory</span>
           </a>
           <a class="nav-link d-flex flex-columns align-items-center" href="/orders-delivery">
             <i class="fa-regular fa-truck" style="font-size: 1.35rem; color: rgb(255, 0, 21)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Orders</span>
