@@ -4,7 +4,7 @@ const mergeGuestCart = require("../utils/mergecart.js");
 
 module.exports.signup = async (req, res, next) => {
     try {
-        let { username, email, otp, password, street, city, state, pincode} = req.body;
+        let { username, email, otp, password, street, city, state, pincode, phone} = req.body;
 
         if (otp != req.session.otp || email !== req.session.otpEmail) {
             req.flash("err", "Invalid OTP or E-MAIL");
@@ -19,7 +19,7 @@ module.exports.signup = async (req, res, next) => {
         // ✅ Save guest cart BEFORE registering
         const guestCart = req.session.cart || [];
 
-        let newUser = new User({ email, username, address: {street, city, state, pincode}});
+        let newUser = new User({ email, username,phone, address: {street, city, state, pincode}});
         let registeredUser = await User.register(newUser, password);
 
         req.login(registeredUser, async (err) => {

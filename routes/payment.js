@@ -148,14 +148,74 @@ router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
 router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
     try{
         const orderId = req.params.id;
-        const {status} = req.body;
-        const order = await Order.findOneAndUpdate({orderId: orderId}, {status},{new: true});
+        const {status, orderGrandTotal} = req.body;
+        const order = await Order.findOneAndUpdate({orderId: orderId}, {status},{new: true})
+            .populate("user")
+            .populate("items.product");
 
         if(!order){
-            res.json({success: false, message: "404 order Not found"});
-        }else{
-            res.json({success:true, message: "Order status Updated", status: order.status});
+            return res.json({success: false, message: "404 order Not found"});
         }
+
+        const phone = order.user.phone;
+
+        if(status === "Confirmed"){
+            let count = 1;
+            let message = `*Order Confirmed!*
+━━━━━━━━━━━━━━━━━━━━
+★ *Order Summary*
+
+        ${order.items.map((item, index) => `${index + 1}. ${item.product.title} x ${item.quantity}`).join("\n\t")}
+
+━━━━━━━━━━━━━━━━━━━━
+★ *Amount to Pay (Inclusive all Taxes):* Rs. ${parseFloat(orderGrandTotal).toFixed(2)}
+━━━━━━━━━━━━━━━━━━━━
+
+★ *Your order is being prepared!*
+We will notify you once it is out for delivery
+
+★ Need help? Call us: +91-77370XXXXX
+   Owner_name : *Yogesh Singh*
+━━━━━━━━━━━━━━━━━━━━
+ _Powered by *★ Grocery-Store ★* `;
+            
+            let encodedMsg = encodeURIComponent(message);
+
+            let url = `https://wa.me/91${phone}?text=${encodedMsg}`;
+
+            return res.json({success:true, message: "Order status Updated", status: order.status, whatsappUrl: url });
+        }
+        if(status === "Placed"){
+            let message = `*Order Delivered Successfully!*
+━━━━━━━━━━━━━━━━━━━━
+★ *Order Summary*
+
+        ${order.items.map((item, index) => `${index + 1}. ${item.product.title} x ${item.quantity}`).join("\n\t")}
+
+━━━━━━━━━━━━━━━━━━━━
+★ *Total Paid:* Rs. ${parseFloat(orderGrandTotal).toFixed(2)}
+━━━━━━━━━━━━━━━━━━━━
+
+★ *Thank you for shopping with us!*
+We hope you enjoy your order
+
+★ *Your feedback matters!*
+Rate your experience & help us improve:
+★ https://grocery-store-r5o0.onrender.com/listings
+
+★ Need help? Call us: +91-7737XXXXXX
+   Owner_Name: *Yogesh Singh*
+━━━━━━━━━━━━━━━━━━━━
+ _Powered by *★ Grocery-Store ★* `;
+            
+            let encodedMsg = encodeURIComponent(message);
+
+            let url = `https://wa.me/91${phone}?text=${encodedMsg}`;
+
+            return res.json({success:true, message: "Order status Updated", status: order.status, whatsappUrl: url });
+        }
+
+        res.json({ success: true, message: "Order status Updated", status: order.status });
     }
     catch(e){
         res.json({success: false, message: e.message});

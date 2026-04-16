@@ -123,12 +123,18 @@
                             </div>
                             <% if (order.status === "Pending") {%>
                                 <div class="col-md-4">
-                                    <button class="btn btn-outline-primary" data-id="<%= order.orderId %>" id="order-confirmed">Order Confirm</button>
+                                    <button class="btn btn-outline-dark" data-category="<%= orderGrandTotal %>"
+                                        data-id="<%= order.orderId %>" id="order-confirmed">
+                                        <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 1.6rem"></i> Order Confirm
+                                     </button>
                                 </div>
                             <% } %>
                             <% if(order.status === "Confirmed" ) {%>
                                 <div class="col-md-4">
-                                    <button class="btn btn-outline-danger" data-id="<%= order.orderId %>" id="order-placed">Order Placed</button>
+                                    <button class="btn btn-outline-success" data-category="<%= orderGrandTotal %>"
+                                        data-id="<%= order.orderId %>" id="order-placed">
+                                        <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 1.6rem;"></i> Order Delivered
+                                    </button>
                                 </div>
                             <% } %>
                             <% if(order.status === "Placed") {%>
@@ -171,26 +177,28 @@
         const orderConfirmed = e.target.closest("#order-confirmed");
         if(orderConfirmed){
             const orderId = orderConfirmed.dataset.id;
-            await updateOrderStatus(orderId, "Confirmed", orderConfirmed);
+            const orderGrandTotal = orderConfirmed.dataset.category;
+            await updateOrderStatus(orderId, "Confirmed", orderConfirmed, orderGrandTotal);
             return;
         }
         const orderPlaced = e.target.closest("#order-placed");
         if(orderPlaced){
             const orderId = orderPlaced.dataset.id;
-            await updateOrderStatus(orderId, "Placed", orderPlaced);
+            const orderGrandTotal = orderPlaced.dataset.category;
+            await updateOrderStatus(orderId, "Placed", orderPlaced, orderGrandTotal);
             return;
         }
     })
 
-    async function updateOrderStatus(orderId, status, btn){
-        // console.log("sending orderId:", orderId);
+    async function updateOrderStatus(orderId, status, btn, orderGrandTotal){
+        console.log("Total orderId:", orderGrandTotal);
 
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
         try{
             let response = await fetch(`/order/${orderId}/status`,{
                 method: "PATCH",
-                body: JSON.stringify({status}),
+                body: JSON.stringify({status, orderGrandTotal}),
                 headers: {"Content-Type": "application/json"}
             })
 
@@ -221,6 +229,9 @@
                             </button>
                     `;
                     btn.parentElement.replaceWith(div); // add to same row as confirm btn
+                    if (data.whatsappUrl) {
+                        window.open(data.whatsappUrl, "_blank"); // ✅
+                    }
                 } else if(data.status === "Placed"){
                     const div = document.createElement("div");
                     if(placedCount) placedCount.textContent = parseInt(placedCount.textContent) + 1;
@@ -228,6 +239,9 @@
                     div.className = "col-md-4";
                     div.innerHTML = `<h3 style="color: brown;">Order Placed</h3>`;
                     btn.parentElement.replaceWith(div);
+                    if(data.whatsappUrl){
+                        window.open(data.whatsappUrl, "_blank");
+                    }
                 }
             }
             else {
