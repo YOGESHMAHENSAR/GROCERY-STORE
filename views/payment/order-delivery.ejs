@@ -66,8 +66,8 @@
                                 <p style="margin: 0; font-weight: 500; font-size: 14px;"><%= order.user.username %></p>
                             </div>
                             <div>
-                                <p style="margin: 0; font-size: 13px; color: #6b7280;">Customer EmailId</p>
-                                <p style="margin: 0; font-weight: 500; font-size: 14px;"><%= order.user.email %></p>
+                                <p style="margin: 0; font-size: 13px; color: #6b7280;">Contact Number</p>
+                                <p style="margin: 0; font-weight: 500; font-size: 14px;"><%= order.user.phone %></p>
                             </div>
                             <div>
                                 <p style="margin: 0; font-size: 13px; color: #6b7280;">Order ID</p>
@@ -86,6 +86,7 @@
                                     Pending: "#fef9c3",
                                     Delivered: "#dcfce7",
                                 } %>
+                                <p style="margin: 0; font-size: 13px; color: #6b7280;">Order Status </p>
                                 <span data-id="<%= order.orderId %>" style="font-size: 12px; padding: 4px 12px; border-radius: 20px; background: #fef9c3;">
                                     <%= order.status %>
                                 </span>

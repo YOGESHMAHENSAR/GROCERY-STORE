@@ -20,8 +20,9 @@ router.route("/")
 router.get("/profile",isLoggedIn,(req,res)=>{
     const user = req.user.username;
     const mail = req.user.email;
-    const add = req.user.address
-    res.render("listings/profile", {user,mail, add});
+    const add = req.user.address;
+    const phone = req.user.phone;
+    res.render("listings/profile", {user,mail, add, phone});
 })
 
 router.get("/:id/cart",async (req,res)=>{

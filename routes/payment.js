@@ -138,7 +138,7 @@ router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
                 path: "items.product",
                 match: {_id: {$exists: true}}
             })
-            .populate("user", "username email ")
+            .populate("user", "username email phone")
         res.render("payment/order-delivery", { orders });
     } catch (err) {
         res.redirect("/listings");
