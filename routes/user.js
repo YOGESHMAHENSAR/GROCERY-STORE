@@ -108,9 +108,9 @@ router.post("/profile/address", async(req,res)=>{
 })
 
 router.post("/profile/address/detect",isLoggedIn, async (req,res)=>{
-    console.log("req.body: ", req.body);
+    // console.log("req.body: ", req.body);
     const {lat, lng} = req.body;
-    console.log("recieved: ", lat,lng);
+    // console.log("recieved: ", lat,lng);
 
     if(!lat || !lng){
         console.log("missing cordes");

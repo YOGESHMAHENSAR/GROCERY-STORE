@@ -2,17 +2,39 @@
 <script>
     let mapToken = "<%= process.env.MAP_TOKEN %>"
 </script>
+
+<style>
+    #map { 
+        width: 100%; 
+        height: 350px; 
+        position: relative;
+        margin-top: 20px;
+        border-radius: 10px;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-6 offset-3 mt-4">
         <h3>Add Delivery Address</h3>
-        <button type="button" id="detectLocation" class="btn btn-outline-primary">
+        <div id="map" class="mt-3"></div>
+    <!--  flyTo feture to move map at the starting location -->
+        <button class="btn btn-outline-dark mt-3" style="width: 30%;" id="reset-map-view">Reset Map</button> 
+         <button type="button" id="detectLocation" class="btn btn-outline-primary mt-3 ms-3">
             <i class="fa-solid fa-location-dot"></i> Detect My Location
         </button>
+    </div>
+    <div class="col-md-6 offset-3 mt-4">
+        <div class="loader-overlay" id="locationLoaderOverlay">
+            <div class="loader-container">
+                <div class="loader"></div>
+                <p class="loader-text">Detecting Location ... </p>
+            </div>
+        </div>
 
-        <div id="locationStatus" style="display:none;">Detecting location...</div>
+        <div id="locationStatus" class="reset-map-view" style="display:none;">Detecting location...</div>
 
         <div class="divider mt-4 mb-3">
-            <span style="margin-left: 300px">or</span>
+            <span style="margin-left: 300px"><b>or</b></span>
             <!-- <hr> -->
           </div>
 
@@ -50,15 +72,48 @@
     </div>
 </div>
 <script>
-    if(document.getElementById("map")){
-        mapboxgl.accessToken = mapToken;
-        const map = new mapboxgl.Map({
-            container: 'map', // container ID
-            center: [75.77694339685273, 26.909805885517095], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-            zoom: 9 // starting zoom
-        });
+    mapboxgl.accessToken = mapToken;
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        center: [75.77694339685273, 26.909805885517095], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+        zoom: 9, // starting zoom,
+        style: 'mapbox://styles/mapbox/streets-v12',
+    });
+    const marker = new mapboxgl.Marker({
+        color: "green", // set marker color
+        scale: 1.2,
+        draggable: true
+    })
+        .setLngLat([75.77694339685273, 26.909805885517095])
+        .addTo(map);
+
+    let currPopup = null;
+
+    function showPopup(lng, lat, address) {
+        if(currPopup) currPopup.remove();
+        currPopup = new mapboxgl.Popup({ closeButton: false, offset: 35 })
+            .setLngLat([lng, lat])
+            .setHTML(`
+                <div style="font-size: 0.75rem; line-height: 1.7;">
+                    <b>📍 Location</b><br>
+                    ${address.street}<br>
+                    ${address.city}, ${address.state}<br>
+                    <b>${address.pincode}</b>
+                </div>
+            `)
+            .addTo(map);
     }
-    document.getElementById("detectLocation").addEventListener("click", ()=>{
+
+    function fillForm(address) {
+        document.getElementById("city").value = address.city;
+        document.getElementById("state").value = address.state;
+        document.getElementById("pincode").value = address.pincode;
+        document.getElementById("street").value = address.street;
+    }
+
+    const detect = document.getElementById("detectLocation");
+    detect.addEventListener("click", ()=>{
+        document.querySelector("#locationLoaderOverlay").style.display = "flex";
         navigator.geolocation.getCurrentPosition(
             async (position) =>{
                 const lat = (position.coords.latitude);
@@ -77,20 +132,54 @@
                 //  console.log("fetch status:", response.status); // ✅ check status code
                 const data = await response.json();
                 // console.log("data received:", data);
+                document.querySelector("#locationLoaderOverlay").style.display = "none";
 
-                if(data.success){
-                    document.getElementById("city").value = data.address.city;
-                    document.getElementById("state").value = data.address.state;
-                    document.getElementById("pincode").value = data.address.pincode;
-                    document.getElementById("street").value = data.address.street;
+                if (data.success) {
+                    fillForm(data.address);
+                    map.flyTo({ center: [lng, lat], zoom: 13 });
+                    marker.setLngLat([lng, lat]);
+                    showPopup(lng, lat, data.address);
 
-                    document.getElementById("locationStatus").innerText = "Location Detected!";
+                    document.getElementById("locationStatus").style.display = "block";
+                    document.getElementById("locationStatus").innerText = "✅ Location Detected!";
                 }
             },
             (error)=>{ // if user clicks block for the location access
+                 document.querySelector("#locationLoaderOverlay").style.display = "none";
                 alert("Location Access Denied. Please fill the Location Manually!");
             }
         );
     })
+
+    marker.on('dragend', async () => {
+        const { lat, lng } = marker.getLngLat();
+        document.querySelector("#locationLoaderOverlay").style.display = "flex";
+
+        const response = await fetch("/profile/address/detect", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lat, lng })
+        });
+
+        const data = await response.json();
+        document.querySelector("#locationLoaderOverlay").style.display = "none";
+
+        if (data.success) {
+            fillForm(data.address);
+            showPopup(lng, lat, data.address);
+
+            document.getElementById("locationStatus").style.display = "block";
+            document.getElementById("locationStatus").innerText = "✅ Location Updated!";
+        }
+    });
+
+    const zoomOutButton = document.querySelector('#reset-map-view');
+    zoomOutButton.addEventListener('click', () => {
+        map.flyTo({
+            center: [75.77694339685273, 26.909805885517095],
+            zoom: 16
+        });
+        marker.setLngLat([75.77694339685273, 26.909805885517095]);
+    });
 </script>
 <!-- <script src="/js/map.js"></script> -->
