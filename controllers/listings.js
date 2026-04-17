@@ -83,12 +83,13 @@ module.exports.update = async (req,res)=>{
 
 module.exports.show = async (req,res)=>{
     let {id} = req.params;
+    // console.log("id:", id);
     let cart = [];
     let addedToCart = [];
     if(req.user){
         const user = await User.findById(req.user._id).populate("cart.product");
-        cart = user.cart.filter(item => item.product !== null);
-        addedToCart = user.cart.map(item => item.product._id.toString());
+        cart = cart.filter(item => item.product !== null);
+        addedToCart = cart.map(item => item.product._id.toString());
     } else {
         const sessionCart = req.session.cart || [];
         cart = sessionCart.map(item => ({
@@ -102,7 +103,7 @@ module.exports.show = async (req,res)=>{
       .populate("owners");
     if(!lists){
         req.flash("error", "Product You requested for Does not Exist");
-        res.redirect("/listings");
+        return res.redirect("/listings");
     }else{
         res.render("listings/show",{lists, cart, addedToCart});
     }

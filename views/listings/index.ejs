@@ -89,7 +89,7 @@
                                 <!-- <form action="/cart/<%# list._id %>" method="post" onsubmit="showLoader(this)"> -->
                                     <input type="hidden" name="returnTo" value="/listings?category=<%= category %>">
                                     <% if(list.inStock) {%>
-                                      <button type="button" data-id="<%= list._id %>" data-category="<%= category %>" 
+                                      <button type="button" id="cartAddBtn" data-id="<%= list._id %>" data-category="<%= category %>" 
                                         class="btn btn-outline-primary add-to-cart-btn" title="Add To Cart"
                                         style="margin-top: -3px;margin-left: -22px;width: 4rem;"
                                         onclick="addToCart(event, '<%= list._id %>', '<%= category %>')">
@@ -98,6 +98,12 @@
                                     <% } %>
                                 <!-- </form> -->
                               <% } %>
+                            </div>
+                            <div class="loader-overlay" id="cartLoaderOverlay">
+                                <div class="loader-container">
+                                    <div class="loader"></div>
+                                    <p class="loader-text">Adding Item To Cart ... </p>
+                                </div>
                             </div>
                                <!-- <div style="margin-left: 130px; font-size: 14px;margin-top: -20px;">CART<span style="color: red; "><b>*</b></span></div> -->
                           </div>
@@ -145,6 +151,7 @@
         }
     });
     async function addToCart(event, id, category) {
+      document.querySelector("#cartLoaderOverlay").style.display = "flex";
       event.stopPropagation();
       const btn = event.target.closest(".add-to-cart-btn");
 
@@ -166,6 +173,7 @@
           a.href = "/cart";
           a.className = "btn btn-outline-success";
           a.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>View Cart`;
+          document.querySelector("#cartLoaderOverlay").style.display = "none";
           a.style.width = "4rem";
           a.style.margin = "-31px auto auto";
           a.style.marginLeft = "-28px";

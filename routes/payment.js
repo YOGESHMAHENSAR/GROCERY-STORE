@@ -138,9 +138,13 @@ router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
                 path: "items.product",
                 match: {_id: {$exists: true}}
             })
-            .populate("user", "username email phone")
+            .populate("user", "username email phone");
+        orders.forEach(order => {
+            order.items = order.items.filter(item => item.product !== null); // needed as the product is deelted from the website but in the order placed 
+        });
         res.render("payment/order-delivery", { orders });
     } catch (err) {
+        console.log(err);
         res.redirect("/listings");
     }
 });

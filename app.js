@@ -166,6 +166,7 @@ app.use(async (req,res,next) =>{
     res.locals.signupErr = req.flash("err");
     res.locals.currUser = req.user;
     res.locals.category = req.query.category || null;//for category selection middleware
+    res.locals.req = req; //this is used for the active option of the navbar
 
     //cart middleware
     try {                                                    // ← wrap in try-catch
