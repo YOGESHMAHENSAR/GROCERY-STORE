@@ -12,6 +12,7 @@ module.exports.listingSchema = joi.object({
                 sellingPrice: joi.string().min(0),
                 margin: joi.string().required().min(0),
                 Tax: joi.string().required().min(0),
+                stockCount: joi.number().required().min(0)
         }).required()
 })
 

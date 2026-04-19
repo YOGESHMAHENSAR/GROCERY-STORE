@@ -17,7 +17,7 @@ const razorpay = new Razorpay({
 
 //Add order success page
 router.get('/order-success', isLoggedIn, async (req, res) => {
-    try {
+    try {        
         const orderId = req.session.lastOrderId;
         // console.log("lastOrderId from session:", orderId); // debug
 
@@ -32,6 +32,21 @@ router.get('/order-success', isLoggedIn, async (req, res) => {
         if (!order) {
             req.flash("error", "Order not found!");
             return res.redirect("/listings");
+        }
+
+        for(let item of order.items){
+            if(!item.product) continue;
+
+            const product = await List.findById(item.product._id);
+            if(product){
+                product.stockCount -= item.quantity;
+                if(product.stockCount <= 0){
+                    product.inStock = false;
+                    product.stockCount = 0;
+                }
+                await product.save();
+                // console.log(`✅ ${product.title} stock reduced to ${product.stockCount}`); // debug
+            }
         }
 
         // ✅ Clear session after using it

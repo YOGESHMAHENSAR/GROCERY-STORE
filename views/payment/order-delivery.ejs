@@ -227,8 +227,8 @@
                     if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) + 1;
                     div.className = "col-md-4";
                     div.innerHTML = `
-                            <button class="btn btn-outline-danger" data-id="${orderId}" id="order-placed">
-                                Order Placed
+                            <button class="btn btn-outline-success" data-id="${orderId}" id="order-placed">
+                                <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 1.6rem;"></i> Order Delivered
                             </button>
                     `;
                     btn.parentElement.replaceWith(div); // add to same row as confirm btn

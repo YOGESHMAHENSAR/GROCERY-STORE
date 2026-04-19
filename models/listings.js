@@ -60,6 +60,10 @@ const listingSchema = new mongoose.Schema({
         required: true,
         default: true
     },
+    stockCount:{
+        type: Number,
+        required: true
+    },
     category:[
         {
             type: String,

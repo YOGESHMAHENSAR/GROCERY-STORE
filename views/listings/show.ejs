@@ -45,8 +45,11 @@
                                             <b>Tax: </b> <%= lists.Tax %>%
                                         </div>
                                         <%# lists.sellingPrice = (lists.costPrice * (1+ lists.margin)) * (1+ lists.Tax) %>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6 mt-4">
                                             <b>Selling-Price: </b> <%= lists.sellingPrice %>
+                                        </div>
+                                        <div class="col-md-6 mt-4">
+                                            <b>Stock Remaining : </b> <%= lists.stockCount %>
                                         </div>
                                     </div>
                                     <br>
@@ -61,7 +64,7 @@
                                         </div>    
                                     </div>
                                 <% } %>
-                                <div class="col-md-8">
+                                <div class="col-md-8 mt-3">
                                     <span id="status-<%= lists._id %>" class="stock-status <%= lists.inStock ? 'in-stock' : 'out-stock' %>">
                                         <%= lists.inStock ? "In Stock" : "Out of Stock" %>
                                     </span>

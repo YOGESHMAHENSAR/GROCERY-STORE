@@ -62,9 +62,10 @@
                     <th>Margin %</th>
                     <th>Tax %</th>
                     <th>In Stock</th>
-                    <th>Action</th>
+                    <th>Stock</th>
                     <th>Toggle</th>
-                    <th>Discount</th>
+                    <th>Action</th>
+                    <!-- <th>Discount</th> -->
                 </tr>
             </thead>
             <tbody>
@@ -108,6 +109,9 @@
                             </span>
                         </td>
                         <td>
+                            <%= list.stockCount %>
+                        </td>
+                        <td>
                             <input type="checkbox" 
                             data-id="<%= list._id %>"
                             class="form-check-input stock-toggle"
@@ -125,9 +129,9 @@
                                 <i class="fa-solid fa-trash"></i>
                             </a>
                         </td>
-                        <td>
+                        <!-- <td>
                             <h6>NO</h6>
-                        </td>
+                        </td> -->
                     </tr>
                 <% } %>
             </tbody>

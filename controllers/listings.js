@@ -28,6 +28,7 @@ module.exports.validate = async (req,res)=>{
     let url = req.file.url;
     let filename = req.file.filename;
     const newListing = new List(req.body.listing);
+    
     // store as array so multiple owners can be supported
     newListing.image = {url, filename};
      if (process.env.OWNER_IDS) {
@@ -88,7 +89,7 @@ module.exports.show = async (req,res)=>{
     let addedToCart = [];
     if(req.user){
         const user = await User.findById(req.user._id).populate("cart.product");
-        cart = cart.filter(item => item.product !== null);
+        cart = user.cart.filter(item => item.product !== null);
         addedToCart = cart.map(item => item.product._id.toString());
     } else {
         const sessionCart = req.session.cart || [];
