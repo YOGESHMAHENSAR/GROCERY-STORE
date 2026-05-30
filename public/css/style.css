@@ -1,8 +1,13 @@
+*, *::after, *::before{
+    box-sizing: border-box;
+}
 body{
     font-family: "Montserrat", sans-serif;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 .container{
@@ -82,6 +87,17 @@ body{
     transform: scaleX(1); /* Grow to full width */
 }
 
+/* ── Navbar base ── */
+.navbar {
+  padding: 0 !important;
+}
+
+#search{
+    margin-top: -38px; 
+    margin-left: 72px; 
+    width: 348px;
+}
+
 /* FOOTER */
 .f-info-social{
     font-size: 24px;
@@ -152,6 +168,21 @@ body{
 .demo_user{
     border-radius: 1rem;
     width: 30px;
+}
+
+.card{
+    border-radius: 17px;
+    width: 13rem; 
+    height: 18rem; 
+    margin-left: .5rem; 
+    cursor: pointer;
+}
+
+.internal-card{
+    border-radius: 17px;
+    width: 66rem; 
+    height: 18rem; 
+    margin-left: .5rem; 
 }
 
 .card-body{
@@ -814,4 +845,195 @@ body {
     color: #16a34a !important;        /* green */
     /* border-bottom: 2px solid #16a34a; */
     padding-bottom: 2px;
+}
+
+.btnAddToCart{
+    margin-top: -50px;
+}
+
+.feedbackImage{
+    height: 403px; 
+    width: 562px;
+}
+
+.indexViewCart{
+    width: 6.4rem; 
+    margin-left: -57px;
+    font-size: 0.8rem;
+}
+
+#map{ 
+    width: 100%; 
+    height: 350px; 
+    position: relative;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+.cartBtns{
+    text-decoration: none;
+    margin-top: -290px;
+    height: 3rem;
+    margin-left: -105rem;
+}
+
+
+/* ── Media queries ── */
+@media (max-width: 767px) {
+    .rotating-text{
+        display: none !important;
+    }
+    #search{
+        max-width: 228px !important;
+    }
+    #cart-count{
+        margin-left: -275px !important;
+    }
+    .listing-link{
+        width: 11rem !important;
+        height: 18rem !important;
+    }
+    #cartAddBtn{
+        margin-top: -52px !important;
+        margin-left: 92px !important;
+        width: 3rem !important;
+    }
+    .show-img{
+        border-radius: 1rem;
+        height: 8rem;
+        width: 8rem !important;
+    }
+    .internal-card{
+        width: 18rem;
+        height: 23rem;
+    }
+    .btnAddToCart{
+        margin-top: -159px;
+        margin-left: 8rem;
+        width: 9rem;
+        height: 2.3rem;
+    }
+    .feedbackImage{
+        height: 302px;
+        width: 392px;
+    }
+    .btnViewCart {
+        width: 8rem;
+        margin: -31px auto auto;
+        margin-left: 143px;
+        margin-top: -10rem;
+    }
+    .indexViewCart{
+        width: 3.47rem;
+        font-size: 0.7rem;
+        margin-left: 89px;
+        margin-top: -36px;
+        font-weight: 600;
+    }
+    .personal-info{
+        margin-left: -55px;
+    }
+    .box-size{
+        width: 22rem;
+    }
+    #map{
+        width: 351.4px;
+        height: 221px;
+        padding: .5rem;
+    }
+    .address-info{
+        width: 20rem;
+    }
+    .logout-modal{
+        width: 22.5rem;
+    }
+    /* .cartBtns{
+        height: 5rem;
+        font-size: .8rem;
+    } */
+  #navbarNavAltMarkup {
+    width: 100%;
+    background-color: white;
+    border-top: 1px solid #e5e5e5;
+    padding-bottom: 8px;
+  }
+
+  #navbarNavAltMarkup .nav-link {
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 500;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  #navbarNavAltMarkup .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  #navbarNavAltMarkup .nav-link i {
+    width: 24px;          /* icon column — keeps text aligned */
+    text-align: center;
+    font-size: 1.2rem;
+  }
+}
+
+/* ── Desktop nav ── */
+@media (min-width: 768px) {
+  .navbar-nav .nav-link {
+    padding: 0 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 576px) {
+    /* Hide table headers */
+    .cart-table thead {
+        display: none;
+    }
+
+    /* Each row becomes a card */
+    .cart-table tbody tr {
+        display: block;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+
+    /* Each cell becomes a row with a label */
+    .cart-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border: none;
+        font-size: 0.9rem;
+    }
+
+    .stockInfo{
+        display: none !important;
+    }
+
+    .labelsTag{
+        display: none !important; 
+    }
+    .totalBoxShrink{
+        margin: auto;
+    }
+    /* .line{
+        display: none !important;
+    } */
+    .cartBtns{
+        text-decoration: none;
+        margin-top: 0px;
+        height: 4rem;
+        margin-left: 0rem;
+    }
+    /* Add labels before each cell */
+    .cart-table tbody td:nth-child(1)::before { content: "Product"; font-weight: 600; }
+    .cart-table tbody td:nth-child(2)::before { content: "Price"; font-weight: 600; }
+    .cart-table tbody td:nth-child(3)::before { content: "Quantity (Max 3)"; font-weight: 600; }
+    .cart-table tbody td:nth-child(4)::before { content: "Total"; font-weight: 600; }
+    .cart-table tbody td:nth-child(5)::before { content: "Action"; font-weight: 600; }
 }

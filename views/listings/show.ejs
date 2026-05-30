@@ -24,7 +24,7 @@
     </div>
     <div class="row">
         <div class="col-6 offset-2" style="width: 82%;">
-            <div class="card listing-card" style="border-radius: 15px; padding: 2px;">
+            <div class="internal-card" style="border-radius: 15px; padding: 2px;">
                 <div class="row">
                     <div class="col-md-6">
                         <img src="<%= lists.image.url %>" class="card-img-top show-img" alt="listImg">
@@ -81,14 +81,14 @@
                                         <div class="col-md-6">
                                             <% const alreadyAdded = addedToCart && addedToCart.includes(lists._id.toString()) %>
                                             <% if(alreadyAdded) {%>
-                                                <a href="/cart" class="btn btn-outline-success">
+                                                <a href="/cart" class="btn btn-outline-success btnViewCart">
                                                     <i class="fa-solid fa-cart-shopping"></i>View Cart
                                                 </a>
                                             <% } else { %>
                                             <% if(lists.inStock) {%>
                                                 <form action="/cart/<%= lists._id %>" method="post" id="cart-form">
                                                     <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
-                                                    <button class="btn btn-outline-primary" style="margin-top: -50px;">
+                                                    <button class="btn btn-outline-primary btnAddToCart">
                                                         <i class="fa-solid fa-cart-shopping"></i>Add To Cart
                                                     </button>
                                                 </form>
@@ -200,7 +200,7 @@
         <% if(lists.reviews.length === 0){ %>
             <div class="d-flex justify-content-center">
                 <!-- <h3 class="mb-4">no review yet!</h3> <br> -->
-                <img src="../css/imageReview.png" class="mt-3" style="height: 403px; width: 562px;" alt="no review yet pic">
+                <img src="../css/imageReview.png" class="mt-3 feedbackImage" alt="no review yet pic">
             </div>
         <% } %>
         <div class="row mt-2">

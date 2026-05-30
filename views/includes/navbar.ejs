@@ -1,28 +1,28 @@
-<nav class="navbar navbar-expand-md bg-body-light sticky-top border-bottom ">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-md bg-body-light sticky-top border-bottom px-0">
+  <div class="container-fluid px-0 navbar-mobile">
     <a class="navbar-brand" href="/listings"><img src="/css/grocery-image.png" style="width: 80px; margin-left: 10px; height: 67px;" alt="logo"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
-      <div class="navbar-nav d-flex justify-content-center w-80 ms-auto">
+    <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
+      <div class="navbar-nav d-flex justify-content-center ms-auto">
         <a class="nav-link <%= req.originalUrl === '/listings' ? 'active' : '' %> <%= !category ? 'active' : '' %> d-flex flex-columns align-items-center"  aria-current="page" href="/listings">
           <i class="fa-solid fa-house" style="font-size: 1.35rem; color: rgb(185, 86, 86)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Home</span>
         </a>
         <a class="nav-link <%= req.originalUrl === '/listings?category=Grocery' ? 'active' : '' %> <%= !category === 'Grocery' ? 'active' : '' %> d-flex flex-columns align-items-center"  aria-current="page" href="/listings?category=Grocery">
           <i class="fa-solid fa-bag-shopping" style="font-size: 1.35rem; color: rgb(223, 112, 146)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Grocery</span>
         </a>
-        <a class="nav-link <%= req.originalUrl === '/listings?category=Beverages' ? 'active' : '' %> <%= category === 'Beverages' ? 'active' : '' %> d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings?category=Beverages">
+        <a class="nav-link <%= req.originalUrl === '/listings?category=Beverages' ? 'active' : '' %> <%= category === 'Beverages' ? 'active' : '' %> d-flex align-items-center flex-columns" aria-current="page" href="/listings?category=Beverages">
           <i class="fa-solid fa-bread-slice" style="font-size: 1.35rem; color: rgb(229, 140, 45)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Beverages</span>
         </a>
-        <a class="nav-link <%= req.originalUrl === '/listings?category=Snacks' ? 'active' : '' %> <%= category === 'Snacks' ? 'active' : '' %> d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings?category=Snacks">
+        <a class="nav-link <%= req.originalUrl === '/listings?category=Snacks' ? 'active' : '' %> <%= category === 'Snacks' ? 'active' : '' %> d-flex align-items-center flex-columns" aria-current="page" href="/listings?category=Snacks">
           <i class="fa-solid fa-cookie-bite" style="font-size: 1.35rem; color: brown"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Snacks & Sweets</span>
         </a>
-        <a class="nav-link <%= req.originalUrl === '/listings?category=Dairy' ? 'active' : '' %> <%= category === 'Dairy' ? 'active' : '' %> d-flex align-items-center flex-columns ms-3" aria-current="page" href="/listings?category=Dairy">
+        <a class="nav-link <%= req.originalUrl === '/listings?category=Dairy' ? 'active' : '' %> <%= category === 'Dairy' ? 'active' : '' %> d-flex align-items-center flex-columns" aria-current="page" href="/listings?category=Dairy">
           <i class="fa-solid fa-cow" style="font-size: 1.35rem; color: rgb(0, 0, 0)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Dairy & Eggs</span>
         </a>
          <% if(!currUser || !ownerId.includes(currUser._id.toString())) {%>
-          <a href="/cart" class="nav-link <%= req.originalUrl === '/cart' ? 'active' : '' %> d-flex align-items-center flex-columns ms-3">
+          <a href="/cart" class="nav-link <%= req.originalUrl === '/cart' ? 'active' : '' %> d-flex align-items-center flex-columns">
             <i class="fa-solid fa-cart-arrow-down" style="font-size: 1.35rem; color: rgb(149, 62, 241)"></i><span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Cart</span>
             <!-- <span class="ms-2" style="font-size: 1.1rem; margin-top: 4px;">Cart</span> -->
             <strong id="cart-count" class="position-absolute top-2 start-100 translate-middle badge rounded-pill bg-primary" style="margin: 5px ;"><%= cartCount %></strong>
@@ -69,7 +69,7 @@
 <!-- model for permanently logout start -->
 <div class="modal fade" id="logout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content logout-modal">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel"><b>LOGOUT !</b></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

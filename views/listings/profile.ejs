@@ -6,18 +6,21 @@
   <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
 
     <!-- Header with avatar -->
-    <div style="background: #f9fafb; padding: 2rem; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; gap: 1.25rem;">
-      <div style="width: 64px; height: 64px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 500; color: #1d4ed8; flex-shrink: 0;">
-        <%= user.charAt(0).toUpperCase() %>
-      </div>
-      <div>
-        <p style="font-size: 20px; font-weight: 600; margin: 0;"><%=user%></p>
-        <% if(user === "Manish" || user === "YOGESH_SINGH") {%>
-          <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0;">Owner</p>
-        <% } else { %>
-          <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0;">Customer</p>
-        <% } %>
-      </div>
+    <div  style="background: #f9fafb; padding: 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 1.2rem;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 500; color: #1d4ed8; flex-shrink: 0;">
+              <%= user.charAt(0).toUpperCase() %>
+            </div>
+            <div>
+            <p style="font-size: 20px; font-weight: 600; margin: 0;"><%=user%></p>
+            <% if(user === "Manish" || user === "YOGESH_SINGH") {%>
+              <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0;">Owner</p>
+            <% } else { %>
+              <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0;">Customer</p>
+            <% } %>
+          </div>
+        </div>
+        <a href="/profile/personal-details" style="font-size: 13px; color: #2563eb; text-decoration: none;">Edit Personal Details</a>
     </div>
 
     <!-- Account details -->
@@ -52,7 +55,7 @@
                 <p style="margin: 0 0 4px; font-size: 13px; color: #6b7280;"><%= add.city %>, <%= add.state %></p>
                 <p style="margin: 0; font-size: 13px; color: #6b7280;">Pincode: <%= add.pincode %></p>
               </div>
-              <a href="/profile/address" style="font-size: 13px; color: #2563eb; text-decoration: none;">Edit</a>
+              <a href="/profile/address" style="font-size: 13px; color: #2563eb; text-decoration: none;">Edit Address</a>
             </div>
           </div>
         <% } else { %>

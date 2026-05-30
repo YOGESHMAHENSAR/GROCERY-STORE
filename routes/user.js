@@ -106,6 +106,30 @@ router.post("/profile/address", async(req,res)=>{
         res.redirect("/profile/address");
      }
 })
+//for personal details of the user
+
+router.get("/profile/personal-details", isLoggedIn, async (req,res)=>{
+    const name = req.user.username;
+    const mail = req.user.email;
+    const phone = req.user.phone;
+    // const password = req.user.password;
+    res.render("users/personal-details", {name, mail, phone});
+})
+
+router.post("/profile/personal-details",isLoggedIn, async(req,res)=>{
+    try{
+        const { name, mail, phone} = req.body;
+        await User.findByIdAndUpdate(req.user._id, 
+            {username: name, email: mail, phone: phone}, 
+            {new: true, runValidators: true}
+        );
+        req.flash("login", "Changes Saved successfully!");
+        res.redirect("/listings/profile");
+     }catch(err) {
+        req.flash("error", err.message);
+        res.redirect("/listings/profile/personal-details");
+     }
+})
 
 router.post("/profile/address/detect",isLoggedIn, async (req,res)=>{
     // console.log("req.body: ", req.body);

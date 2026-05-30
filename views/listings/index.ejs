@@ -31,19 +31,18 @@
             color: red;
         }
     </style>
-    <div class="col-md-4 mb-4">
+    <div class="col-md-4 mb-4 search-box">
         <label for="search" class="form-label"><b>Search: </b></label>
-        <input type="text" id="search" style="margin-top: -38px; margin-left: 72px; width: 348px;" class="form-control" placeholder="Search By Name, Category, Price, Stock">
+        <input type="text" id="search" class="form-control" placeholder="Search By Name, Category, Price, Stock">
     </div>
     <div id="no-result" style="display:none; text-align:center; margin-top:2rem;">
         <h5 style="color: #6b7280;">No products found for "<span id="search-term"></span>"</h5>
     </div>
 
-  <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1">
+  <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1 d-flex flex-wrap justify-content-evenly">
     <% for(let list of lists) {%>
         <!-- <a href="/listings/<%# list._id %>" class=""> -->
             <div class="card listing-card listing-link" 
-            style="border-radius: 17px; width: 13rem; height: 18rem; margin-left: .5rem; cursor: pointer;" 
             onclick="window.location='/listings/<%= list._id %>'">
                 <!-- <img src="<%# list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
                  <img 
@@ -74,15 +73,15 @@
                       <% } %>
                       <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
                           <div class="row mt-3">
-                            <div class="col-md-8">
-                              <span id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
+                            <div class="col-md-8" >
+                              <span style="font-size: .7rem;" id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
                                   <%= list.inStock ? "In Stock" : "Out of Stock" %>
                               </span>
                             </div>
                             <div class="col-md-2">
                               <% const alreadyAdded = addedToCart && addedToCart.includes(list._id.toString()); %>
                               <% if(alreadyAdded) {%>
-                                <a href="/cart" class="btn btn-outline-success" style="width: 4rem;margin: -31px auto auto;margin-left: -28px;" onclick="event.stopPropagation()">
+                                <a href="/cart" class="btn btn-outline-success indexViewCart" onclick="event.stopPropagation()">
                                   <i class="fa-solid fa-cart-shopping"></i> View Cart
                                 </a>
                               <% } else { %>
@@ -91,7 +90,7 @@
                                     <% if(list.inStock) {%>
                                       <button type="button" id="cartAddBtn" data-id="<%= list._id %>" data-category="<%= category %>" 
                                         class="btn btn-outline-primary add-to-cart-btn" title="Add To Cart"
-                                        style="margin-top: -3px;margin-left: -22px;width: 4rem;"
+                                       style="margin-left: -28px; margin-top: -3px;"
                                         onclick="addToCart(event, '<%= list._id %>', '<%= category %>')">
                                           <i class="fa-solid fa-cart-shopping"></i>
                                       </button>
@@ -171,12 +170,9 @@
         if (response.ok) {
           const a = document.createElement("a");
           a.href = "/cart";
-          a.className = "btn btn-outline-success";
+          a.className = "btn btn-outline-success indexViewCart";
           a.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>View Cart`;
           document.querySelector("#cartLoaderOverlay").style.display = "none";
-          a.style.width = "4rem";
-          a.style.margin = "-31px auto auto";
-          a.style.marginLeft = "-28px";
           a.onclick = (e) => e.stopPropagation(); // Block card click
           btn.replaceWith(a);
 

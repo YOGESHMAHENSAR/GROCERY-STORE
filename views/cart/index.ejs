@@ -3,8 +3,21 @@
 <div class="container py-5">
 
     <!-- title -->
-    <h2 class="cart-title">🛒 My Cart</h2>
-    <p class="cart-subtitle"><b><%= cart.length %> item(s)</b> in your cart</p>
+     <div class="d-flex justify-content-between ">
+        <h2 class="cart-title">🛒 My Cart</h2>
+        <a href="/listings" class="text-decoration-none" style="margin-left: 5rem;">
+            <button class="btn-continue labelsBtn1">
+                <i class="fa-solid fa-arrow-left me-2"></i><p class="labelsTag" style="display: inline;">Continue Shopping</p>
+            </button>
+        </a>
+        <a href="/orders" class="text-decoration-none " >
+            <button class="btn-continue ms-5 labelsBtn2">
+                <i class="fa-regular fa-truck me-2"></i><p class="labelsTag" style="display: inline;">Track Placed Orders</p>
+            </button>
+        </a>
+     </div>
+    
+    <p class="cart-subtitle"><b style="color: rgb(255, 132, 0);"><%= cart.length %> item(s)</b> in your cart</p>
 
     <% if(cart.length === 0) { %>
         <div class="empty-cart">
@@ -17,7 +30,7 @@
     <% } else { %>
 
     <!-- table -->
-    <div class="cart-table mb-4">
+    <div class="cart-table table-responsive mb-4">
         <table class="table mb-0">
             <thead>
                 <tr>
@@ -33,7 +46,7 @@
                 <tr id="cart-item-<%= item.product._id %>">
                     <td>
                         <div class="product-name"><%= item.product.title %></div>
-                        <div class="product-badge">✓ In Stock</div>
+                        <div class="product-badge stockInfo">✓ In Stock</div>
                     </td>
                     <td>
                         <span class="price-tag" id="price-<%= item.product._id %>"
@@ -86,18 +99,12 @@
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
         <!-- continue shopping -->
-        <a href="/listings" class="text-decoration-none" style="margin-left: 5rem;">
-            <button class="btn-continue">
-                <i class="fa-solid fa-arrow-left me-2"></i>Continue Shopping
-            </button>
-        </a>
-        <a href="/orders" class="text-decoration-none " >
-            <button class="btn-continue ms-5">
-                <i class="fa-regular fa-truck me-2"></i>Track Placed Orders
-            </button>
-        </a>
+         <!-- <div class="d-flex justify-content-center"> -->
+            
+         <!-- </div> -->
+        
         <!-- grand total box -->
-        <div class="grand-total-box">
+        <div class="grand-total-box totalBoxShrink">
             <%
                 let subTotal  = cart.reduce((sum, item) => sum + parseInt(item.product.sellingPrice) * item.quantity, 0);
                 let totalTax  = cart.reduce((sum, item) => {
@@ -142,7 +149,7 @@
    
 
     <!-- place order -->
-    <div class="d-flex justify-content-end mt-4">
+    <div class="d-flex justify-content-end mt-4 mb-3">
         <!-- <form action="/order" method="post"> -->
           <!-- <a href="listings/privacy" style="text-decoration: none;"> -->
             <% if(!currUser) {%>
@@ -159,23 +166,23 @@
                         currentUser.address.street && 
                         currentUser.address.pincode
                 %>
-                 <p class="mt-2 me-3 d-inline">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
                 <% if(hasAddress) {%>
-                    <a href="/profile/address" class="btn btn-verify-address" style="text-decoration: none;">
-                        <i class="fa-solid fa-location-dot me-2"></i>Verify Address
+                    <a href="/profile/address" class="btn btn-verify-address cartBtns" style="text-decoration: none;">
+                        <i class="fa-solid fa-location-dot me-2 "></i>Verify Address
                     </a>
-                    <button type="button" id="pay-btn" class="ms-3 btn-place-order" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
-                        <i class="fa-solid fa-bag-shopping me-2"></i>Place Order
+                    <button type="button" id="pay-btn" class="ms-3 btn-place-order cartBtns" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
+                        <i class="fa-solid fa-bag-shopping me-2 "></i>Place Order
                     </button>
                 <% } else {%>
-                    <a href="/profile/address" class="btn btn-verify-address" style="text-decoration: none;">
-                        <i class="fa-solid fa-location-dot me-2"></i>Add Address to Place Order
+                    <a href="/profile/address" class="btn btn-verify-address cartBtns" style="text-decoration: none;">
+                        <i class="fa-solid fa-location-dot me-2 "></i>Add Address to Place Order
                     </a>
                 <% } %>
             <% } %>
         <!-- </form> -->
         <!-- </a> -->
     </div>
+    <p class="me-3 mt-3 d-inline line">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
 
     <% } %>
 </div>
