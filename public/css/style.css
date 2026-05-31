@@ -877,7 +877,23 @@ body {
     margin-left: -105rem;
 }
 
+.orLine{
+    margin-left: 300px;
+}
 
+.loginBtn{
+    width: 11rem;
+}
+.signupBtn{
+    width: 13rem;
+}
+.showEditBtn{
+    margin-top: -35px;
+}
+.showDeleteBtn{
+    margin-top: -35px;
+    margin-left: 20px;
+}
 /* ── Media queries ── */
 @media (max-width: 767px) {
     .rotating-text{
@@ -887,16 +903,16 @@ body {
         max-width: 228px !important;
     }
     #cart-count{
-        margin-left: -275px !important;
+        margin-left: -245px !important;
     }
     .listing-link{
-        width: 11rem !important;
-        height: 18rem !important;
+        width: 10rem !important;
+        height: 16rem !important;
     }
     #cartAddBtn{
         margin-top: -52px !important;
-        margin-left: 92px !important;
-        width: 3rem !important;
+        margin-left: 78px !important;
+        width: 2.8rem !important;
     }
     .show-img{
         border-radius: 1rem;
@@ -914,8 +930,8 @@ body {
         height: 2.3rem;
     }
     .feedbackImage{
-        height: 302px;
-        width: 392px;
+        height: 235px;
+        width: 222px;
     }
     .btnViewCart {
         width: 8rem;
@@ -947,15 +963,84 @@ body {
     .logout-modal{
         width: 22.5rem;
     }
+    .loginHeading{
+        text-align: center;
+        font-size: 1.2rem;
+        width: 16rem;
+        /* margin: auto; */
+    }
+    .signupHeading{
+        text-align: center;
+        font-size: 1.2rem;
+        width: 12rem;
+        /* margin: auto; */
+    }
+    .orLine{
+        margin-left: 93px;
+    }
+    .google-btn{
+        width: 14rem;
+    }
+    .loginBtn{
+        width: 6rem;
+        height: 3rem;
+    }
+    .signupBtn{
+        width: 6rem;
+        height: 3rem;
+    }
+    .createAccountBtn{
+        width: 12rem;
+    height: 3rem;
+    padding: 0rem;
+    }
     /* .cartBtns{
         height: 5rem;
         font-size: .8rem;
     } */
+    .costSection{
+    display: none;
+    }
+    .form-control{
+        height: 2.2rem;
+    }
+    .form-label{
+        font-size: .96rem;
+    }
+    .add{
+        width: 8rem;
+    }
+    .noCartLine{
+        display: none;
+    }
+    .mainCard{
+        height: 36rem;
+    }
+    .showEditBtn{
+        margin-top: -676px;
+        margin-left: 10.8rem;
+    }
+    .showDeleteBtn{
+        margin-top: -610px;
+        margin-left: 10.8rem;
+    }
+    /* .showStockStatus{
+        margin-top: 1.2rem;
+    } */
+    textarea{
+        height: 16rem;
+    }
+    .footerText{
+        font-size: .8rem;
+    }
   #navbarNavAltMarkup {
     width: 100%;
     background-color: white;
     border-top: 1px solid #e5e5e5;
     padding-bottom: 8px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   #navbarNavAltMarkup .nav-link {
@@ -974,6 +1059,11 @@ body {
     width: 24px;          /* icon column — keeps text aligned */
     text-align: center;
     font-size: 1.2rem;
+  }
+
+  /* Prevent body scroll when navbar menu is open */
+  body.navbar-open {
+    overflow: hidden;
   }
 }
 
@@ -1036,4 +1126,54 @@ body {
     .cart-table tbody td:nth-child(3)::before { content: "Quantity (Max 3)"; font-weight: 600; }
     .cart-table tbody td:nth-child(4)::before { content: "Total"; font-weight: 600; }
     .cart-table tbody td:nth-child(5)::before { content: "Action"; font-weight: 600; }
+}
+
+/* Order success responsive fix */
+.order-success-wrapper{ display: block; z-index: 1; }
+
+@media (max-width: 576px) {
+    .order-success-wrapper{
+        max-width: 100% !important;
+        margin: 1rem auto !important;
+        padding: 0 1rem !important;
+    }
+}
+
+/* Navbar base */
+.navbar { padding: 0 !important; }
+
+/* Mobile collapsed menu */
+@media (max-width: 767px) {
+    #navbarNavAltMarkup {
+        background-color: white;
+        border-top: 1px solid #e5e7eb;
+        width: 100%;
+    }
+
+    #navbarNavAltMarkup .nav-link {
+        padding: 10px 0;
+        font-size: 1rem;
+        font-weight: 500;
+        border-bottom: 1px solid #f0f0f0;
+        width: 100%;
+    }
+
+    #navbarNavAltMarkup .nav-link i {
+        font-size: 1.2rem;
+    }
+
+    /* Last link no border */
+    #navbarNavAltMarkup li:last-child .nav-link {
+        border-bottom: none;
+    }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+    .navbar-nav .nav-link {
+        padding: 0 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
 }

@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6 offset-2" style="width: 82%;">
+        <div class="col-6 offset-2 mainCard" style="width: 82%;">
             <div class="internal-card" style="border-radius: 15px; padding: 2px;">
                 <div class="row">
                     <div class="col-md-6">
@@ -65,7 +65,7 @@
                                     </div>
                                 <% } %>
                                 <div class="col-md-8 mt-3">
-                                    <span id="status-<%= lists._id %>" class="stock-status <%= lists.inStock ? 'in-stock' : 'out-stock' %>">
+                                    <span id="status-<%= lists._id %>" class="showStockStatus stock-status <%= lists.inStock ? 'in-stock' : 'out-stock' %>">
                                         <%= lists.inStock ? "In Stock" : "Out of Stock" %>
                                     </span>
                                 </div>
@@ -119,11 +119,11 @@
                 </div>
             </div>
             <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
-                <h6 style="margin-left: 259px;">As owner, cart option <b style="color: red;">not available!</b></h6>
-                <a href="/listings/<%= lists._id %>/edit"><button class="btn btn-outline-dark mb-3" style=" margin-top: -35px;">Edit</button></a>
+                <h6 style="margin-left: 259px;" class="noCartLine">As owner, cart option <b style="color: red;">not available!</b></h6>
+                <a href="/listings/<%= lists._id %>/edit"><button class="btn btn-outline-dark mb-3 showEditBtn">Edit</button></a>
                 
                 <!-- delete btn -->
-                <button type="button" style="margin-left: 20px; margin-top: -35px;" class="btn btn-outline-danger mb-3" data-bs-toggle="modal" data-bs-target="#delete-<%= lists._id %>">DELETE</button>
+                <button type="button" class="btn btn-outline-danger mb-3 showDeleteBtn" data-bs-toggle="modal" data-bs-target="#delete-<%= lists._id %>">DELETE</button>
             <% } %>
         </div>
     </div>

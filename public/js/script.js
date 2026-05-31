@@ -72,6 +72,29 @@ document.addEventListener("DOMContentLoaded", ()=>{
       image: "/css/grocery-image.png",
       order_id: orderData.order.id,
 
+      config: {
+          display: {
+              blocks: {
+                  upi_intent: {
+                      name: "Pay via UPI",
+                      instruments: [
+                          { method: "upi", flows: ["intent"] }, // ← intent not collect
+                      ]
+                  },
+                  other: {
+                      name: "Other Methods",
+                      instruments: [
+                          { method: "card" },
+                          { method: "netbanking" },
+                          { method: "wallet" }
+                      ]
+                  }
+              },
+              sequence: ["block.upi_intent", "block.other"],
+              preferences: { show_default_blocks: false }
+          }
+      },
+
       //after successful payement
 
       handler: async function(response) {

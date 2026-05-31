@@ -58,10 +58,10 @@
                 <!-- <div class="card-img-overlay" ></div> -->
                 <div class="card-body ms-2" >
                     <p class="card-text">
-                      <b ><%= list.title %></b> <br />
+                      <b style="font-size: .9rem;"><%= list.title %></b> <br />
                       <div class="row">
                         <div class="col-md-12" style="margin-top: -10px;">
-                          <i class="fas fa-rupee-sign"></i><b> : <%=list.sellingPrice?.toLocaleString("en-IN") %> </b>
+                          <i style="font-size: .9rem;" class="fas fa-rupee-sign"></i><b style="font-size: .9rem;"> : <%=list.sellingPrice?.toLocaleString("en-IN") %> </b>
                         </div>
                       </div>
                       <% if(currUser && list.owners.some(o => o._id.equals(currUser._id))){ %>
