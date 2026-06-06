@@ -18,8 +18,9 @@ const razorpay = new Razorpay({
 //Add order success page
 router.get('/order-success', isLoggedIn, async (req, res) => {
     try {        
-        const orderId = req.session.lastOrderId;
-        // console.log("lastOrderId from session:", orderId); // debug
+        // ✅ Check session first, then query param (mobile fallback)
+        const orderId = req.session.lastOrderId || req.query.id;
+        // console.log("orderId from session or query:", orderId); // debug
 
         if (!orderId) {
             req.flash("error", "No recent order found!");
@@ -142,7 +143,8 @@ router.post("/verify-payment", async(req,res)=>{
 
         //socket io code ends
 
-        res.json({ success: true, message: "Payment Verified!" });
+        // ✅ Return orderId so client can use it as fallback
+        res.json({ success: true, message: "Payment Verified!", orderId: order._id.toString() });
 
 
     }catch(err){

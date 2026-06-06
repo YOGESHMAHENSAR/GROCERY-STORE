@@ -49,7 +49,8 @@ const listingSchema = new mongoose.Schema({
     },
     margin:{
         type: String,
-        required: true
+        required: false,
+        default: "0"
     },
     Tax: {
         type: String,
@@ -67,7 +68,7 @@ const listingSchema = new mongoose.Schema({
     category:[
         {
             type: String,
-            enum: ["Beverages", "Snacks", "Dairy", "Grocery"],
+            enum: ["Beverages", "Snacks", "Dairy", "Grocery", "Normal"],
             required: true
         }
     ],

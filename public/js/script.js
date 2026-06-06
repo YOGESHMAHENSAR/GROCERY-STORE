@@ -110,7 +110,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
           const verifyData = await verifyRes.json();
 
           if (verifyData.success) {
-              window.location.href = "/order-success"; // ✅ redirect
+              // ✅ Pass orderId as query param for mobile fallback
+              window.location.href = `/order-success?id=${verifyData.orderId}`;
           } else {
               alert("Payment verification failed!");
           }
