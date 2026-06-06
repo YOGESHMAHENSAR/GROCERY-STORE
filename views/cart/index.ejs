@@ -10,11 +10,13 @@
                 <i class="fa-solid fa-arrow-left me-2"></i><p class="labelsTag" style="display: inline;">Continue Shopping</p>
             </button>
         </a>
-        <a href="/orders" class="text-decoration-none " >
-            <button class="btn-continue ms-5 labelsBtn2">
-                <i class="fa-regular fa-truck me-2"></i><p class="labelsTag" style="display: inline;">Track Placed Orders</p>
-            </button>
-        </a>
+        <% if(currUser) {%>
+            <a href="/orders" class="text-decoration-none " >
+                <button class="btn-continue ms-5 labelsBtn2">
+                    <i class="fa-regular fa-truck me-2"></i><p class="labelsTag" style="display: inline;">Track Placed Orders</p>
+                </button>
+            </a>
+        <% } %>
      </div>
     
     <p class="cart-subtitle"><b style="color: rgb(255, 132, 0);"><%= cart.length %> item(s)</b> in your cart</p>

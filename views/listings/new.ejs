@@ -22,6 +22,7 @@
             id="title"
             placeholder="Enter Name Of Product"
             name="listing[title]"
+            pattern="[a-zA-Z0-9\-\.\(\)]+"
             required
           />
           <div class="invalid-feedback">Please Enter a valid Name</div>
@@ -203,4 +204,11 @@
     // form is valid — show loader
     document.getElementById("loaderOverlay").classList.add("active");
   });
+
+  document.getElementById("title").addEventListener("input", (e)=>{
+    e.target.value = e.target.value.replace(/[^a-zA-Z0-9 \-\.()]/g, "");
+  })
+  document.getElementById("desc").addEventListener("input", (e)=>{
+    e.target.value = e.target.value.replace(/[^a-zA-Z0-9 \-\.()]/g, "");
+  })
 </script>

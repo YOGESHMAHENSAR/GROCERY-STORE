@@ -318,10 +318,15 @@
                 const pendingCount = document.querySelector("#count-pending");
                 const confirmCount = document.querySelector("#count-confirm");
                 const placedCount = document.querySelector("#count-place");
+                const navPendingBadge = document.querySelector('a[href="/orders-delivery"] .badge');
 
                 if(data.status === "Confirmed") {
                     if(pendingCount) pendingCount.textContent = parseInt(pendingCount.textContent) - 1;
                     if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) + 1;
+                    if(navPendingBadge) {
+                        const value = parseInt(navPendingBadge.textContent) || 0;
+                        navPendingBadge.textContent = Math.max(value - 1, 0);
+                    }
                     const newBtn = document.createElement("button");
                     newBtn.className = "btn btn-outline-success action-btn";
                     newBtn.dataset.id = orderId;
@@ -333,6 +338,10 @@
                 } else if(data.status === "Placed") {
                     if(placedCount) placedCount.textContent = parseInt(placedCount.textContent) + 1;
                     if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) - 1;
+                    if(navPendingBadge && pendingCount) {
+                        const value = parseInt(navPendingBadge.textContent) || 0;
+                        navPendingBadge.textContent = Math.max(value - 1, 0);
+                    }
                     const deliveredDiv = document.createElement("div");
                     deliveredDiv.style.cssText = "text-align:center;padding:8px 0;font-size:13px;color:#166634;font-weight:500;";
                     deliveredDiv.textContent = "✓ Order delivered";

@@ -40,15 +40,16 @@
           <div class="invalid-feedback">Please Enter the UserName</div>
         </div>
         <div class="mb-3 mt-3">
-          <label class="form-label" for="phone">Phone Number </label
+          <label class="form-label" for="phone">Phone Number (Prefer What'sApp Number) </label
           ><span> <b style="color: red"> *</b> : </span>
           <input
-            type="number"
+            type="tel"
             class="form-control"
             width="50%"
-            id="form"
+            id="phone"
             placeholder="Enter your Phone Number"
             name="phone"
+            
             required
           />
           <div class="invalid-feedback">Please Enter the Phone Number</div>
@@ -236,4 +237,9 @@
 
     // Resend OTP button
     document.getElementById("resendOtpBtn").addEventListener('click', sendOTP);
+
+    document.getElementById("phone").addEventListener("input", function(){
+      if(this.value < 0) this.value = 0;
+      this.value = this.value.replace(/\D/g,"").slice(0,10);
+    })
 </script>

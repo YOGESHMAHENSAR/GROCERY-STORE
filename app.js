@@ -2,6 +2,9 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
+const http = require("http"); // http req come 
+const {Server} = require("socket.io"); // make a server for the socket 
+
 const express = require("express");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
@@ -25,6 +28,22 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const initData = require("./init/data.js");
 const wrapAsync = require('./utils/wrapAsync.js');
 let app = express();
+
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.set("io", io); // make io to be accessible to routes
+
+io.on("connection", (socket)=>{
+    socket.on("join-owner", (ownerId)=>{
+        socket.join(`owner-${ownerId}`);
+        // console.log(`owner-${ownerId} has joined`);
+    })
+    socket.on("disconnect", () => {
+        // console.log("Client disconnected");
+    });
+})
+
 // app.use(cookieParser(";098___)()__++==9$%^&*("));
 app.set("view engine","ejs");
 app.set("views", path.join(__dirname,"views"));
@@ -232,6 +251,9 @@ app.use((err,req,res,next)=>{
 
 //SERVER STARTING
 let port = process.env.PORT || 8080;
-app.listen(port,"0.0.0.0",()=>{
+server.listen(port,"0.0.0.0",()=>{
     console.log(`Listening to server ${port}`)
 })
+// app.listen(port,"0.0.0.0",()=>{
+//     console.log(`Listening to server ${port}`)
+// })

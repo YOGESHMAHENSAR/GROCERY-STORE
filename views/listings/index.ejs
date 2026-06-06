@@ -176,17 +176,34 @@
           a.onclick = (e) => e.stopPropagation(); // Block card click
           btn.replaceWith(a);
 
+          const cartCount = data.cartCount; // to updates all badges
+
           const badge = document.getElementById("cart-count");
-          if (badge) badge.textContent = data.cartCount;
-        } else {
-          alert(data.error || "Failed to add item to cart");
+          if (badge) {
+              badge.textContent = cartCount;
+              badge.style.display = cartCount > 0 ? "inline" : "none";
+              if (cartCount > 0) {
+                  badge.classList.remove("bg-primary");
+                  badge.classList.add("bg-primary");
+              }
+          } else if (cartCount > 0) {
+              const cartLink = document.querySelector('a[href="/cart"]');
+              if (cartLink) {
+                  const newBadge = document.createElement("span");
+                  newBadge.id = "cart-count";
+                  newBadge.className = "badge bg-primary";
+                  newBadge.textContent = cartCount;
+                  cartLink.appendChild(newBadge);
+              }
+          }
+        }
+      }
+        catch (err) {
+          console.error("addToCart error:", err); // ← add this
+          document.querySelector("#cartLoaderOverlay").style.display = "none"; // ← hide loader on error too
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>`;
         }
-      } catch (err) {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>`;
-      }
     }
   </script>
 </body>

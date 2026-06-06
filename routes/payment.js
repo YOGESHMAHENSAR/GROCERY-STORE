@@ -124,6 +124,24 @@ router.post("/verify-payment", async(req,res)=>{
             req.session.save(err => err ? reject(err) : resolve());
         });
 
+        // socket io code started
+
+        const io = req.app.get("io");
+        const ownerIds = (process.env.OWNER_IDS || "").split(",").map(id => id.trim());
+
+        ownerIds.forEach(ownerId => {
+            io.to(`owner-${ownerId}`).emit("new-order", {
+                orderId: order.orderId,
+                customer: user.username,
+                phone: user.phone,
+                amount: order.totalAmount.toFixed(2),
+                itemCount: order.items.length,
+                time: new Date().toLocaleTimeString("en-IN")
+            });
+        });
+
+        //socket io code ends
+
         res.json({ success: true, message: "Payment Verified!" });
 
 
@@ -163,6 +181,9 @@ router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
         res.redirect("/listings");
     }
 });
+
+//whatsapp route that as soon as the order is created and sent for delivered we send the msg to the client 
+// via whatsapp
 
 router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
     try{
