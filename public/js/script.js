@@ -37,17 +37,66 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+//mode selection card or cod
+
+document.getElementById("pay-btn").addEventListener("click", function(){
+  const mode = document.getElementById("payment-mode").value;
+  if(!mode) {
+        alert("Please select a payment mode first");
+        return;
+    }
+  if(mode === 'COD'){
+    initiateCod();
+  }
+  if(mode === 'Razorpay'){
+    initiateCard();
+  }
+});
+
+async function initiateCod() {
+    const btn = document.getElementById("pay-btn");
+    // btn.disabled = true;
+    // btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Placing Order...`;
+
+    try {
+        // ✅ Get amount from DOM — same as initiateCard does
+        const Total = document.querySelector(".grand-total-final");
+        const amount = parseFloat(Total.innerText.replace("₹", "").replace(/,/g, "").trim());
+
+        const res = await fetch("/create-cod-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount })
+        });
+
+        const data = await res.json();
+
+        if(data.success) {
+            window.location.href = "/order-success";
+        } else {
+            alert(data.message || "Failed to place order");
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-bag-shopping me-2"></i> Place Order`;
+        }
+    } catch(err) {
+        console.error("COD Order Error:", err);
+        alert("An error occurred. Please try again.");
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-bag-shopping me-2"></i> Place Order`;
+    }
+}
+
 //open the payment model of the razorpay
-document.addEventListener("DOMContentLoaded", ()=>{
+async function initiateCard(){
   const btn = document.getElementById("pay-btn")
   if(!btn) return;
   const key = btn.getAttribute("data-key");
   const Total  = document.querySelector(".grand-total-final");
+  // btn.disabled = true;
+  // btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
 
-  btn.addEventListener("click", async ()=> {
-    console.log("btn was clicked");
     const amount = parseFloat(Total.innerText.replace("₹", "").trim());
-
+  try{
     //create order on backend
     const orderRes = await fetch("/create-order",{
       method: "POST",
@@ -81,23 +130,16 @@ document.addEventListener("DOMContentLoaded", ()=>{
                           { method: "upi", flows: ["intent"] }, // ← intent not collect
                       ]
                   },
-                  other: {
-                      name: "Other Methods",
-                      instruments: [
-                          { method: "card" },
-                          { method: "netbanking" },
-                          { method: "wallet" }
-                      ]
-                  }
               },
               sequence: ["block.upi_intent", "block.other"],
-              preferences: { show_default_blocks: false }
+              preferences: { show_default_blocks: true }
           }
       },
 
       //after successful payement
 
       handler: async function(response) {
+        console.log(response);
           const verifyRes  = await fetch('/verify-payment', {
               method:  "POST",
               headers: { "Content-Type": "application/json" },
@@ -130,8 +172,15 @@ document.addEventListener("DOMContentLoaded", ()=>{
     });
 
     rzp.open();
-  })
-});
+  } catch(err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-bag-shopping me-2"></i> Place Order`;
+    }
+}
+
+//inititate cod payment  method
+
 
 
 //for tax prefitted in the select box of the category

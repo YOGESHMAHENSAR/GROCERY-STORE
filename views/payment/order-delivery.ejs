@@ -218,6 +218,7 @@
         <div class="info-row"><span class="info-label">Contact</span><span class="info-value"><%= order.user.phone %></span></div>
         <div class="info-row"><span class="info-label">Order ID</span><span class="info-value" style="font-size: 11px;"><%= order.orderId %></span></div>
         <div class="info-row"><span class="info-label">Total</span><span class="info-value" style="font-size: 15px;">₹ <%= orderGrandTotal.toFixed(2) %></span></div>
+        <div class="info-row"><span class="info-label">Payment Mode</span><span class="info-value" style="font-size: 15px;"><%= order.paymentMethod%></span></div>
 
         <!-- DESKTOP: flex row -->
         <div class="desktop-info-grid">
@@ -226,6 +227,7 @@
             <div><p style="margin:0;font-size:13px;color:#6b7280;">Order ID</p><p style="margin:0;font-weight:500;font-size:14px;"><%= order.orderId %></p></div>
             <div><p style="margin:0;font-size:13px;color:#6b7280;">Ordered at</p><p style="margin:0;font-size:14px;"><%= order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : 'N/A' %></p></div>
             <div><p style="margin:0;font-size:13px;color:#6b7280;">Total</p><p style="margin:0;font-weight:600;">₹<%= orderGrandTotal.toFixed(2) %></p></div>
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Payment Mode</p><p style="margin:0;font-weight:600;"><%= order.paymentMethod %></p></div>
         </div>
 
         <!-- Items -->

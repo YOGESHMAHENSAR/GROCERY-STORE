@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
@@ -9,6 +10,11 @@ const orderSchema = new mongoose.Schema({
     },
     totalAmount: {
         type: Number
+    },
+    paymentMethod: {
+        type: String,
+        enum: ["Razorpay", "COD"],
+        default: "Razorpay"
     },
     status: {
         type: String,

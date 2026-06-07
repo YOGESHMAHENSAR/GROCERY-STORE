@@ -81,6 +81,97 @@ router.post("/create-order",isLoggedIn, async (req,res)=>{
     }
 })
 
+// fxn used to push the notification to the owner
+
+async function sendPushToOwners(app, title, body, url) {
+    const webpush = app.get("webpush");
+    const ownerIds = (process.env.OWNER_IDS || "").split(",").map(id => id.trim());
+
+    for(const ownerId of ownerIds) {
+        try {
+            const owner = await User.findById(ownerId);
+            if(owner && owner.pushSubscription) {
+                await webpush.sendNotification(
+                    owner.pushSubscription,
+                    JSON.stringify({ title, body, url })
+                );
+                console.log(`✅ Push sent to owner ${ownerId}`);
+            }
+        } catch(err) {
+            console.error(`Push failed for owner ${ownerId}:`, err.message);
+            // If subscription expired — clear it
+            if(err.statusCode === 410) {
+                await User.findByIdAndUpdate(ownerId, { pushSubscription: null });
+            }
+        }
+    }
+}
+
+//cod route 
+
+router.post("/create-cod-order", isLoggedIn, async (req, res) => {
+    try {
+        // Check address
+        const user = await User.findById(req.user._id).populate("cart.product");
+        if(!user.address || !user.address.pincode || !user.address.city) {
+            return res.json({ 
+                success: false, 
+                message: "Please add a delivery address first!" 
+            });
+        }
+
+        // Check cart
+        if(!user.cart || user.cart.length === 0) {
+            return res.json({ 
+                success: false, 
+                message: "Your cart is empty!" 
+            });
+        }
+
+        // Create order — no payment ID for COD
+        const order = new Order({
+            user: req.user._id,
+            items: user.cart.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity,
+                price: item.product.sellingPrice
+            })),
+            totalAmount: user.cart.reduce((sum, item) =>
+                sum + item.product.sellingPrice * item.quantity
+            , 0),
+            paymentId: "COD",           // ← mark as COD
+            orderId: `COD-${Date.now()}`,
+            address: user.address,
+            paymentMethod: "COD",       // ← add this field to your Order model
+            status: "Pending"
+        });
+
+        await order.save();
+
+        await sendPushToOwners( // this is used to send the notification to the owner who gets the order via COD
+            req.app,
+            "🛒 New COD Order!",
+            `${user.username} placed a COD order of ₹${order.totalAmount}`,
+            "/orders-delivery"
+        );
+
+        // Clear cart
+        await User.findByIdAndUpdate(req.user._id, { cart: [] });
+
+        // Save to session for order-success page
+        req.session.lastOrderId = order._id.toString();
+        await new Promise((resolve, reject) => {
+            req.session.save(err => err ? reject(err) : resolve());
+        });
+
+        res.json({ success: true });
+
+    } catch(err) {
+        console.error("COD order error:", err);
+        res.json({ success: false, message: err.message });
+    }
+});
+
 //to verify the payment done by the user
 
 router.post("/verify-payment", async(req,res)=>{
@@ -88,7 +179,7 @@ router.post("/verify-payment", async(req,res)=>{
         const{razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body; // deconstruct the crucial info
 
         // Ensure razorpay_order_id is a string
-        const orderId = razorpay_order_id.id || razorpay_order_id;
+        const orderId = typeof razorpay_order_id === "object" ? razorpay_order_id.id : razorpay_order_id;
 
         //signature created on our  own side.
         const body = orderId + "|" + razorpay_payment_id;
@@ -113,35 +204,26 @@ router.post("/verify-payment", async(req,res)=>{
                 sum + item.product.sellingPrice * item.quantity
             ,0),
             paymentId: razorpay_payment_id,
+            paymentMethod: "Razorpay",
             orderId: orderId,
             address: user.address
         })
 
         await order.save();
+
+        await sendPushToOwners( // used to send the notification when payment using ONLINE method
+            req.app,
+            "🛒 New Order Received!",
+            `${user.username} placed an order of ₹${order.totalAmount} (${order.items.length} items)`,
+            "/orders-delivery"
+        );
+
         await User.findByIdAndUpdate(req.user._id, {cart: []});
 
         req.session.lastOrderId = order._id.toString();
         await new Promise((resolve, reject) => {
             req.session.save(err => err ? reject(err) : resolve());
         });
-
-        // socket io code started
-
-        const io = req.app.get("io");
-        const ownerIds = (process.env.OWNER_IDS || "").split(",").map(id => id.trim());
-
-        ownerIds.forEach(ownerId => {
-            io.to(`owner-${ownerId}`).emit("new-order", {
-                orderId: order.orderId,
-                customer: user.username,
-                phone: user.phone,
-                amount: order.totalAmount.toFixed(2),
-                itemCount: order.items.length,
-                time: new Date().toLocaleTimeString("en-IN")
-            });
-        });
-
-        //socket io code ends
 
         // ✅ Return orderId so client can use it as fallback
         res.json({ success: true, message: "Payment Verified!", orderId: order._id.toString() });
@@ -261,17 +343,6 @@ Rate your experience & help us improve:
     }
     catch(e){
         res.json({success: false, message: e.message});
-    }
-})
-
-//Invoice
-router.get("/orders/:id/invoice",isLoggedIn, async (req,res)=>{
-    try{
-        const order = await Order.findOne({ orderId: req.params.id }).populate("user").populate("items.product");
-        res.render("listings/invoice", {order});
-    }catch(e){
-        req.flash("error","Error in Inventory");
-        res.redirect("/listings");
     }
 })
 

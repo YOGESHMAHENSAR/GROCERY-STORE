@@ -95,6 +95,20 @@ router.get("/profile/address", isLoggedIn, async (req,res)=>{
     res.render("users/address");
 })
 
+//web push post router help to push the notification to the owner that the order is placed
+
+router.post("/save-push-subscription", isLoggedIn, async (req, res) => {
+    try {
+        const subscription = req.body;
+        await User.findByIdAndUpdate(req.user._id, {
+            pushSubscription: subscription
+        });
+        res.json({ success: true });
+    } catch(err) {
+        res.json({ success: false });
+    }
+});
+
 router.post("/profile/address", async(req,res)=>{
     try{
         const { street, state, pincode, city } = req.body;

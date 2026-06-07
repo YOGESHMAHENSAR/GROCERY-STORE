@@ -11,7 +11,7 @@
             </button>
         </a>
         <% if(currUser) {%>
-            <a href="/orders" class="text-decoration-none " >
+            <a href="/orders" class="text-decoration-none track-order" >
                 <button class="btn-continue ms-5 labelsBtn2">
                     <i class="fa-regular fa-truck me-2"></i><p class="labelsTag" style="display: inline;">Track Placed Orders</p>
                 </button>
@@ -98,7 +98,8 @@
         </table>
     </div>
     <!-- bottom row -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+     <p class="me-3 mt-3 d-inline line">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
+    <div class="d-flex justify-content-evenly align-items-center flex-wrap gap-1 mt-3 ">
 
         <!-- continue shopping -->
          <!-- <div class="d-flex justify-content-center"> -->
@@ -106,6 +107,7 @@
          <!-- </div> -->
         
         <!-- grand total box -->
+         
         <div class="grand-total-box totalBoxShrink">
             <%
                 let subTotal  = cart.reduce((sum, item) => sum + parseInt(item.product.sellingPrice) * item.quantity, 0);
@@ -147,46 +149,46 @@
             </div>
             <div class="grand-total-note">Inclusive of all taxes</div>
         </div>
-    </div>
-   
 
-    <!-- place order -->
-    <div class="d-flex justify-content-end mt-4 mb-3">
-        <!-- <form action="/order" method="post"> -->
-          <!-- <a href="listings/privacy" style="text-decoration: none;"> -->
-            <% if(!currUser) {%>
-                <form action="/login" method="get">
-                    <button type="submit" class="btn-place-order">
-                        <i class="fa-solid fa-bag-shopping me-2"></i>Login to Place Order
-                    </button>
-                </form>
-            <% } else { %>
-                <% 
-                    const hasAddress = currentUser && 
-                        currentUser.address && 
-                        currentUser.address.city && 
-                        currentUser.address.street && 
-                        currentUser.address.pincode
-                %>
-                <% if(hasAddress) {%>
-                    <a href="/profile/address" class="btn btn-verify-address cartBtns" style="text-decoration: none;">
-                        <i class="fa-solid fa-location-dot me-2 "></i>Verify Address
-                    </a>
-                    <button type="button" id="pay-btn" class="ms-3 btn-place-order cartBtns" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
-                        <i class="fa-solid fa-bag-shopping me-2 "></i>Place Order
-                    </button>
-                <% } else {%>
-                    <a href="/profile/address" class="btn btn-verify-address cartBtns" style="text-decoration: none;">
-                        <i class="fa-solid fa-location-dot me-2 "></i>Add Address to Place Order
-                    </a>
+        <!-- place order -->
+        <div class="d-flex justify-content-center mt-4 mb-3" style="display: flex; flex-direction: column;">
+            <!-- <form action="/order" method="post"> -->
+            <!-- <a href="listings/privacy" style="text-decoration: none;"> -->
+                <% if(!currUser) {%>
+                    <form action="/login" method="get">
+                        <button type="submit" class="btn-place-order">
+                            <i class="fa-solid fa-bag-shopping me-2"></i>Login to Place Order
+                        </button>
+                    </form>
+                <% } else { %>
+                    <% 
+                        const hasAddress = currentUser && 
+                            currentUser.address && 
+                            currentUser.address.city && 
+                            currentUser.address.street && 
+                            currentUser.address.pincode
+                    %>
+                    <% if(hasAddress) {%>
+                        <select id="payment-mode" class="form-select mb-3 cartPayment">
+                            <option value="" selected disabled>Selct the Payment Mode</option>
+                            <option value="Razorpay">💳 Pay via Card / UPI</option>
+                            <option value="COD">🚚 Cash on Delivery (COD)</option>
+                        </select>
+                        <a href="/profile/address" class="btn btn-verify-address cartVerify" style="text-decoration: none;">
+                            <i class="fa-solid fa-location-dot me-2 "></i>Verify Address
+                        </a>
+                        
+                        <button type="button" id="pay-btn" class="mt-3 btn-place-order cartPlace" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
+                            <i class="fa-solid fa-bag-shopping me-2 "></i>Place Order
+                        </button>
+                    <% } else {%>
+                        <a href="/profile/address" class="btn btn-verify-address cartAddress" style="text-decoration: none;">
+                            <i class="fa-solid fa-location-dot me-2 "></i>Add Address to Place Order
+                        </a>
+                    <% } %>
                 <% } %>
-            <% } %>
-        <!-- </form> -->
-        <!-- </a> -->
+        </div>
     </div>
-    <p class="me-3 mt-3 d-inline line">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
-
     <% } %>
 </div>
-
 <script src="/js/cart.js"></script>

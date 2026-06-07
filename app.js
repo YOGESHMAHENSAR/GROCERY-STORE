@@ -2,8 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-const http = require("http"); // http req come 
-const {Server} = require("socket.io"); // make a server for the socket 
+const webpush = require("web-push"); // reuire to push the notification in the notification bar menu
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -29,20 +28,16 @@ const initData = require("./init/data.js");
 const wrapAsync = require('./utils/wrapAsync.js');
 let app = express();
 
-const server = http.createServer(app);
-const io = new Server(server);
+//setup of webpus staet
+webpush.setVapidDetails(
+    'mailto:yogajm8@gmail.com',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+)
 
-app.set("io", io); // make io to be accessible to routes
+app.set("webpush", webpush);
 
-io.on("connection", (socket)=>{
-    socket.on("join-owner", (ownerId)=>{
-        socket.join(`owner-${ownerId}`);
-        // console.log(`owner-${ownerId} has joined`);
-    })
-    socket.on("disconnect", () => {
-        // console.log("Client disconnected");
-    });
-})
+//set-up ends
 
 // app.use(cookieParser(";098___)()__++==9$%^&*("));
 app.set("view engine","ejs");
@@ -251,9 +246,6 @@ app.use((err,req,res,next)=>{
 
 //SERVER STARTING
 let port = process.env.PORT || 8080;
-server.listen(port,"0.0.0.0",()=>{
+app.listen(port,"0.0.0.0",()=>{
     console.log(`Listening to server ${port}`)
 })
-// app.listen(port,"0.0.0.0",()=>{
-//     console.log(`Listening to server ${port}`)
-// })

@@ -881,9 +881,8 @@ body {
 
 .cartBtns{
     text-decoration: none;
-    margin-top: -290px;
+    margin-top: -20px;
     height: 3rem;
-    margin-left: -105rem;
 }
 
 .orLine{
@@ -903,6 +902,9 @@ body {
     margin-top: -35px;
     margin-left: 20px;
 }
+/* .payment-mode{
+    width: 95%;
+} */
 /* ── Media queries ── */
 @media (max-width: 767px) {
     .rotating-text{
@@ -1041,6 +1043,12 @@ body {
     }
     .footerText{
         font-size: .8rem;
+    }
+    .track-order{
+        margin-left: -40px;
+    }
+    .payment-mode{
+        width: 95%;
     }
   #navbarNavAltMarkup {
     width: 100%;
