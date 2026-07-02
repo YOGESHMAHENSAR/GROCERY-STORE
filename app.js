@@ -21,6 +21,7 @@ const MongoStore = require("connect-mongo").default; // for storing the session 
 const flash = require("connect-flash");
 const passport = require("passport");
 const User = require("./models/user.js");
+const Order = require("./models/order.js");
 const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
@@ -181,6 +182,17 @@ app.use(async (req,res,next) =>{
     res.locals.currUser = req.user;
     res.locals.category = req.query.category || null;//for category selection middleware
     res.locals.req = req; //this is used for the active option of the navbar
+    res.locals.orders = [];
+
+    if (req.user && (process.env.OWNER_IDS || "").split(",").map(id => id.trim()).filter(Boolean).includes(req.user._id.toString())) {
+        try {
+            res.locals.orders = await Order.find()
+                .sort({ createdAt: -1 })
+                .populate("user", "username email phone");
+        } catch (err) {
+            console.error("Orders middleware error:", err.message);
+        }
+    }
 
     //cart middleware
     try {                                                    // ← wrap in try-catch

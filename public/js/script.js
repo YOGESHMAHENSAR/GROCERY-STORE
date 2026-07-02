@@ -19,8 +19,10 @@
 })()
 
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('form');
-  const loaderOverlay = document.getElementById('loaderOverlay');
+  const form = document.querySelector('.needs-validation');
+  const loaderOverlay = document.getElementById('addProductLoaderOverlay')
+    || document.getElementById('loginLoaderOverlay')
+    || document.getElementById('loaderOverlay');
   
   if (form && loaderOverlay) {    
     form.addEventListener('submit', function(e) {
@@ -30,7 +32,16 @@ document.addEventListener('DOMContentLoaded', function() {
         form.classList.add('was-validated');
         return;
       }
-      loaderOverlay.classList.add('active');  // ← shows your overlay
+
+      e.preventDefault();
+      if (loaderOverlay.classList) {
+        loaderOverlay.classList.add('active');
+      }
+      loaderOverlay.style.display = 'flex';
+
+      requestAnimationFrame(() => {
+        form.submit();
+      });
     });
   } else {
     console.error('Form or loader overlay not found!');
@@ -38,20 +49,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 //mode selection card or cod
-
-document.getElementById("pay-btn").addEventListener("click", function(){
-  const mode = document.getElementById("payment-mode").value;
-  if(!mode) {
-        alert("Please select a payment mode first");
-        return;
+const payBtn = document.getElementById("pay-btn");
+if (payBtn) {
+  payBtn.addEventListener("click", function(){
+    const mode = document.getElementById("payment-mode");
+    if (!mode || !mode.value) {
+      alert("Please select a payment mode first");
+      return;
     }
-  if(mode === 'COD'){
-    initiateCod();
-  }
-  if(mode === 'Razorpay'){
-    initiateCard();
-  }
-});
+    if (mode.value === 'COD') {
+      initiateCod();
+    }
+    if (mode.value === 'Razorpay') {
+      initiateCard();
+    }
+  });
+}
 
 async function initiateCod() {
     const btn = document.getElementById("pay-btn");
@@ -180,25 +193,31 @@ async function initiateCard(){
 }
 
 //inititate cod payment  method
-
-
-
 //for tax prefitted in the select box of the category
-    const categoryTax = {
-      "Beverages": 12,
-      "Snacks": 18,
-      "Dairy": 2,
-      "Grocery": 5
-    }
+const categoryTax = {
+  "Beverages": 12,
+  "Snacks": 18,
+  "Dairy": 2,
+  "Grocery": 5
+};
 
-    function setTax(category){
-      const tax = categoryTax[category];// selects the category and have the tax value
-      document.getElementById("taxField").value = tax; //update tax value as the category is selected.
-    }
+function setTax(category) {
+  const taxField = document.getElementById("taxField");
+  if (!taxField) return;
 
-    // to make it loaded on the edit page automatically;
+  const tax = categoryTax[category];
+  taxField.value = tax ?? "";
+}
 
-    document.addEventListener("DOMContentLoaded",()=>{
-      const category = document.getElementById("taxField");
-      if(category) setTax(category);
-    })
+// to make it loaded on the edit page automatically;
+document.addEventListener("DOMContentLoaded", () => {
+  const categorySelect = document.getElementById("category");
+  const taxField = document.getElementById("taxField");
+
+  if (categorySelect && taxField) {
+    setTax(categorySelect.value);
+    categorySelect.addEventListener("change", (event) => {
+      setTax(event.target.value);
+    });
+  }
+});

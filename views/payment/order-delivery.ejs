@@ -332,10 +332,19 @@
                     const newBtn = document.createElement("button");
                     newBtn.className = "btn btn-outline-success action-btn";
                     newBtn.dataset.id = orderId;
+                    newBtn.dataset.category = orderGrandTotal;
                     newBtn.id = "order-placed";
                     newBtn.innerHTML = `<i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem;"></i> Mark as delivered`;
                     btn.replaceWith(newBtn);
-                    if(data.whatsappUrl) window.open(data.whatsappUrl, "_blank");
+                    if(data.whatsappUrl) {
+                        const link = document.createElement("a");
+                        link.href = data.whatsappUrl;
+                        link.target = "_blank";
+                        link.rel = "noopener noreferrer";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
 
                 } else if(data.status === "Placed") {
                     if(placedCount) placedCount.textContent = parseInt(placedCount.textContent) + 1;
@@ -348,7 +357,15 @@
                     deliveredDiv.style.cssText = "text-align:center;padding:8px 0;font-size:13px;color:#166634;font-weight:500;";
                     deliveredDiv.textContent = "✓ Order delivered";
                     btn.replaceWith(deliveredDiv);
-                    if(data.whatsappUrl) window.open(data.whatsappUrl, "_blank");
+                    if(data.whatsappUrl) {
+                        const link = document.createElement("a");
+                        link.href = data.whatsappUrl;
+                        link.target = "_blank";
+                        link.rel = "noopener noreferrer";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
                 }
             } else {
                 alert(data.message || "Failed to update order status");

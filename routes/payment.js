@@ -83,6 +83,23 @@ router.post("/create-order",isLoggedIn, async (req,res)=>{
 
 // fxn used to push the notification to the owner
 
+function calculateOrderAmount(items = []) {
+    const subtotal = (items || []).reduce((sum, item) => {
+        const price = parseFloat(item.price ?? item.product?.sellingPrice ?? 0) || 0;
+        const quantity = item.quantity || 1;
+        return sum + (price * quantity);
+    }, 0);
+
+    const tax = (items || []).reduce((sum, item) => {
+        const price = parseFloat(item.price ?? item.product?.sellingPrice ?? 0) || 0;
+        const quantity = item.quantity || 1;
+        const taxRate = item.product?.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+        return sum + ((price * quantity) * taxRate);
+    }, 0);
+
+    return subtotal + tax + 10;
+}
+
 async function sendPushToOwners(app, title, body, url) {
     const webpush = app.get("webpush");
     const ownerIds = (process.env.OWNER_IDS || "").split(",").map(id => id.trim());
@@ -136,9 +153,7 @@ router.post("/create-cod-order", isLoggedIn, async (req, res) => {
                 quantity: item.quantity,
                 price: item.product.sellingPrice
             })),
-            totalAmount: user.cart.reduce((sum, item) =>
-                sum + item.product.sellingPrice * item.quantity
-            , 0),
+            totalAmount: calculateOrderAmount(user.cart),
             paymentId: "COD",           // ← mark as COD
             orderId: `COD-${Date.now()}`,
             address: user.address,
@@ -200,9 +215,7 @@ router.post("/verify-payment", async(req,res)=>{
                 quantity: items.quantity,
                 price: items.product.sellingPrice,
             })),
-            totalAmount: user.cart.reduce((sum,item)=>
-                sum + item.product.sellingPrice * item.quantity
-            ,0),
+            totalAmount: calculateOrderAmount(user.cart),
             paymentId: razorpay_payment_id,
             paymentMethod: "Razorpay",
             orderId: orderId,
@@ -283,6 +296,23 @@ router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
 
         const phone = order.user.phone;
 
+        const subtotal = order.items.reduce((sum, item) => {
+            const price = parseFloat(item.price || item.product?.sellingPrice || 0) || 0;
+            const quantity = item.quantity || 1;
+            return sum + (price * quantity);
+        }, 0);
+
+        const tax = order.items.reduce((sum, item) => {
+            const price = parseFloat(item.price || item.product?.sellingPrice || 0) || 0;
+            const quantity = item.quantity || 1;
+            const taxRate = item.product?.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+            return sum + ((price * quantity) * taxRate);
+        }, 0);
+
+        const resolvedGrandTotal = Number.isFinite(parseFloat(orderGrandTotal)) && parseFloat(orderGrandTotal) > 0
+            ? parseFloat(orderGrandTotal)
+            : subtotal + tax + 10;
+
         if(status === "Confirmed"){
             let count = 1;
             let message = `*Order Confirmed!*
@@ -292,7 +322,7 @@ router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
         ${order.items.map((item, index) => `${index + 1}. ${item.product.title} x ${item.quantity}`).join("\n\t")}
 
 ━━━━━━━━━━━━━━━━━━━━
-★ *Amount to Pay (Inclusive all Taxes):* Rs. ${parseFloat(orderGrandTotal).toFixed(2)}
+★ *Amount to Pay (Inclusive all Taxes):* Rs. ${resolvedGrandTotal.toFixed(2)}
 ━━━━━━━━━━━━━━━━━━━━
 
 ★ *Your order is being prepared!*
@@ -305,7 +335,7 @@ We will notify you once it is out for delivery
             
             let encodedMsg = encodeURIComponent(message);
 
-            let url = `https://wa.me/91${phone}?text=${encodedMsg}`;
+            let url = `whatsapp://send?phone=91${phone}&text=${encodedMsg}`;
 
             return res.json({success:true, message: "Order status Updated", status: order.status, whatsappUrl: url });
         }
@@ -317,7 +347,7 @@ We will notify you once it is out for delivery
         ${order.items.map((item, index) => `${index + 1}. ${item.product.title} x ${item.quantity}`).join("\n\t")}
 
 ━━━━━━━━━━━━━━━━━━━━
-★ *Total Paid:* Rs. ${parseFloat(orderGrandTotal).toFixed(2)}
+★ *Total Paid:* Rs. ${resolvedGrandTotal.toFixed(2)}
 ━━━━━━━━━━━━━━━━━━━━
 
 ★ *Thank you for shopping with us!*
@@ -334,7 +364,7 @@ Rate your experience & help us improve:
             
             let encodedMsg = encodeURIComponent(message);
 
-            let url = `https://wa.me/91${phone}?text=${encodedMsg}`;
+            let url = `whatsapp://send?phone=91${phone}&text=${encodedMsg}`;
 
             return res.json({success:true, message: "Order status Updated", status: order.status, whatsappUrl: url });
         }

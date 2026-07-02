@@ -22,7 +22,7 @@
             id="title"
             placeholder="Enter Name Of Product"
             name="listing[title]"
-            pattern="[a-zA-Z0-9\-\.\(\)]+"
+            pattern="[a-zA-Z0-9\-\.\()]+"
             required
           />
           <div class="invalid-feedback">Please Enter a valid Name</div>
@@ -77,13 +77,24 @@
               <option value="Dairy">Dairy & Eggs (2% Tax)</option>
               <option value="Grocery">Grocery (5% Tax)</option>
             </select>
-            <div class="invalid-feedback">Please Provide the valid Price</div>
+            <div class="invalid-feedback">Please Select the valid Category</div>
           </div>
           <div class="col-md-6 mb-3">
-            <label for="count" class="form-label">Number Of Stock Available </label><span> <b style="color: red"> *</b> : </span>
-            <input type="Number"  class="form-control" placeholder="Enter the Quantity of Stock" 
-            id="count" oninput="if(this.value<0) this.value=0" name="listing[stockCount]" required>
-            <div class="invalid-feedback">Please Provide the Quntatiy of Stock</div>
+            <label for="count" class="form-label"
+              >Number Of Stock Available </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="Number"
+              class="form-control"
+              placeholder="Enter the Quantity of Stock"
+              id="count"
+              oninput="if (this.value < 0) this.value = 0;"
+              name="listing[stockCount]"
+              required
+            />
+            <div class="invalid-feedback">
+              Please Provide the Quntatiy of Stock
+            </div>
           </div>
         </div>
         <div class="divider costSection mt-4 mb-3">
@@ -138,8 +149,7 @@
             </div>
           </div>
           <div class="mb-3 col-md-4">
-            <label class="form-label" for="price"
-              >Profit Margin %: </label
+            <label class="form-label" for="price">Profit Margin %: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
               type="number"
@@ -152,7 +162,10 @@
               oninput="if (this.value < 0) this.value = 0;"
               required
             />
-            <div class="mt-2" style="font-size: 13px;">Profit Margin is Considered in <b>Percentage</b><span style="color: red;">*</span></div>
+            <div class="mt-2" style="font-size: 13px">
+              Profit Margin is Considered in <b>Percentage</b
+              ><span style="color: red">*</span>
+            </div>
             <div class="invalid-feedback">
               Please Provide the valid Profit Margin
             </div>
@@ -178,13 +191,15 @@
           </div>
         </div>
         <div class="new-btn">
-          <button class="btn btn-outline-dark mb-3 mt-3 add">Add Product</button>
+          <button class="btn btn-outline-dark mb-3 mt-3 add">
+            Add Product
+          </button>
         </div>
         <br /><br />
       </form>
     </div>
   </div>
-  <div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-overlay" id="addProductLoaderOverlay">
     <div class="loader-container">
       <div class="loader"></div>
       <p class="loader-text">Adding New Product ...</p>
@@ -192,23 +207,10 @@
   </div>
 </body>
 <script>
-  const form = document.querySelector(".needs-validation");
-
-  form.addEventListener("submit", (e) => {
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      e.stopPropagation();
-      form.classList.add("was-validated");
-      return; // ← don't show loader if form is invalid
-    }
-    // form is valid — show loader
-    document.getElementById("loaderOverlay").classList.add("active");
+  document.getElementById("title").addEventListener("input", (e) => {
+    e.target.value = e.target.value.replace(/[^a-zA-Z0-9\-\.( )]/g, "");
   });
-
-  document.getElementById("title").addEventListener("input", (e)=>{
+  document.getElementById("desc").addEventListener("input", (e) => {
     e.target.value = e.target.value.replace(/[^a-zA-Z0-9 \-\.()]/g, "");
-  })
-  document.getElementById("desc").addEventListener("input", (e)=>{
-    e.target.value = e.target.value.replace(/[^a-zA-Z0-9 \-\.()]/g, "");
-  })
+  });
 </script>
