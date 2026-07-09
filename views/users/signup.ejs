@@ -272,6 +272,8 @@ document.getElementById("verify-otp-btn").addEventListener("click", async () => 
         document.getElementById("otp-status").style.color = "green";
         document.getElementById("verify-otp-btn").disabled = true;
         document.getElementById("otp-input").disabled      = true;
+        document.getElementById("resendOtpBtn").disabled   = true;
+        document.getElementById("resend-section").style.display   = "none";
 
         // Show password + submit
         document.getElementById("password-section").style.display = "block";
