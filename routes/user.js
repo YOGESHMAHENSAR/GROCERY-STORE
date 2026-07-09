@@ -22,25 +22,25 @@ router.route("/signup")
     .get(userController.renderSignUpForm)
     .post(wrapAsync(userController.signup));
 
-router.post('/getotp', async (req, res) => {
-    const { email } = req.body;
-    const otp = Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
+// router.post('/getotp', async (req, res) => {
+//     const { email } = req.body;
+//     const otp = Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
 
-    const sent = await sendOTP(email, otp);
+//     const sent = await sendOTP(email, otp);
 
-    if (!sent) {
-        return res.json({ success: false, message: "Failed to send OTP" });
-    }
+//     if (!sent) {
+//         return res.json({ success: false, message: "Failed to send OTP" });
+//     }
 
-    // store OTP in session
-    req.session.otp = otp;
-    req.session.expiryOtp = Date.now() + 5 * 60 * 1000; //session form for the expiry of otp (time in mili_second)
-    req.session.save((err) =>{
-        if(err) res.json({success: false, message: "ERROR: SESSION ERROR"})
-        else res.json({ success: true, message: "OTP sent successfully"})
-    })
-    req.session.otpEmail = email;
-});
+//     // store OTP in session
+//     req.session.otp = otp;
+//     req.session.expiryOtp = Date.now() + 5 * 60 * 1000; //session form for the expiry of otp (time in mili_second)
+//     req.session.save((err) =>{
+//         if(err) res.json({success: false, message: "ERROR: SESSION ERROR"})
+//         else res.json({ success: true, message: "OTP sent successfully"})
+//     })
+//     req.session.otpEmail = email;
+// });
 
 // login for local
 

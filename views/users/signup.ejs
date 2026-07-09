@@ -1,4 +1,4 @@
-<% layout("/layouts/boilerplate") -%>
+<%layout("/layouts/boilerplate") -%>
 <body>
   <br />
   <div class="row">
@@ -6,240 +6,287 @@
       <h2 class="signupHeading" style="text-align: center">SignUp on GROCERY-STORE</h2>
       <br />
       <div class="login-container mt-4 mb-3">
-        <div >
         <a href="/auth/google?intent=signup" class="google-btn">
-            <div class="google-icon-wrapper">
-                <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"/>
-            </div>
-            <span class="btn-text">Sign Up with Google</span>
+          <div class="google-icon-wrapper">
+            <img class="google-icon" 
+                 src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"/>
+          </div>
+          <span class="btn-text">Sign Up with Google</span>
         </a>
-
-        <div class="divider mt-4 mb-3 orLine">
-            <span >or</span>
-            <!-- <hr> -->
-        </div>
-
-        </div>
+        <div class="divider mt-4 mb-3 orLine"><span>or</span></div>
       </div>
-      <!-- flash msg div start -->
+
+      <!-- Flash message -->
       <div id="flash-msg" style="display:none;" class="col-8 offset-2 mt-2"></div>
-      <!-- flash msg div ends -->
-      <form action="/signup" method="post" class="needs-validation" novalidate>
+
+      <!-- Firebase SDKs -->
+      <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+
+      <form action="/signup" method="post" class="needs-validation" novalidate id="signup-form">
+
+        <!-- Username -->
         <div class="mb-3 mt-3">
-          <label class="form-label" for="username">UserName </label
-          ><span> <b style="color: red"> *</b> : </span>
-          <input
-            type="text"
-            class="form-control"
-            width="50%"
-            id="username"
-            placeholder="Enter your UserName"
-            name="username"
-            required
-          />
+          <label class="form-label" for="username">UserName</label>
+          <span><b style="color:red"> *</b> : </span>
+          <input type="text" class="form-control" id="username"
+                 placeholder="Enter your UserName" name="username" required/>
           <div class="invalid-feedback">Please Enter the UserName</div>
         </div>
+
+        <!-- Phone + Send OTP -->
         <div class="mb-3 mt-3">
-          <label class="form-label" for="phone">Phone Number (Prefer What'sApp Number) </label
-          ><span> <b style="color: red"> *</b> : </span>
-          <input
-            type="tel"
-            class="form-control"
-            width="50%"
-            id="phone"
-            placeholder="Enter your Phone Number"
-            name="phone"
-            
-            required
-          />
-          <div class="invalid-feedback">Please Enter the Phone Number</div>
-        </div>
-        <div class="mb-3">
-            <div class="row">
-              <div class="col-md-8">
-                <label class="form-label" for="email">E-Mail Id </label
-                ><span> <b style="color: red"> *</b> : </span>
-                <input
-                  name="email"
-                  class="form-control"
-                  id="email"
-                  placeholder="Enter the E-Mail Id here"
-                  required
-                />
-                <div class="invalid-feedback">Please Enter your E-mail</div>
-              </div>
-              <div class="col-md-4" style="margin-top: 32px;">
-                <button class="btn btn-outline-dark" type="button" id="sendotpbtn">
-                  Send OTP
-                </button>
-                <!-- span tag for the timer in the btn itself -->
-                <span id="resend-section" style="display:none;">
-                  <span id="countdown" style="color:gray; font-size: 0.9rem;">
-                      Resend in <b id="timer">30</b>s
-                  </span>
-                  <button type="button" id="resendOtpBtn" class="btn btn-sm btn-outline-warning" style="display:none;">
-                      Resend OTP
-                  </button>
-              </span>
-              </div>
+          <div class="row">
+            <div class="col-md-8">
+              <label class="form-label" for="phone">Phone Number (Prefer WhatsApp Number)</label>
+              <span><b style="color:red"> *</b> : </span>
+              <input type="tel" class="form-control" id="phone"
+                     placeholder="Enter 10 digit number" name="phone"
+                     maxlength="10" required/>
+              <div class="invalid-feedback">Please Enter valid Phone Number</div>
             </div>
-          <div class="invalid-feedback">Please provide the valid E-Mail Id</div>
+            <div class="col-md-4" style="margin-top:32px;">
+              <button class="btn btn-outline-dark" type="button" id="sendotpbtn">
+                Send OTP
+              </button>
+              <span id="resend-section" style="display:none;">
+                <span id="countdown" style="color:gray; font-size:0.9rem;">
+                  Resend in <b id="timer">30</b>s
+                </span>
+                <button type="button" id="resendOtpBtn"
+                        class="btn btn-sm btn-outline-warning" style="display:none;">
+                  Resend OTP
+                </button>
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="otp" class="form-label">OTP: </label>
-          <span> <b style="color: red"> *</b> : </span>
-          <input type="text" class="form-control" name="otp" placeholder="PLease Enter OTP here" required>
-          <div class="invalid-feedback">Please Provide the OTP for Validation of E-Mail</div>
+
+        <!-- OTP input (hidden until OTP sent) -->
+        <div class="mb-3" id="otp-section" style="display:none;">
+          <label class="form-label">OTP</label>
+          <span><b style="color:red"> *</b> : </span>
+          <div class="d-flex gap-2">
+            <input type="text" class="form-control" id="otp-input"
+                   maxlength="6" placeholder="Enter 6 digit OTP"/>
+            <button type="button" id="verify-otp-btn" class="btn btn-success">
+              Verify
+            </button>
+          </div>
+          <small id="otp-status" class="mt-1 d-block"></small>
         </div>
-        <!-- <%# if(! currUser.address) {%> -->
-          <!-- <div class="mb-3">
-              <label class="form-label">Street Address</label>
-              <input type="text" name="street" class="form-control" 
-                   placeholder="Enter Street Address (Optional)">
-              <div class="invalid-feedback">Please enter street address</div>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">City</label>
-              <input type="text" name="city" class="form-control"
-                    placeholder="Enter City Name (Optional)">
-              <div class="invalid-feedback">Please enter city</div>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">State</label>
-              
-              <input type="text" name="state" class="form-control"
-                   placeholder="Enter State Name (Optional)">
-              <div class="invalid-feedback">Please enter state</div>
-          </div>
-          <div class="mb-3">
-              <label class="form-label">Pincode</label>
-              <span> <b style="color: red"> *</b> : </span>
-              <input type="text" name="pincode" class="form-control" 
-                  pattern="[0-9]{6}" maxlength="6"
-                   required>
-              <div class="invalid-feedback">Please enter valid 6-digit pincode</div>
-          </div> -->
-        <%# } %>
+
+        <!-- Email -->
         <div class="mb-3">
-          <label class="form-label" for="password">Password : </label>
-          <span> <b style="color: red"> *</b> : </span>
-          <input
-            type="password"
-            class="form-control"
-            width="50%"
-            placeholder="Enter your password here"
-            id="password"
-            name="password"
-            required
-          />
+          <label class="form-label" for="email">E-Mail Id</label>
+          <span><b style="color:red"> *</b> : </span>
+          <input type="email" class="form-control" id="email"
+                 name="email" placeholder="Enter your E-Mail Id" required/>
+          <div class="invalid-feedback">Please Enter your E-Mail</div>
+        </div>
+
+        <!-- Password (hidden until OTP verified) -->
+        <div class="mb-3" id="password-section" style="display:none;">
+          <label class="form-label" for="password">Password</label>
+          <span><b style="color:red"> *</b> : </span>
+          <input type="password" class="form-control" id="password"
+                 name="password" placeholder="Enter your password here" required/>
           <div class="invalid-feedback">Please provide the password</div>
         </div>
-        <br /><br />
-        <div class="d-flex justify-content-center">
-          <button
-              type="submit"
-              class="btn btn-outline-success mb-5 col-6 signupBtn"
-            >
+
+        <!-- Hidden firebase token for backend -->
+        <input type="hidden" id="firebase-token" name="firebaseToken" value=""/>
+
+        <!-- Buttons (hidden until OTP verified) -->
+        <div id="submit-section" style="display:none;">
+          <br/><br/>
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-outline-success mb-5 col-6 signupBtn">
               Sign Up
-          </button>
-          <button class="btn btn-outline-warning mb-5 col-6 offset-1 createAccountBtn">
-            <a href="./login?" style="text-decoration: none; color: black;">Already have an Account!</a>
-          </button>
+            </button>
+            <button type="button" class="btn btn-outline-warning mb-5 col-6 offset-1 createAccountBtn">
+              <a href="/login" style="text-decoration:none; color:black;">
+                Already have an Account!
+              </a>
+            </button>
+          </div>
         </div>
+
       </form>
     </div>
   </div>
+
+  <!-- invisible reCAPTCHA — OUTSIDE form, at bottom of body -->
+  <div id="recaptcha-container" style="display:none;"></div>
+
 </body>
 
 <script>
-    // flash message function
-    function showFlash(message, type = "success") {
-        const flash = document.getElementById("flash-msg");
-        flash.style.position = "fixed";  // fixed to screen
-        flash.style.top = "100px";        // below navbar
-        flash.style.right = "10px";       // left corner
-        flash.style.zIndex = "9999";     // above everything
-        flash.style.width = "450px";
-        flash.style.textAlign = "center";
-        flash.style.fontWeight = "500";
-        flash.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        flash.style.display = "block";
-        setTimeout(() => {
-            flash.style.display = "none";
-        }, 5000);
-    }
+// ── Firebase init ─────────────────────────────────────────────
+const firebaseConfig = {
+    apiKey:    "<%= process.env.FIREBASE_API_KEY %>",
+    authDomain:"<%= process.env.FIREBASE_PROJECT_ID %>.firebaseapp.com",
+    projectId: "<%= process.env.FIREBASE_PROJECT_ID %>"
+};
+firebase.initializeApp(firebaseConfig);
 
-    // countdown timer function
-    let countdownInterval;
-    function startCountdown() {
-        let seconds = 30;
-        const timerEl     = document.getElementById("timer");
-        const countdownEl = document.getElementById("countdown");
-        const mainBtn = document.getElementById("sendotpbtn");
-        const resendBtn   = document.getElementById("resendOtpBtn");
-        const resendSec   = document.getElementById("resend-section");
+// ── Flash message ─────────────────────────────────────────────
+function showFlash(message, type = "success") {
+    const flash = document.getElementById("flash-msg");
+    flash.style.position  = "fixed";
+    flash.style.top       = "100px";
+    flash.style.right     = "10px";
+    flash.style.zIndex    = "9999";
+    flash.style.width     = "450px";
+    flash.style.textAlign = "center";
+    flash.style.fontWeight= "500";
+    flash.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    flash.style.display = "block";
+    setTimeout(() => flash.style.display = "none", 5000);
+}
 
-        resendSec.style.display   = "inline";
-        countdownEl.style.display = "inline";
-        mainBtn.style.display = "none",
-        resendBtn.style.display   = "none";
+// ── Countdown timer ───────────────────────────────────────────
+let countdownInterval;
+function startCountdown() {
+    let seconds       = 30;
+    const timerEl     = document.getElementById("timer");
+    const countdownEl = document.getElementById("countdown");
+    const mainBtn     = document.getElementById("sendotpbtn");
+    const resendBtn   = document.getElementById("resendOtpBtn");
+    const resendSec   = document.getElementById("resend-section");
 
-        clearInterval(countdownInterval);
-        countdownInterval = setInterval(() => {
-            seconds--;
-            timerEl.innerText = seconds;
-            if (seconds <= 0) {
-                clearInterval(countdownInterval);
-                countdownEl.style.display = "none";
-                resendBtn.style.display   = "inline";
+    resendSec.style.display   = "inline";
+    countdownEl.style.display = "inline";
+    mainBtn.style.display     = "none";
+    resendBtn.style.display   = "none";
+
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        seconds--;
+        timerEl.innerText = seconds;
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            countdownEl.style.display = "none";
+            resendBtn.style.display   = "inline";
+        }
+    }, 1000);
+}
+
+// ── reCAPTCHA — init after full page load ─────────────────────
+let recaptchaVerifier;
+let confirmationResult = null;
+
+window.onload = function () {
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+        'recaptcha-container',
+        {
+            size: 'invisible',   // ← never shows image challenge
+            callback: () => {},
+            'expired-callback': () => {
+                recaptchaVerifier.reset();
             }
-        }, 1000);// spped of the counter to decrease the 30 sec time
+        }
+    );
+
+    // Pre-render silently so it's ready before user clicks
+    recaptchaVerifier.render().then((widgetId) => {
+        window.recaptchaWidgetId = widgetId;
+    });
+};
+
+// ── Send OTP ──────────────────────────────────────────────────
+async function sendOTP() {
+    const phone    = document.getElementById("phone").value.trim();
+    const username = document.getElementById("username").value.trim();
+
+    if (!username) {
+        showFlash("Please enter your Username first!", "danger");
+        return;
+    }
+    if (phone.length !== 10 || isNaN(phone)) {
+        showFlash("Please enter valid 10 digit phone number!", "danger");
+        return;
     }
 
-    // main OTP sender function
-    async function sendOTP() {
-        const email = document.getElementById("email").value;
-        const username = document.querySelector("#username").value;
+    const btn = document.getElementById("sendotpbtn");
+    btn.disabled  = true;
+    btn.innerText = "Sending...";
 
-        if (!username) {
-            showFlash("Please enter your Username to Validate E-Mail", "danger");
-            return;
+    try {
+        // Reset reCAPTCHA before each attempt
+        if (window.recaptchaWidgetId !== undefined) {
+            grecaptcha.reset(window.recaptchaWidgetId);
         }
 
-        if (!email) {
-            showFlash("Please enter your email first!", "danger");
-            return;
-        }
+        // Firebase sends OTP silently
+        confirmationResult = await firebase.auth()
+            .signInWithPhoneNumber(`+91${phone}`, recaptchaVerifier);
 
-        const response = await fetch('/getotp', {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+        document.getElementById("otp-section").style.display = "block";
+        showFlash(`OTP sent to +91${phone} ✅`, "success");
+        startCountdown();
+
+    } catch (err) {
+        console.error(err);
+        showFlash("Failed to send OTP: " + err.message, "danger");
+        btn.disabled  = false;
+        btn.innerText = "Send OTP";
+
+        // Reset reCAPTCHA on failure so next attempt works
+        recaptchaVerifier.render().then((widgetId) => {
+            window.recaptchaWidgetId = widgetId;
         });
+    }
+}
 
-        const data = await response.json();
+document.getElementById("sendotpbtn").addEventListener("click", sendOTP);
+document.getElementById("resendOtpBtn").addEventListener("click", sendOTP);
 
-        if (data.success) {
-            showFlash(`OTP sent successfully to your email! <br> E-Mail: <b>${email}</b> ✅`, "success");
-            startCountdown(); // start 30s countdown
-        } else {
-            showFlash(data.message || "Failed to send OTP!", "danger");
-        }
+// ── Verify OTP ────────────────────────────────────────────────
+document.getElementById("verify-otp-btn").addEventListener("click", async () => {
+    const otp = document.getElementById("otp-input").value.trim();
+
+    if (!confirmationResult) {
+        showFlash("Please send OTP first!", "danger");
+        return;
+    }
+    if (otp.length !== 6) {
+        showFlash("Enter valid 6 digit OTP!", "danger");
+        return;
     }
 
-    // Get OTP button
-    document.getElementById("sendotpbtn").addEventListener('click', sendOTP);
+    try {
+        // Verify OTP with Firebase
+        const result = await confirmationResult.confirm(otp);
 
-    // Resend OTP button
-    document.getElementById("resendOtpBtn").addEventListener('click', sendOTP);
+        // Get token for backend
+        const token = await result.user.getIdToken();
+        document.getElementById("firebase-token").value = token;
 
-    document.getElementById("phone").addEventListener("input", function(){
-      if(this.value < 0) this.value = 0;
-      this.value = this.value.replace(/\D/g,"").slice(0,10);
-    })
+        // Show verified status
+        document.getElementById("otp-status").innerText   = "✅ Phone verified!";
+        document.getElementById("otp-status").style.color = "green";
+        document.getElementById("verify-otp-btn").disabled = true;
+        document.getElementById("otp-input").disabled      = true;
+
+        // Show password + submit
+        document.getElementById("password-section").style.display = "block";
+        document.getElementById("submit-section").style.display   = "block";
+
+        showFlash("Phone verified! Now set your password ✅", "success");
+
+    } catch (err) {
+        document.getElementById("otp-status").innerText   = "❌ Invalid OTP! Try again.";
+        document.getElementById("otp-status").style.color = "red";
+    }
+});
+
+// ── Phone — numbers only ──────────────────────────────────────
+document.getElementById("phone").addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0, 10);
+});
 </script>

@@ -1,39 +1,47 @@
 const User = require("../models/user.js");
 const passport = require("passport");
 const mergeGuestCart = require("../utils/mergecart.js");
-
+const admin = require("../utils/firebase.js"); // ← add this at top of file
+const { getAuth } = require("../utils/firebase.js")
 module.exports.signup = async (req, res, next) => {
     try {
-        let { username, email, otp, password, street, city, state, pincode, phone} = req.body;
+        let { username, email, password, 
+              street, city, state, pincode, 
+              phone, firebaseToken } = req.body;  // ← replace otp with firebaseToken
 
-        if (otp != req.session.otp || email !== req.session.otpEmail) {
-            req.flash("err", "Invalid OTP or E-MAIL");
+        // ── Verify Firebase phone token ──────────────────────
+        const decoded = await admin.getAuth().verifyIdToken(firebaseToken);
+
+        if (decoded.phone_number !== `+91${phone}`) {
+            req.flash("err", "Phone verification failed! Please try again.");
             return res.redirect("/signup");
         }
-
-        if (Date.now() > req.session.expiryOtp) {
-            req.flash("err", `OTP time expires. Send OTP again to SignUp.`);
-            return res.redirect("/signup");
-        }
+        // ────────────────────────────────────────────────────
 
         // ✅ Save guest cart BEFORE registering
         const guestCart = req.session.cart || [];
 
-        let newUser = new User({ email, username,phone, address: {street, city, state, pincode}});
+        let newUser = new User({ 
+            email, 
+            username, 
+            phone, 
+            address: { street, city, state, pincode } 
+        });
+        
         let registeredUser = await User.register(newUser, password);
 
         req.login(registeredUser, async (err) => {
             if (err) return next(err);
 
-            // ✅ Restore guest cart after passport regenerates session
+            // ✅ Restore guest cart
             req.session.cart = guestCart;
-
             await mergeGuestCart(req);
+
             req.flash("signup", `Welcome ${username} to GROCERY-STORE!`);
             res.redirect("/listings");
         });
 
-        // ✅ Move these INSIDE req.login or they run before it finishes
+        // ✅ Clean up old OTP session vars (no longer needed but safe to keep)
         delete req.session.otp;
         delete req.session.otpEmail;
         delete req.session.expiryOtp;
