@@ -906,6 +906,11 @@ body {
     width: 95%;
 } */
 /* ── Media queries ── */
+
+.btnViewCartBigView{
+    margin-top: -65px;
+}
+
 @media (max-width: 767px) {
     .rotating-text{
         display: none !important;
