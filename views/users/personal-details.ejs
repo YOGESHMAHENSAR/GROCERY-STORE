@@ -17,6 +17,7 @@
           name="name"
           class="form-control box-size"
           value="<%= name || '' %>"
+          required
         />
       </div>
       <div class="mb-4">
@@ -27,16 +28,20 @@
           name="mail"
           class="form-control box-size"
           value="<%= mail || '' %>"
+          required
         />
       </div>
       <div class="mb-4">
         <label for="phone" class="form-label">Phone: </label>
         <input
-          type="text"
+          type="tel"
           id="phone"
+          maxlength="10"
+          pattern="[6-9][0-9]{9}"
           name="phone"
           class="form-control box-size"
           value="<%= phone || '' %>"
+          required
         />
       </div>
       <!-- <div class="mb-3">
@@ -49,3 +54,44 @@
     </form>
   </div>
 </div>
+
+<script>
+  const phoneInput = document.querySelector("#phone");
+  if(phoneInput){
+    phoneInput.addEventListener("input", function (e){
+      let cleanVal = this.value.replace(/\D/g, ""); // D-> stands for the 0-9 only and remove anyother input
+      if(cleanVal.length>0 && !/^[6-9]/.test(cleanVal)){ // here the test is the fxn which return the boolean val
+                                    // and help us to know about the number is between the 6-9 other wies return false
+        cleanVal = cleanVal.substring(1);
+      }
+
+      this.value = cleanVal;
+    })
+  }
+
+  const mailInput = document.querySelector("#mail");
+  if(mailInput){
+    const allowedDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "skit.ac.in"];
+    mailInput.addEventListener("input", function (e){
+      // let cleanVal = this.value.replace(/\W/g, ""); // W -> stands for the char, 0-9 and _ and remove anyother input
+      let cleanVal = this.value.replace(/[^A-Za-z0-9_.@]/g,"");
+      if(cleanVal.includes("@")){
+        const parts = cleanVal.split("@");
+        const domainTyped = parts[1];
+
+        if (domainTyped.length > 0) {
+        const matchesAnyDomain = allowedDomains.some(domain => 
+          domain.startsWith(domainTyped.toLowerCase())
+        );
+
+        // If they type an invalid character for the domain, delete the last character
+        if (!matchesAnyDomain) {
+          cleanVal = cleanVal.slice(0, -1);
+        }
+      }
+      }
+
+      this.value = cleanVal;
+    })
+  }
+</script>
