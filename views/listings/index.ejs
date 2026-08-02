@@ -1,0 +1,209 @@
+<%- layout("/layouts/boilerplate") %>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- <h2 class="mb-4 heading">AVAILABLE PRODUCTS : </h2> -->
+   <div class="continer-fluid mt-2 mb-3 text-center">
+    <span class="d-inline-block rotating-text">
+      Invest in your <b>HEALTH </b> Order <b>NOW!</b>
+    </span>
+   </div>
+  <form action="/listings/new" method="get">
+    <!-- <button>ADD Listings</button> -->
+  </form>
+  <style>
+        .stock-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .stock-status.in-stock {
+            background: #dcfce7;
+            color: green;
+        }
+        .stock-status.out-stock {
+            background: #fee2e2;
+            color: red;
+        }
+    </style>
+    <div class="col-md-4 mb-4 search-box">
+        <label for="search" class="form-label"><b>Search: </b></label>
+        <input type="text" id="search" class="form-control" placeholder="Search By Name, Category, Price, Stock">
+    </div>
+    <div id="no-result" style="display:none; text-align:center; margin-top:2rem;">
+        <h5 style="color: #6b7280;">No products found for "<span id="search-term"></span>"</h5>
+    </div>
+
+  <div class="row row-cols-lg-6 row-cols-md-2 row-cols-sm-1 row-cols-xs-1 d-flex flex-wrap justify-content-evenly">
+    <% for(let list of lists) {%>
+        <!-- <a href="/listings/<%# list._id %>" class=""> -->
+            <div class="card listing-card listing-link" 
+            onclick="window.location='/listings/<%= list._id %>'">
+                <!-- <img src="<%# list.image.url %>" class="card-img-top main_img" style="height: 20rem" alt="..." /> -->
+                 <img 
+                  src="<%= list.image.url %>?w=600&h=400&c=fill&q=auto&f=auto" 
+                  srcset="
+                    <%= list.image.url %>?w=300&q=auto&f=auto 300w,
+                    <%= list.image.url %>?w=600&q=auto&f=auto 600w,
+                    <%= list.image.url %>?w=1200&q=auto&f=auto 1200w
+                  "
+                  sizes="(max-width: 600px) 200px, (max-width: 1200px) 600px, 1200px"
+                  loading="lazy"
+                  class="card-img-top main_img" style="height: 10rem; padding: 2px;" alt="..." />
+                <!-- <div class="card-img-overlay" ></div> -->
+                <div class="card-body ms-2" >
+                    <p class="card-text">
+                      <b style="font-size: .9rem;"><%= list.title %></b> <br />
+                      <div class="row">
+                        <div class="col-md-12" style="margin-top: -10px;">
+                          <i style="font-size: .9rem;" class="fas fa-rupee-sign"></i><b style="font-size: .9rem;"> : <%=list.sellingPrice?.toLocaleString("en-IN") %> </b>
+                        </div>
+                      </div>
+                      <% if(currUser && list.owners.some(o => o._id.equals(currUser._id))){ %>
+                      <div class="col-md-8 mt-3">
+                        <span id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
+                            <%= list.inStock ? "In Stock" : "Out of Stock" %>
+                        </span>
+                      </div>
+                      <% } %>
+                      <% if(!currUser || !list.owners.some(o=>o._id.equals(currUser._id))) {%>
+                          <div class="row mt-3">
+                            <div class="col-md-8" >
+                              <span style="font-size: .7rem;" id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
+                                  <%= list.inStock ? "In Stock" : "Out of Stock" %>
+                              </span>
+                            </div>
+                            <div class="col-md-2">
+                              <% const alreadyAdded = addedToCart && addedToCart.includes(list._id.toString()); %>
+                              <% if(alreadyAdded) {%>
+                                <a href="/cart" class="btn btn-outline-success indexViewCart" onclick="event.stopPropagation()">
+                                  <i class="fa-solid fa-cart-shopping"></i> View Cart
+                                </a>
+                              <% } else { %>
+                                <!-- <form action="/cart/<%# list._id %>" method="post" onsubmit="showLoader(this)"> -->
+                                    <input type="hidden" name="returnTo" value="/listings?category=<%= category %>">
+                                    <% if(list.inStock) {%>
+                                      <button type="button" id="cartAddBtn" data-id="<%= list._id %>" data-category="<%= category %>" 
+                                        class="btn btn-outline-primary add-to-cart-btn" title="Add To Cart"
+                                       style="margin-left: -28px; margin-top: -3px;"
+                                        onclick="addToCart(event, '<%= list._id %>', '<%= category %>')">
+                                          <i class="fa-solid fa-cart-shopping"></i>
+                                      </button>
+                                    <% } %>
+                                <!-- </form> -->
+                              <% } %>
+                            </div>
+                            <div class="loader-overlay" id="cartLoaderOverlay">
+                                <div class="loader-container">
+                                    <div class="loader"></div>
+                                    <p class="loader-text">Adding Item To Cart ... </p>
+                                </div>
+                            </div>
+                               <!-- <div style="margin-left: 130px; font-size: 14px;margin-top: -20px;">CART<span style="color: red; "><b>*</b></span></div> -->
+                          </div>
+                      <% } %>
+                      <!-- Review show in front only betterment of the UI/UX -->
+                      <!-- <div class="col-md-6">
+                        Rating: <b> : <%#list.reviews.rating %> </b>
+                      </div> -->
+                      
+                    </p>
+                </div>
+            </div>
+        <!-- </a> -->
+    <% } %>
+  </div>
+  <!-- <script>
+    function showLoader(event){
+      const btn = event.querySelector(".btn");
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+    }
+  </script> -->
+  <script>
+    document.getElementById("search").addEventListener("input", function() {
+        const searchValue = this.value.toLowerCase().trim();
+        const rows = document.querySelectorAll(".listing-card");
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const title = row.textContent.toLowerCase();
+
+            if(title.includes(searchValue)) {
+                visibleCount++;
+                row.style.display = "";      // ✅ show row
+            } else {
+                row.style.display = "none";  // ✅ hide row
+            }
+        });
+
+        const noresult = document.getElementById("no-result");
+        document.getElementById("search-term").textContent = searchValue;
+        if(visibleCount === 0 && searchValue !== ""){
+          noresult.style.display = "block"; // show the text
+        }else{
+          noresult.style.display = "none"; //hide the text
+        }
+    });
+    async function addToCart(event, id, category) {
+      document.querySelector("#cartLoaderOverlay").style.display = "flex";
+      event.stopPropagation();
+      const btn = event.target.closest(".add-to-cart-btn");
+
+      const url = `/cart/${id}/fetch`;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ returnTo: `/listings?category=${category}` })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          const a = document.createElement("a");
+          a.href = "/cart";
+          a.className = "btn btn-outline-success indexViewCart";
+          a.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>View Cart`;
+          document.querySelector("#cartLoaderOverlay").style.display = "none";
+          a.onclick = (e) => e.stopPropagation(); // Block card click
+          btn.replaceWith(a);
+
+          const cartCount = data.cartCount; // to updates all badges
+
+          const badge = document.getElementById("cart-count");
+          if (badge) {
+              badge.textContent = cartCount;
+              badge.style.display = cartCount > 0 ? "inline" : "none";
+              if (cartCount > 0) {
+                  badge.classList.remove("bg-primary");
+                  badge.classList.add("bg-primary");
+              }
+          } else if (cartCount > 0) {
+              const cartLink = document.querySelector('a[href="/cart"]');
+              if (cartLink) {
+                  const newBadge = document.createElement("span");
+                  newBadge.id = "cart-count";
+                  newBadge.className = "badge bg-primary";
+                  newBadge.textContent = cartCount;
+                  cartLink.appendChild(newBadge);
+              }
+          }
+        }
+      }
+        catch (err) {
+          console.error("addToCart error:", err); // ← add this
+          document.querySelector("#cartLoaderOverlay").style.display = "none"; // ← hide loader on error too
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i>`;
+        }
+    }
+  </script>
+</body>

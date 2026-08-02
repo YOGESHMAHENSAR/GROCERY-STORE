@@ -1,0 +1,188 @@
+<nav class="navbar navbar-expand-md bg-white sticky-top border-bottom" style="padding: 0;">
+  <div class="container-fluid px-0">
+
+    <!-- Logo -->
+    <a class="navbar-brand ps-2" href="/listings">
+      <img src="/css/grocery-image.png" style="width: 80px; height: 67px; margin-left: 10px;" alt="logo">
+    </a>
+
+    <!-- Hamburger -->
+    <button class="navbar-toggler me-2" type="button"
+      data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
+      <!-- ── Main nav links ── -->
+      <ul class="navbar-nav flex-column flex-md-row align-items-start align-items-md-center me-auto px-3 px-md-2 gap-md-1">
+
+        <li class="nav-item w-100 w-md-auto">
+          <a class="nav-link d-flex align-items-center gap-2
+            <%= req.originalUrl === '/listings' && !category ? 'active' : '' %>"
+            href="/listings">
+            <i class="fa-solid fa-house" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(185,86,86);"></i>
+            <span style="font-size: 1.1rem; font-weight: 500;">Home</span>
+          </a>
+        </li>
+
+        <li class="nav-item w-100 w-md-auto">
+          <a class="nav-link d-flex align-items-center gap-2
+            <%= category === 'Grocery' ? 'active' : '' %>"
+            href="/listings?category=Grocery">
+            <i class="fa-solid fa-bag-shopping" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(223,112,146);"></i>
+            <span style="font-size: 1.1rem; font-weight: 500;">Grocery</span>
+          </a>
+        </li>
+
+        <li class="nav-item w-100 w-md-auto">
+          <a class="nav-link d-flex align-items-center gap-2
+            <%= category === 'Beverages' ? 'active' : '' %>"
+            href="/listings?category=Beverages">
+            <i class="fa-solid fa-bread-slice" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(229,140,45);"></i>
+            <span style="font-size: 1.1rem; font-weight: 500;">Beverages</span>
+          </a>
+        </li>
+
+        <li class="nav-item w-100 w-md-auto">
+          <a class="nav-link d-flex align-items-center gap-2
+            <%= category === 'Snacks' ? 'active' : '' %>"
+            href="/listings?category=Snacks">
+            <i class="fa-solid fa-cookie-bite" style="font-size: 1.3rem; width:22px; text-align:center; color: brown;"></i>
+            <span style="font-size: 1.1rem; font-weight: 500;">Snacks &amp; Sweets</span>
+          </a>
+        </li>
+
+        <li class="nav-item w-100 w-md-auto">
+          <a class="nav-link d-flex align-items-center gap-2
+            <%= category === 'Dairy' ? 'active' : '' %>"
+            href="/listings?category=Dairy">
+            <i class="fa-solid fa-cow" style="font-size: 1.3rem; width:22px; text-align:center;"></i>
+            <span style="font-size: 1.1rem; font-weight: 500;">Dairy &amp; Eggs</span>
+          </a>
+        </li>
+
+        <!-- Cart (customers only) -->
+        <% if(!currUser || !ownerId.includes(currUser._id.toString())) { %>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2 position-relative
+              <%= req.originalUrl === '/cart' ? 'active' : '' %>"
+              href="/cart">
+              <i class="fa-solid fa-cart-arrow-down" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(149,62,241);"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Cart</span>
+              <% if(cartCount > 0){ %>
+                <span class="badge bg-primary" id="cart-count"><%= cartCount %></span>
+              <% } else { %>
+              <span class="badge bg-primary" id="cart-count" style="display: none;"></span>
+              <% } %>
+            </a>
+          </li>
+        <% } %>
+
+        <!-- Owner links -->
+        <% if(currUser && ownerId.includes(currUser._id.toString())) { %>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= req.originalUrl === '/listings/new' ? 'active' : '' %>"
+              href="/listings/new">
+              <i class="fa-solid fa-cart-plus" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(0,72,255);"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Add Products</span>
+            </a>
+          </li>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= req.originalUrl === '/listings/inventory' ? 'active' : '' %>"
+              href="/listings/inventory">
+              <i class="fa-solid fa-boxes-stacked" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(106,90,10);"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Inventory</span>
+            </a>
+          </li>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= req.originalUrl === '/orders-delivery' ? 'active' : '' %>"
+              href="/orders-delivery">
+              <i class="fa-regular fa-truck" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(255,0,21);"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Orders</span>
+              <% if(typeof orders !== "undefined" && orders.length > 0) { %>
+                <span class="badge bg-success">Pending: <%= orders.filter(o => o.status === "Pending").length %></span>
+              <% }else{ %>
+                <span class="badge bg-success">Pending: 0</span>
+              <% } %>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+
+      <!-- ── Auth links ── -->
+      <ul class="navbar-nav flex-column flex-md-row align-items-start align-items-md-center px-3 px-md-2 pb-3 pb-md-0 gap-2">
+
+        <% if(currUser) { %>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= req.originalUrl === '/listings/profile' ? 'active' : '' %>"
+              href="/listings/profile">
+              <i class="fa-regular fa-circle-user" style="font-size: 1.8rem; color: rgb(42,99,174);"></i>
+              <span class="d-md-none" style="font-size: 1.2rem; font-weight: 500;">Profile</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link p-0" style="cursor:pointer;"
+              data-bs-toggle="modal" data-bs-target="#logout">
+              <button class="btn btn-outline-dark btn-sm" style="font-size: 1.05rem;">Log Out</button>
+            </a>
+          </li>
+        <% } %>
+
+        <% if(!currUser) { %>
+          <li class="nav-item">
+            <a class="nav-link p-0" href="/login">
+              <button class="btn btn-outline-dark btn-sm" style="font-size: 1.1rem;">Login</button>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link p-0" href="/signup">
+              <button class="btn btn-outline-dark btn-sm" style="font-size: 1.1rem;">Sign Up</button>
+            </a>
+          </li>
+        <% } %>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Logout modal -->
+<div class="modal fade" id="logout" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutLabel"><b>LOGOUT!</b></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to <b>LOGOUT</b>?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+        <form action="/logout">
+          <button class="btn btn-warning">LOGOUT</button>
+        </form>
+      </div>
+      <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+          <div class="loader"></div>
+          <p class="loader-text">Logging Out...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Navbar badge is rendered server-side. No client-side badge creation is required here.
+  const badge = document.getElementById("cart-count");
+  if (badge) {
+      badge.style.display = badge.textContent > 0 ? "inline" : "none";
+  }
+</script>

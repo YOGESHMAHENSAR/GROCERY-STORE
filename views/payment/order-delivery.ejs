@@ -1,0 +1,383 @@
+<%- layout("/layouts/boilerplate") -%>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+.orders-wrapper { padding: 1rem; max-width: 100%; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+.stat-box {
+    background: #f5eaff;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+}
+.stat-label { font-size: 12px; color: #6b7280; margin: 0 0 2px; }
+.stat-value { font-size: 20px; font-weight: 500; margin: 0; }
+
+.profit-bar {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.profit-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #6b7280;
+    padding: 4px 0;
+}
+.profit-final {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 500;
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.order-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.status-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 6px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+.info-row:last-of-type { border-bottom: none; }
+.info-label { font-size: 12px; color: #6b7280; flex-shrink: 0; }
+.info-value { font-size: 13px; font-weight: 500; text-align: right; word-break: break-all; max-width: 60%; }
+.section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 10px 0 6px;
+}
+.product-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+.product-row:last-child { border-bottom: none; }
+.address-box {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0.75rem 0;
+}
+.action-btn {
+    width: 100%;
+    margin-top: 4px;
+}
+
+/* Desktop — show as wide table-like layout */
+@media (min-width: 768px) {
+    .orders-wrapper { max-width: 900px; margin: 1rem auto; }
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    .stat-box { grid-column: auto !important; }
+    .order-card { padding: 1.5rem; }
+    .desktop-info-grid {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .desktop-info-grid > div { min-width: 100px; }
+    .info-row { display: none; } /* hide mobile rows on desktop */
+    .desktop-info-grid { display: flex; }
+    .profit-bar { max-width: 300px; position: sticky; top: 80px; float: right; margin-left: 1rem; }
+}
+
+@media (max-width: 767px) {
+    .desktop-info-grid { display: none; } /* hide desktop layout on mobile */
+    .profit-bar { float: none; max-width: 100%; position: static; }
+}
+</style>
+
+<div class="orders-wrapper">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-box" style="grid-column: 1 / -1;">
+            <p class="stat-label">Total orders</p>
+            <p class="stat-value"><%= orders.length %></p>
+        </div>
+        <div class="stat-box">
+            <p class="stat-label" style="color: rgb(209,161,17);">Pending</p>
+            <p class="stat-value" id="count-pending"><%= orders.filter(o => o.status === "Pending").length %></p>
+        </div>
+        <div class="stat-box">
+            <p class="stat-label" style="color: rgb(22,163,74);">Confirmed</p>
+            <p class="stat-value" id="count-confirm"><%= orders.filter(o => o.status === "Confirmed").length %></p>
+        </div>
+        <div class="stat-box" style="grid-column: 1 / -1;">
+            <p class="stat-label" style="color: rgb(80,92,225);">Delivered</p>
+            <p class="stat-value" id="count-place"><%= orders.filter(o => o.status === "Placed").length %></p>
+        </div>
+    </div>
+
+    <% if(orders.length === 0) { %>
+        <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 16px;">
+            <p style="color: #6b7280;">NO-THING TO DELIVER YET! <br><b><span style="color: red;">WAIT</span></b> FOR CUSTOMER TO ORDER.</p>
+            <h3 style="color: #6b7280;">HAVE PATIENCE!</h3><br>
+            <a href="/listings" class="btn btn-success">GO TO HOME</a>
+        </div>
+    <% } else { %>
+
+    <%
+        let totalSellingSum = orders.reduce((orderSum, order) => {
+            return orderSum + order.items.reduce((itemSum, item) => {
+                const price = parseFloat(item.product?.sellingPrice?.toString().replace(/[^\d.-]/g, '')) || 0;
+                const taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+                return itemSum + (price * (1 + taxRate) * item.quantity);
+            }, 0);
+        }, 0);
+
+        let totalCostSum = orders.reduce((orderSum, order) => {
+            return orderSum + order.items.reduce((itemSum, item) => {
+                const price = parseFloat(item.product?.costPrice?.toString().replace(/[^\d.-]/g, '')) || 0;
+                const taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
+                return itemSum + (price * (1 + taxRate) * item.quantity);
+            }, 0);
+        }, 0);
+
+        let profit = totalSellingSum - totalCostSum;
+    %>
+
+    <!-- Profit bar (sticky on desktop, inline on mobile) -->
+    <div class="profit-bar">
+        <p class="section-label">Profit summary</p>
+        <div class="profit-row"><span>Total selling price</span><span>₹ <%= totalSellingSum.toLocaleString("en-IN") %></span></div>
+        <div class="profit-row"><span>Total cost price</span><span>₹ <%= totalCostSum.toLocaleString("en-IN") %></span></div>
+        <div class="profit-final"><span>Final profit</span><span>₹ <%= profit.toLocaleString("en-IN") %></span></div>
+    </div>
+
+    <!-- Order cards -->
+    <% for(let order of orders) { %>
+    <%
+        let orderSubTotal = order.items.reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
+        let orderTax = order.items.reduce((s, i) => {
+            let t = parseFloat(i.price) * i.quantity;
+            let r = i.product && i.product.Tax ? parseFloat(i.product.Tax) / 100 : 0;
+            return s + (t * r);
+        }, 0);
+        let orderGrandTotal = orderSubTotal + orderTax + 10;
+
+        const badgeBg = order.status === "Confirmed" ? "#dbeafe" : order.status === "Placed" ? "#dcfce7" : "#fef9c3";
+        const badgeClr = order.status === "Confirmed" ? "#1e40af" : order.status === "Placed" ? "#166534" : "#854d0e";
+    %>
+
+    <div class="order-card">
+
+        <!-- Status + date -->
+        <div class="card-header-row">
+            <span class="status-badge" data-id="<%= order.orderId %>"
+                style="background: <%= badgeBg %>; color: <%= badgeClr %>;">
+                <%= order.status %>
+            </span>
+            <span style="font-size: 12px; color: #6b7280;">
+                <%= order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : 'N/A' %>
+            </span>
+        </div>
+
+        <!-- MOBILE: info rows -->
+        <div class="info-row"><span class="info-label">Customer</span><span class="info-value"><%= order.user.username %></span></div>
+        <div class="info-row"><span class="info-label">Contact</span><span class="info-value"><%= order.user.phone %></span></div>
+        <div class="info-row"><span class="info-label">Order ID</span><span class="info-value" style="font-size: 11px;"><%= order.orderId %></span></div>
+        <div class="info-row"><span class="info-label">Total</span><span class="info-value" style="font-size: 15px;">₹ <%= orderGrandTotal.toFixed(2) %></span></div>
+        <div class="info-row"><span class="info-label">Payment Mode</span><span class="info-value" style="font-size: 15px;"><%= order.paymentMethod%></span></div>
+
+        <!-- DESKTOP: flex row -->
+        <div class="desktop-info-grid">
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Customer</p><p style="margin:0;font-weight:500;font-size:14px;"><%= order.user.username %></p></div>
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Contact</p><p style="margin:0;font-weight:500;font-size:14px;"><%= order.user.phone %></p></div>
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Order ID</p><p style="margin:0;font-weight:500;font-size:14px;"><%= order.orderId %></p></div>
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Ordered at</p><p style="margin:0;font-size:14px;"><%= order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : 'N/A' %></p></div>
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Total</p><p style="margin:0;font-weight:600;">₹<%= orderGrandTotal.toFixed(2) %></p></div>
+            <div><p style="margin:0;font-size:13px;color:#6b7280;">Payment Mode</p><p style="margin:0;font-weight:600;"><%= order.paymentMethod %></p></div>
+        </div>
+
+        <!-- Items -->
+        <p class="section-label">Items</p>
+        <% for(let item of order.items) { %>
+            <% if(item.product) { %>
+            <div class="product-row">
+                <img src="<%= item.product.image.url %>"
+                    style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0;" alt="">
+                <div>
+                    <p style="margin:0;font-size:13px;font-weight:500;"><%= item.product.title %></p>
+                    <p style="margin:2px 0 0;font-size:12px;color:#6b7280;">Qty: <%= item.quantity %> × ₹<%= item.product.sellingPrice %></p>
+                </div>
+            </div>
+            <% } %>
+        <% } %>
+
+        <!-- Address -->
+        <div class="address-box">
+            📍 <%= order.address.street %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %>
+        </div>
+
+        <!-- Action buttons -->
+        <% if(order.status === "Pending") { %>
+            <button class="btn btn-outline-dark action-btn"
+                data-category="<%= orderGrandTotal %>"
+                data-id="<%= order.orderId %>"
+                id="order-confirmed">
+                <i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem;"></i> Confirm order
+            </button>
+        <% } %>
+        <% if(order.status === "Confirmed") { %>
+            <button class="btn btn-outline-success action-btn"
+                data-category="<%= orderGrandTotal %>"
+                data-id="<%= order.orderId %>"
+                id="order-placed">
+                <i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem;"></i> Mark as delivered
+            </button>
+        <% } %>
+        <% if(order.status === "Placed") { %>
+            <div style="text-align:center;padding:8px 0;font-size:13px;color:#166534;font-weight:500;">
+                ✓ Order delivered
+            </div>
+        <% } %>
+
+    </div>
+    <% } %>
+
+    <% } %>
+</div>
+
+<script>
+    document.addEventListener("click", async function(e) {
+        const orderConfirmed = e.target.closest("#order-confirmed");
+        if(orderConfirmed) {
+            const orderId = orderConfirmed.dataset.id;
+            const orderGrandTotal = orderConfirmed.dataset.category;
+            await updateOrderStatus(orderId, "Confirmed", orderConfirmed, orderGrandTotal);
+            return;
+        }
+        const orderPlaced = e.target.closest("#order-placed");
+        if(orderPlaced) {
+            const orderId = orderPlaced.dataset.id;
+            const orderGrandTotal = orderPlaced.dataset.category;
+            await updateOrderStatus(orderId, "Placed", orderPlaced, orderGrandTotal);
+            return;
+        }
+    });
+
+    async function updateOrderStatus(orderId, status, btn, orderGrandTotal) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+        try {
+            let response = await fetch(`/order/${orderId}/status`, {
+                method: "PATCH",
+                body: JSON.stringify({ status, orderGrandTotal }),
+                headers: { "Content-Type": "application/json" }
+            });
+
+            const data = await response.json();
+
+            if(response.ok && data.success) {
+                const badge = document.querySelector(`span[data-id="${orderId}"]`);
+                if(badge) {
+                    badge.textContent = data.status;
+                    if(data.status === "Confirmed") { badge.style.background = "#dbeafe"; badge.style.color = "#1e40af"; }
+                    else if(data.status === "Placed") { badge.style.background = "#dcfce7"; badge.style.color = "#166534"; }
+                }
+
+                const pendingCount = document.querySelector("#count-pending");
+                const confirmCount = document.querySelector("#count-confirm");
+                const placedCount = document.querySelector("#count-place");
+                const navPendingBadge = document.querySelector('a[href="/orders-delivery"] .badge');
+
+                if(data.status === "Confirmed") {
+                    if(pendingCount) pendingCount.textContent = parseInt(pendingCount.textContent) - 1;
+                    if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) + 1;
+                    if(navPendingBadge) {
+                        const value = parseInt(navPendingBadge.textContent) || 0;
+                        navPendingBadge.textContent = Math.max(value - 1, 0);
+                    }
+                    const newBtn = document.createElement("button");
+                    newBtn.className = "btn btn-outline-success action-btn";
+                    newBtn.dataset.id = orderId;
+                    newBtn.dataset.category = orderGrandTotal;
+                    newBtn.id = "order-placed";
+                    newBtn.innerHTML = `<i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem;"></i> Mark as delivered`;
+                    btn.replaceWith(newBtn);
+                    if(data.whatsappUrl) {
+                        const link = document.createElement("a");
+                        link.href = data.whatsappUrl;
+                        link.target = "_blank";
+                        link.rel = "noopener noreferrer";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+
+                } else if(data.status === "Placed") {
+                    if(placedCount) placedCount.textContent = parseInt(placedCount.textContent) + 1;
+                    if(confirmCount) confirmCount.textContent = parseInt(confirmCount.textContent) - 1;
+                    if(navPendingBadge && pendingCount) {
+                        const value = parseInt(navPendingBadge.textContent) || 0;
+                        navPendingBadge.textContent = Math.max(value - 1, 0);
+                    }
+                    const deliveredDiv = document.createElement("div");
+                    deliveredDiv.style.cssText = "text-align:center;padding:8px 0;font-size:13px;color:#166634;font-weight:500;";
+                    deliveredDiv.textContent = "✓ Order delivered";
+                    btn.replaceWith(deliveredDiv);
+                    if(data.whatsappUrl) {
+                        const link = document.createElement("a");
+                        link.href = data.whatsappUrl;
+                        link.target = "_blank";
+                        link.rel = "noopener noreferrer";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }
+            } else {
+                alert(data.message || "Failed to update order status");
+                btn.disabled = false;
+                btn.innerHTML = status === "Confirmed"
+                    ? `<i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem;"></i> Confirm order`
+                    : `<i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem;"></i> Mark as delivered`;
+            }
+        } catch(e) {
+            console.error("Error:", e);
+            alert("An error occurred");
+            btn.disabled = false;
+        }
+    }
+</script>

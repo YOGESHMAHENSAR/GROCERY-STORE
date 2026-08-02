@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>GROCERY-STORE Various products Description</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/png" href="/css/grocery-image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/rating.css">
+    <!-- mapbox api for the address prefilled. -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.js"></script>
+</head>
+<body>
+    <%- include("../includes/navbar.ejs") %>
+    <div class="container">
+        <div class="conatiner">
+            <%- include("../includes/flash.ejs") %>
+            <%- body %>
+        </div>
+    </div>
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+        </div>
+    <footer>
+        <%- include("../includes/footer.ejs") %>
+    </footer>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script>
+        let flashDiv = document.querySelector(".flash-msg");
+        if(flashDiv){
+            setTimeout(()=>{
+                flashDiv.style.opacity = "0";
+                flashDiv.style.transition = "opacity 0.5s ease";
+                setTimeout(()=>{
+                    flashDiv.remove();
+                },500)
+            },3700);
+        }
+    </script>
+    <script src="/js/script.js"></script>
+    <% if(currUser && ownerId.includes(currUser._id.toString())) { %>
+        <script>
+        async function registerPushNotification() {
+            if(!("serviceWorker" in navigator) || !("PushManager" in window)) {
+                console.log("Push not supported on this browser");
+                return;
+            }
+
+            try {
+                // 1. Register service worker
+                const registration = await navigator.serviceWorker.register("/service-worker.js");
+                console.log("✅ Service Worker registered");
+
+                // 2. Ask permission
+                const permission = await Notification.requestPermission();
+                if(permission !== "granted") {
+                    console.log("❌ Notification permission denied");
+                    return;
+                }
+
+                // 3. Subscribe to push
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array("<%= process.env.VAPID_PUBLIC_KEY %>")
+                });
+
+                // 4. Send subscription to server
+                await fetch("/save-push-subscription", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(subscription)
+                });
+
+                console.log("✅ Push subscription saved");
+
+            } catch(err) {
+                console.error("Push registration failed:", err);
+            }
+        }
+
+        // Helper function
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for(let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        // Run when owner visits site
+        registerPushNotification();
+        </script>
+<% } %>
+<style>
+@keyframes slideInToast {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+</style>
+</body>
+</html>

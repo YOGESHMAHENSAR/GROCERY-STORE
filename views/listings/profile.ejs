@@ -1,0 +1,81 @@
+<%- layout("/layouts/boilerplate") -%>
+<!-- main route calling is from the routes -> listings.js  -->
+<body>
+<div style="max-width: 680px; margin: 2rem auto; padding: 0 1rem;">
+
+  <div style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;">
+
+    <!-- Header with avatar -->
+    <div  style="background: #f9fafb; padding: 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 1.2rem;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 500; color: #1d4ed8; flex-shrink: 0;">
+              <%= user.charAt(0).toUpperCase() %>
+            </div>
+            <div>
+            <p style="font-size: 20px; font-weight: 600; margin: 0;"><%=user%></p>
+            <% if(user === "Manish" || user === "YOGESH_SINGH") {%>
+              <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0;">Owner</p>
+            <% } else { %>
+              <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0;">Customer</p>
+            <% } %>
+          </div>
+        </div>
+        <a href="/profile/personal-details" style="font-size: 13px; color: #2563eb; text-decoration: none;">Edit Personal Details</a>
+    </div>
+
+    <!-- Account details -->
+    <div style="padding: 1.5rem 2rem;">
+      <p style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #9ca3af; margin: 0 0 12px; text-transform: uppercase;">Account details</p>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+        <span style="font-size: 13px; color: #6b7280;">Name</span>
+        <span style="font-size: 14px; font-weight: 500;"><%=user%></span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+        <span style="font-size: 13px; color: #6b7280;">Email</span>
+        <span style="font-size: 14px;"><%=mail%></span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+        <span style="font-size: 13px; color: #6b7280;">Phone Number</span>
+        <span style="font-size: 14px;"><%=phone%></span>
+      </div>
+    </div>
+
+    <!-- Address section -->
+     <% if(user != "Manish" && user != "YOGESH_SINGH") {%>
+      <div style="padding: 0 2rem 1.5rem;">
+        <p style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #9ca3af; margin: 0 0 12px; text-transform: uppercase;">Delivery address</p>
+      
+        <% if(add && add.pincode) { %>
+          <div style="background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb; padding: 1rem 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <p style="margin: 0 0 4px; font-size: 14px;"><%= add.street %></p>
+                <p style="margin: 0 0 4px; font-size: 13px; color: #6b7280;"><%= add.city %>, <%= add.state %></p>
+                <p style="margin: 0; font-size: 13px; color: #6b7280;">Pincode: <%= add.pincode %></p>
+              </div>
+              <a href="/profile/address" style="font-size: 13px; color: #2563eb; text-decoration: none;">Edit Address</a>
+            </div>
+          </div>
+        <% } else { %>
+          <div style="background: #fffbeb; border-radius: 10px; border: 1px solid #fde68a; padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; color: #92400e;">No address added yet</span>
+            <a href="/profile/address" style="font-size: 13px; color: #d97706; text-decoration: none; font-weight: 500;">+ Add Address</a>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+
+    <!-- Footer actions -->
+    <div style="padding: 1rem 2rem 1.5rem; border-top: 1px solid #e5e7eb; display: flex; gap: 10px; justify-content: flex-end;">
+      <% if(currUser && user !== "Manish" && user !== "YOGESH_SINGH") {%>
+        <a href="/orders" style="font-size: 13px; text-decoration: none; padding: 8px 16px; border-radius: 8px; border: 1px solid #d1d5db; color: #374151;">My Orders</a>
+        <a href="/cart" style="font-size: 13px; text-decoration: none; padding: 8px 16px; border-radius: 8px; border: 1px solid #d1d5db; color: #374151;">View Cart</a>
+      <% } %>
+      <a href="/logout" style="font-size: 13px; text-decoration: none; padding: 8px 16px; border-radius: 8px; background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;">Log out</a>
+    </div>
+
+  </div>
+</div>
+</body>
