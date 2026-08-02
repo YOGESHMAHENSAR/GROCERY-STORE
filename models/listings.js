@@ -65,6 +65,26 @@ const listingSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    quantityType: {
+        type: String,
+        enum: ["loose_weight", "count", "fixed_pack", "single_variant"],
+        required: true
+    },
+    variants: [
+        {
+            label: { type: String },// e.g. "500g", "1 Dozen", "10kg Sack"
+            value: { type: Number },// e.g. 0.5, 12, 10
+            unit: { type: String },// "kg", "g", "dozen", "piece", "sack"
+            price: { type: Number },
+            stock: { type: Number }
+        }
+    ],
+    pricePerUnit: {// used only for loose_weight
+        type: Number
+    },
+    baseUnit: {// used only for loose_weight, e.g. "kg"
+        type: String
+    },
     category:[
         {
             type: String,

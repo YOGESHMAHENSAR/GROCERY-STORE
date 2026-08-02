@@ -61,6 +61,50 @@
             Please Select image of type: jpeg, png only
           </div>
         </div>
+        <div class="mb-3">
+          <label class="form-label" for="quant">Select Quantity Type</label
+            ><span><b style="color: red;"> *</b> : </span>
+            <select name="listing[quantityType]" class="form-select" id="quant">
+              <option value="" selected disabled>Select Quantities </option>
+              <option value="loose_weight">Loose Weight</option>
+              <option value="single_variant">Single Variant</option>
+              <option value="fixed_packed">Fixed Pack</option>
+              <option value="count">Count </option>
+            </select>
+            <div class="invalid-feedback">Please Select the valid Quantity</div>
+        </div>
+        
+        <!-- dynamically shown by default hidden for the Base Unit type selection -->
+        <div id="loose_weight_fields" class="d-none quant-fields mb-3">
+          <label for="unit" class="form-label">Base Unit</label><span><b style="color: red;"> *</b> : </span>
+          <select name="listing[baseUnit]" id="unit">
+            <option value="" selected disabled>Select the Unit of Item</option>
+            <option value="kg">Kilogram</option>
+            <option value="gm">Gram</option>
+            <option value="l">Litre</option>
+          </select>
+          <div class="mt-2" style="font-size: 13px;">
+            Cost Price below will be treated as <b>price per unit</b> (e.g. per kg).
+          </div>
+        </div>
+        <!-- Base unit selection ends -->
+
+        <!-- Fixed variants start -->
+        <div class="fixed_variants_fields d-none quant-fields mb-3" >
+          <label for="fixed" class=form-label>Fixed Unit</label><span><b style="color: red;"> *</b> : </span>
+          <div id="fixed_pack_variant_rows"></div>
+          <button type="button" class="btn btn-sm btn-outline-dark mt-2" onclick="addVariantRow('fixed_pack')">
+            + Add Variant</button>
+        </div>
+         <!-- fixed variants field ends -->
+
+        <div id="count_fields" class="quant-fields d-none mb-3">
+          <label class="form-label">Count Variants (e.g. 6 pcs, 1 Dozen)</label>
+          <div id="count_variant_rows"></div>
+          <button type="button" class="btn btn-sm btn-outline-dark mt-2" onclick="addVariantRow('count')">+ Add Variant</button>
+        </div>
+
+
         <div class="row">
           <div class="mb-3 col-md-6">
             <label class="form-label" for="price">Select Category </label
@@ -97,12 +141,12 @@
             </div>
           </div>
         </div>
-        <div class="divider costSection mt-4 mb-3">
+        <div class="divider costSection mt-4 mb-3 ">
           <span
             style="
               margin-left: 330px;
               color: rgb(137, 132, 132);
-              font-weight: 700;
+              font-weight: 700; 
               font-size: 20px;
             "
             ><u>Cost Section</u></span
@@ -110,7 +154,7 @@
           <!-- <hr> -->
         </div>
         <br />
-        <div class="row">
+        <div class="row baseCostSection">
           <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Cost Price </label
             ><span> <b style="color: red"> *</b> : </span>
@@ -213,4 +257,69 @@
   document.getElementById("desc").addEventListener("input", (e) => {
     e.target.value = e.target.value.replace(/[^a-zA-Z0-9 \-\.()]/g, "");
   });
+
+  const quantSelect = document.getElementById("quant");
+  const allQuantFieldGroups = document.querySelectorAll(".quant-fields");
+  const baseCostSection = document.querySelector(".baseCostSection");
+  const stockInput = document.getElementById("count");
+  const costPriceInput = document.getElementById("price");
+  const marginInput = document.getElementById("margin");
+
+  quantSelect.addEventListener("change", function (){
+    allQuantFieldGroups.forEach(el => el.classList.add("d-none"));
+    const selected = this.value;
+    let target = document.getElementById(selected + "_fields");
+
+    if(target) target.classList.remove("d-none");
+    if(selected === "fixed_pack" || selected === "count"){
+      baseCostSection.classList.add("d-none");
+      stockInput.required = false;
+      costPriceInput.required = false;
+      marginInput.required = false;
+    }else{
+      baseCostSection.classList.remove("d-none");
+      stockInput.required = true;
+      costPriceInput.required = true;
+      marginInput.required = true;
+    }
+  });
+
+  let variantIndex = { count: 0, fixed_pack: 0 };
+
+  function addVariantRow(type) {
+    const container = document.getElementById(type + "_variant_rows");
+    const idx = variantIndex[type]++;
+    const row = document.createElement("div");
+    row.className = "row g-2 mb-2 align-items-center";
+    row.innerHTML = `
+      <div class="col-3">
+        <input type="text" name="listing[variants][${idx}][label]" class="form-control" placeholder="Label e.g. 500g / 1 Dozen" required>
+      </div>
+      <div class="col-2">
+        <input type="number" step="0.01" name="listing[variants][${idx}][value]" class="form-control" placeholder="Value" required>
+      </div>
+      <div class="col-2">
+        <select name="listing[variants][${idx}][unit]" class="form-select">
+          <option value="g">g</option>
+          <option value="kg">kg</option>
+          <option value="dozen">dozen</option>
+          <option value="piece">piece</option>
+          <option value="sack">sack</option>
+        </select>
+      </div>
+      <div class="col-2">
+        <input type="number" step="0.01" name="listing[variants][${idx}][costPrice]" class="form-control" placeholder="Cost ₹" required>
+      </div>
+      <div class="col-2">
+        <input type="number" step="0.01" name="listing[variants][${idx}][margin]" class="form-control" placeholder="Margin %" required>
+      </div>
+      <div class="col-2">
+        <input type="number" name="listing[variants][${idx}][stock]" class="form-control" placeholder="Stock" required>
+      </div>
+      <div class="col-1">
+        <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.row').remove()">✕</button>
+      </div>
+    `;
+    container.appendChild(row);
+  }
 </script>
