@@ -15,6 +15,7 @@ const reviewsRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/user.js");
 const cartRouter = require("./routes/cart.js");
 const paymentRouter = require("./routes/payment.js");
+const insightsRouter = require("./routes/insights.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default; // for storing the session info. of the user
@@ -226,6 +227,9 @@ app.get("/",(req,res)=>{
     res.redirect("/listings");
 })
 
+//all insights routes
+app.use("/", insightsRouter);
+
 //all user routes
 app.use("/", userRouter);
 
@@ -257,7 +261,7 @@ app.use((err,req,res,next)=>{
 })
 
 //SERVER STARTING
-let port = process.env.PORT || 8080;
+let port = process.env.PORT || 3000;
 app.listen(port,"0.0.0.0",()=>{
     console.log(`Listening to server ${port}`)
 })

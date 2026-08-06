@@ -44,24 +44,45 @@
             <span style="font-size: 1.1rem; font-weight: 500;">Beverages</span>
           </a>
         </li>
-
-        <li class="nav-item w-100 w-md-auto">
-          <a class="nav-link d-flex align-items-center gap-2
-            <%= category === 'Snacks' ? 'active' : '' %>"
-            href="/listings?category=Snacks">
-            <i class="fa-solid fa-cookie-bite" style="font-size: 1.3rem; width:22px; text-align:center; color: brown;"></i>
-            <span style="font-size: 1.1rem; font-weight: 500;">Snacks &amp; Sweets</span>
-          </a>
-        </li>
-
-        <li class="nav-item w-100 w-md-auto">
-          <a class="nav-link d-flex align-items-center gap-2
-            <%= category === 'Dairy' ? 'active' : '' %>"
-            href="/listings?category=Dairy">
-            <i class="fa-solid fa-cow" style="font-size: 1.3rem; width:22px; text-align:center;"></i>
-            <span style="font-size: 1.1rem; font-weight: 500;">Dairy &amp; Eggs</span>
-          </a>
-        </li>
+        <% if(currUser && ownerId.includes(currUser._id.toString())) { %>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= category === 'Snacks' ? 'active' : '' %>"
+              href="/listings?category=Snacks">
+              <i class="fa-solid fa-cookie-bite" style="font-size: 1.3rem; width:22px; text-align:center; color: brown;"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Snacks</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= category === 'Snacks' ? 'active' : '' %>"
+              href="/listings?category=Snacks">
+              <i class="fa-solid fa-cookie-bite" style="font-size: 1.3rem; width:22px; text-align:center; color: brown;"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Snacks &amp; Sweets</span>
+            </a>
+          </li>
+        <% } %>
+        
+        <% if(currUser && ownerId.includes(currUser._id.toString())) { %>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= category === 'Dairy' ? 'active' : '' %>"
+              href="/listings?category=Dairy">
+              <i class="fa-solid fa-cow" style="font-size: 1.3rem; width:22px; text-align:center;"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Dairy</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= category === 'Dairy' ? 'active' : '' %>"
+              href="/listings?category=Dairy">
+              <i class="fa-solid fa-cow" style="font-size: 1.3rem; width:22px; text-align:center;"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Dairy &amp; Eggs</span>
+            </a>
+          </li>
+        <% } %>
 
         <!-- Cart (customers only) -->
         <% if(!currUser || !ownerId.includes(currUser._id.toString())) { %>
@@ -87,7 +108,15 @@
               <%= req.originalUrl === '/listings/new' ? 'active' : '' %>"
               href="/listings/new">
               <i class="fa-solid fa-cart-plus" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(0,72,255);"></i>
-              <span style="font-size: 1.1rem; font-weight: 500;">Add Products</span>
+              <span style="font-size: 1.1rem; font-weight: 500;">Add</span>
+            </a>
+          </li>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
+              <%= req.originalUrl === '/insights' ? 'active' : '' %>"
+              href="/insights">
+              <i class="fa-solid fa-chart-simple" style="font-size: 1.3rem; width:22px; text-align:center; color: chartreuse;"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Analytics</span>
             </a>
           </li>
           <li class="nav-item w-100 w-md-auto">
