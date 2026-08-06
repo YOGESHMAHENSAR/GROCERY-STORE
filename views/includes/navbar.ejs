@@ -92,6 +92,14 @@
           </li>
           <li class="nav-item w-100 w-md-auto">
             <a class="nav-link d-flex align-items-center gap-2
+              <%= req.originalUrl === '/insights' ? 'active' : '' %>"
+              href="/insights">
+              <i class="fa-solid fa-chart-simple" style="font-size: 1.3rem; width:22px; text-align:center; color: chartreuse;"></i>
+              <span style="font-size: 1.1rem; font-weight: 500;">Analytics</span>
+            </a>
+          </li>
+          <li class="nav-item w-100 w-md-auto">
+            <a class="nav-link d-flex align-items-center gap-2
               <%= req.originalUrl === '/listings/inventory' ? 'active' : '' %>"
               href="/listings/inventory">
               <i class="fa-solid fa-boxes-stacked" style="font-size: 1.3rem; width:22px; text-align:center; color: rgb(106,90,10);"></i>

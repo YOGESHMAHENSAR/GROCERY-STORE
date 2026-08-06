@@ -1,0 +1,155 @@
+<% layout("/layouts/boilerplate") -%>
+<body>
+  <div class="row">
+    <div class="col-10 offset-1 mt-3 mb-3">
+      <h2 style="color: brown; text-align: center; font-weight: 700;">Insights
+        <span class="text-muted">Your shop's bird's eye view</span>
+      </h2>
+
+      <!-- KPI Cards -->
+      <div class="d-flex flex-column flex-md-row gap-4 mb-4 align-items-start">
+  
+  <!-- Left Column: Vertically Stacked Metric Cards -->
+        <div class="d-flex flex-column gap-3 flex-shrink-0" style="width: 100%; max-width: 260px;">
+            
+            <div class="card text-center p-3 shadow-sm" style="height: 8rem;">
+                <h6 class="text-muted mb-1">Total Revenue</h6>
+                <h4 id="totalRevenue" class="mb-0">₹0</h4>
+            </div>
+
+            <div class="card text-center p-3 shadow-sm" style="height: 8rem;">
+                <h6 class="text-muted mb-1">Total Profit</h6>
+                <h4 id="totalProfit" class="mb-0">₹0</h4>
+            </div>
+
+            <div class="card text-center p-3 shadow-sm" style="height: 8rem;">
+                <h6 class="text-muted mb-1">Best Seller</h6>
+                <h4 id="bestSeller" class="mb-0">–</h4>
+            </div>
+
+            <div class="card text-center p-3 shadow-sm" style="height: 8rem;">
+                <h6 class="text-muted mb-1">Top Category</h6>
+                <h4 id="topCategory" class="mb-0">–</h4>
+            </div>
+
+        </div>
+
+        <!-- Right Area: Tabs + Chart (Expands to fill remaining space) -->
+        <div class="flex-grow-1 w-100">
+            
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-3" id="chartTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-chart="salesProfit" type="button">Sales & Profit</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-chart="top5" type="button">Top 5 Products</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-chart="category" type="button">Category Split</button>
+            </li>
+            </ul>
+
+            <!-- Chart Container -->
+            <div class="card shadow-sm p-4" style="width: 50rem; height: 30rem;">
+                <div style="width:65%; margin: auto;">
+                    <canvas id="mainChart" height="250"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        </div>
+
+    </div>
+  </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let currentChart = null;
+  let insightsData = null;
+
+  function renderChart(type) {
+    if (currentChart) currentChart.destroy();
+    const ctx = document.getElementById("mainChart");
+
+    if (type === "salesProfit") {
+      currentChart = new Chart(ctx, {
+        data: {
+          labels: Object.keys(insightsData.monthlySales),
+          datasets: [
+            {
+              type: "bar",
+              label: "Sales (₹)",
+              data: Object.values(insightsData.monthlySales),
+              backgroundColor: "#2e7d32"
+            },
+            {
+              type: "line",
+              label: "Profit (₹)",
+              data: Object.values(insightsData.monthlyProfit),
+              borderColor: "#f9a825",
+              tension: 0.3,
+              fill: false
+            }
+          ]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      });
+
+    } else if (type === "top5") {
+      currentChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: insightsData.top5Products.map(p => p[0]),
+          datasets: [{
+            label: "Units Sold",
+            data: insightsData.top5Products.map(p => p[1]),
+            backgroundColor: "#1565c0"
+          }]
+        },
+        options: { responsive: true, indexAxis: "y", scales: { x: { beginAtZero: true } } }
+      });
+
+    } else if (type === "category") {
+      currentChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: Object.keys(insightsData.categorySales),
+          datasets: [{
+            data: Object.values(insightsData.categorySales),
+            backgroundColor: ["#2e7d32", "#f9a825", "#1565c0", "#c62828", "#6a1b9a"]
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: "right" } } }
+      });
+    }
+  }
+
+  document.querySelectorAll("#chartTabs .nav-link").forEach(btn => {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("#chartTabs .nav-link").forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+      renderChart(this.dataset.chart);
+    });
+  });
+
+  fetch("/insights/data")
+    .then(res => res.json())
+    .then(data => {
+      insightsData = data;
+
+      document.getElementById("totalRevenue").innerText =
+        "₹" + Object.values(data.monthlySales).reduce((a, b) => a + b, 0).toFixed(0);
+      document.getElementById("totalProfit").innerText =
+        "₹" + Object.values(data.monthlyProfit).reduce((a, b) => a + b, 0).toFixed(0);
+      document.getElementById("bestSeller").innerText =
+        data.top5Products[0]?.[0] || "–";
+      document.getElementById("topCategory").innerText =
+        Object.entries(data.categorySales).sort((a, b) => b[1] - a[1])[0]?.[0] || "–";
+
+      renderChart("salesProfit"); // default tab on load
+    })
+    .catch(err => console.error("Failed to load insights:", err));
+</script>
