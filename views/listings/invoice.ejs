@@ -75,7 +75,6 @@
         <div class="store">
             <p><b>Store Name:</b> Grocery Store</p>
             <h6><b>Store Address:</b> Maharaja Gate Sripur, Bikaner, Rajasthan </h6>
-            <!-- Add more details if available, e.g., email, address -->
         </div>
     </div>
     <hr>
@@ -93,19 +92,24 @@
             <% for(let item of order.items) { %>
                 <% let itemTotal = parseFloat(item.price) * item.quantity; total += itemTotal; %>
                 <tr>
-                    <td><%= item.product.title %></td>
+                    <td>
+                        <%= item.product.title %>
+                        <% if(item.variantLabel) { %>
+                            <span style="font-size: 0.8rem; color: #6b7280; font-weight: 600;">(<%= item.variantLabel %>)</span>
+                        <% } %>
+                    </td>
                     <td><%= item.quantity %></td>
                     <td>₹<%= item.price %></td>
-                    <td>₹<%= itemTotal %></td>
+                    <td>₹<%= itemTotal.toFixed(2) %></td>
                 </tr>
             <% } %>
         </tbody>
     </table>
     <hr>
     <%
-        let subTotal  = order.items.reduce((sum, item) => sum + parseFloat(item.product.sellingPrice) * item.quantity, 0);
+        let subTotal  = order.items.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
         let totalTax  = order.items.reduce((sum, item) => {
-            let itemTotal = parseFloat(item.product.sellingPrice) * item.quantity;
+            let itemTotal = parseFloat(item.price) * item.quantity;
             let taxRate   = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
             return sum + (itemTotal * taxRate);
         }, 0);

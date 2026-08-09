@@ -193,7 +193,7 @@ async function initiateCard(){
 }
 
 //inititate cod payment  method
-//for tax prefitted in the select box of the category
+// for tax prefitted in the select box of the category
 const categoryTax = {
   "Beverages": 12,
   "Snacks": 18,
@@ -202,19 +202,20 @@ const categoryTax = {
 };
 
 function setTax(category) {
-  const taxField = document.getElementById("taxField");
-  if (!taxField) return;
+  const taxInputs = document.querySelectorAll('input[name="listing[Tax]"]');
+  if (!taxInputs || taxInputs.length === 0) return;
 
   const tax = categoryTax[category];
-  taxField.value = tax ?? "";
+  const value = tax ?? "";
+  taxInputs.forEach(inp => { inp.value = value; });
 }
 
-// to make it loaded on the edit page automatically;
+// initialize on load and wire change events
 document.addEventListener("DOMContentLoaded", () => {
   const categorySelect = document.getElementById("category");
-  const taxField = document.getElementById("taxField");
+  const taxInputs = document.querySelectorAll('input[name="listing[Tax]"]');
 
-  if (categorySelect && taxField) {
+  if (categorySelect && taxInputs.length) {
     setTax(categorySelect.value);
     categorySelect.addEventListener("change", (event) => {
       setTax(event.target.value);

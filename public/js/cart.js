@@ -2,35 +2,35 @@ document.addEventListener("DOMContentLoaded", updateCalculation);
 
 const qtyTimers = {};
 
-async function chnageQty(productId, delta, btn) {
-    const qtyEl   = document.getElementById(`qty-${productId}`); // ✅ consistent name
+async function chnageQty(productId, variantId, delta, btn) {
+    const qtyEl   = document.getElementById(`qty-${variantId}`); // keyed by variant, matches EJS
     const current = parseInt(qtyEl.innerText);
     const newQty  = current + delta;
 
-    // ✅ fixed condition
     if (newQty < 1 || newQty > 3) return;
 
     qtyEl.innerText = newQty;
     updateCalculation();
 
-    clearTimeout(qtyTimers[productId]);
-    qtyTimers[productId] = setTimeout(async () => {
+    clearTimeout(qtyTimers[variantId]);
+    qtyTimers[variantId] = setTimeout(async () => {
         try {
             const response = await fetch(`/cart/${productId}/quantity`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ quantity: newQty })
+                body: JSON.stringify({ quantity: newQty, variantId })
             });
 
             const data = await response.json();
 
             if (!data.success) {
-                qtyEl.innerText = current; // ✅ qtyEl not qtyE
+                qtyEl.innerText = current;
                 updateCalculation();
+                if (data.message) alert(data.message); // surface stock-limit errors etc.
             }
         } catch(err) {
             console.error(err);
-            qtyEl.innerText = current; // ✅ qtyEl not qtyE
+            qtyEl.innerText = current;
             updateCalculation();
         }
     }, 600);
@@ -41,17 +41,17 @@ function updateCalculation() {
     let totalTax = 0;
 
     document.querySelectorAll(".qty-number").forEach(qtyEl => {
-        const productId = qtyEl.id.replace("qty-", "");
+        const variantId = qtyEl.id.replace("qty-", "");
         const qty       = parseInt(qtyEl.innerText);
-        const priceEl   = document.getElementById(`price-${productId}`);
+        const priceEl   = document.getElementById(`price-${variantId}`);
         const price     = parseFloat(priceEl.dataset.price);
-        const tax       = parseFloat(priceEl.dataset.tax) / 100; // ✅ works if Tax is stored as number
+        const tax       = parseFloat(priceEl.dataset.tax) / 100;
 
         const itemTotal = price * qty;
         subTotal += itemTotal;
         totalTax += itemTotal * tax;
 
-        const itemTotalEl = document.getElementById(`item-total-${productId}`);
+        const itemTotalEl = document.getElementById(`item-total-${variantId}`);
         if (itemTotalEl) itemTotalEl.innerText = `₹${itemTotal.toFixed(2)}`;
     });
 

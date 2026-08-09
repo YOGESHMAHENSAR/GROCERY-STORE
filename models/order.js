@@ -31,6 +31,12 @@ const orderSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "List"
             },
+            variantId: {
+                type: mongoose.Schema.Types.ObjectId
+            },
+            variantLabel: {
+                type: String
+            },
             quantity: Number,
             price: Number
         }

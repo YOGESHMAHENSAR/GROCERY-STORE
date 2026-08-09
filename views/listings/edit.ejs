@@ -2,10 +2,10 @@
 <body>
   <div class="row">
     <div class="col-8 offset-2">
-      <h2>Editing Product :  <b><%= list.title %></b></h2>
+      <h2>Editing Product : <b><%= list.title %></b></h2>
       <br />
       <form
-        action="/listings/<%=list._id%>?_method=PUT"
+        action="/listings/<%= list._id %>?_method=PUT"
         method="post"
         class="needs-validation"
         enctype="multipart/form-data"
@@ -18,9 +18,10 @@
             class="form-control"
             type="text"
             id="title"
-            placeholder="Enter title of Hotel"
+            placeholder="Enter Name Of Product"
             name="listing[title]"
-            value="<%=list.title%>"
+            value="<%= list.title %>"
+            pattern="[a-zA-Z0-9\-\.\()]+"
             required
           />
           <div class="invalid-feedback">Please provide the valid Name</div>
@@ -35,15 +36,14 @@
             id="desc"
             rows="5"
             cols="30"
-            placeholder="Enter the description of the HOTEL"
+            placeholder="Enter the description of the Product"
             required
-          >
-<%=list.description%></textarea
-          >
+          ><%= list.description %></textarea>
           <div class="invalid-feedback">
             Please provide the valid Description
           </div>
         </div>
+
         <div class="row">
           <div class="mb-3 col-md-6">
             <label for="img" class="form-label">Upload new Image : </label>
@@ -51,16 +51,15 @@
               type="file"
               id="img"
               class="form-control"
-              value="<%= list.image %>"
               accept="image/png, image/jpeg, image/jpg"
               width="500px"
               name="listing[image]"
             />
           </div>
           <div class="col-md-4">
-            <button class="btn btn-outline-warning" style="margin-top: 32px">
-              <a
-                href="<%= list.image.url %>"
+            <button type="button" class="btn btn-outline-warning" style="margin-top: 32px">
+              
+              <a href="<%= list.image.url %>"
                 target="_blank"
                 style="text-decoration: none; color: black"
               >
@@ -69,33 +68,93 @@
             </button>
           </div>
         </div>
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <label class="form-label" for="price">Select Category </label
-            ><span> <b style="color: red"> *</b> : </span>
-            <select class="form-select" name="listing[category]" id="category" onchange="setTax(this.value)" >
-              <option value="" selected disabled>Select Category</option>
-              <option value="Beverages" <%= lists.category == 'Beverages' ? 'selected': '' %> >Beverages (12% Tax)</option>
-              <option value="Snacks" <%= lists.category == 'Snacks' ? 'selected': '' %> >Snacks and Sweets (18% Tax)</option>
-              <option value="Dairy" <%= lists.category == 'Dairy' ? 'selected': '' %> >Dairy & Eggs (2% Tax)</option>
-              <option value="Grocery" <%= lists.category == 'Grocery' ? 'selected': '' %> >Grocery (5% Tax)</option>
-            </select>
-            <div class="invalid-feedback">Please Provide the valid Price</div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="count" class="form-label">Number Of Stock Available </label><span> <b style="color: red"> *</b> : </span>
-            <input type="Number"  class="form-control" placeholder="Enter the Quantity of Stock" 
-            id="count" oninput="if(this.value<0) this.value=0" name="listing[stockCount]" value='<%= lists.stockCount %>' required>
-            <div class="invalid-feedback">Please Provide the Quntatiy of Stock</div>
-          </div>
-        </div>
-        <div class="divider mt-4 mb-3 costSection">
-          <span style="margin-left: 330px; color: rgb(137, 132, 132); font-weight: 700; font-size: 20px;"><u>Cost Section</u></span>
-          <!-- <hr> -->
-        </div>
-        <br>
+
         <div class="row">
           <div class="mb-3 col-md-4">
+            <label class="form-label" for="category">Select Category </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <select
+              class="form-select"
+              name="listing[category]"
+              id="category"
+              onchange="setTax(this.value)"
+              required
+            >
+              <option value="" disabled>Select Category</option>
+              <option value="Beverages" <%= list.category.includes('Beverages') ? 'selected' : '' %>>Beverages (12% Tax)</option>
+              <option value="Snacks" <%= list.category.includes('Snacks') ? 'selected' : '' %>>Snacks and Sweets (18% Tax)</option>
+              <option value="Dairy" <%= list.category.includes('Dairy') ? 'selected' : '' %>>Dairy & Eggs (2% Tax)</option>
+              <option value="Grocery" <%= list.category.includes('Grocery') ? 'selected' : '' %>>Grocery (5% Tax)</option>
+            </select>
+            <div class="invalid-feedback">Please Select the valid Category</div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="quant">Select Quantity Type</label
+            ><span><b style="color: red"> *</b> : </span>
+            <select
+              name="listing[quantityType]"
+              class="form-select"
+              id="quant"
+              required
+            >
+              <option value="" disabled>Select Quantities</option>
+              <option value="fixed_pack" <%= list.quantityType === 'fixed_pack' ? 'selected' : '' %>>Fixed Pack</option>
+              <option value="count" <%= list.quantityType === 'count' ? 'selected' : '' %>>Count</option>
+            </select>
+            <div class="invalid-feedback">Please Select the valid Quantity</div>
+          </div>
+          <div class="col-md-4 mb-3" id="stockValCount">
+            <label for="count" class="form-label">Number Of Stock Available </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="Number"
+              class="form-control"
+              placeholder="Enter the Quantity of Stock"
+              id="count"
+              oninput="if (this.value < 0) this.value = 0;"
+              name="listing[stockCount]"
+              value="<%= list.quantityType === 'fixed_pack' ? (list.variants[0]?.stockCount ?? '') : '' %>"
+              required
+            />
+            <div class="invalid-feedback">Please Provide the Quntatiy of Stock</div>
+          </div>
+          <div class="mb-3 col-md-4 d-none" id="innerTax">
+            <label class="form-label" for="taxFieldInner">Tax on Product %: </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="number"
+              min="0"
+              class="form-control"
+              width="50%"
+              id="taxFieldInner"
+              value="<%= list.Tax %>"
+              oninput="if (this.value < 0) this.value = 0;"
+              required
+              readonly
+            />
+            <div class="invalid-feedback">
+              Please Select valid Category for Tax Selection
+            </div>
+          </div>
+        </div>
+
+        <div id="count_fields" class="quant-fields d-none mb-3">
+          <label class="form-label">Count Variants (e.g. 6 pcs, 1 Dozen)</label>
+          <div id="count_variant_rows"></div>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark mt-2"
+            onclick="addVariantRow('count')"
+          >
+            + Add Variant
+          </button>
+        </div>
+
+        <div class="row baseCostSection">
+          <div class="divider costSection mt-4 mb-4">
+            <span style="margin-left: 330px; color: rgb(137, 132, 132); font-weight: 700; font-size: 20px;"><u>Cost Section</u></span>
+          </div>
+          <div class="mb-3 col-md-4" id="costPrice">
             <label class="form-label" for="price">Cost Price </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
@@ -103,24 +162,24 @@
               min="0"
               class="form-control"
               width="50%"
-              value="<%= lists.costPrice %>"
+              value="<%= list.quantityType === 'fixed_pack' ? (list.variants[0]?.costPrice ?? '') : '' %>"
               placeholder="Enter Cost price of Product"
-              id="costPrice"
+              id="price"
               name="listing[costPrice]"
               oninput="if (this.value < 0) this.value = 0;"
               required
             />
             <div class="invalid-feedback">Please Provide the valid Cost Price</div>
           </div>
-          <div class="mb-3 col-md-4">
-            <label class="form-label" for="price">Tax on Product: </label
+          <div class="mb-3 col-md-4" id="tax">
+            <label class="form-label" for="taxField">Tax on Product %: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
               type="number"
               min="0"
               class="form-control"
               width="50%"
-              value="<%= lists.Tax %>"
+              value="<%= list.Tax %>"
               placeholder="Select Category for Tax"
               id="taxField"
               name="listing[Tax]"
@@ -128,65 +187,191 @@
               required
               readonly
             />
-            <div class="invalid-feedback">Please Provide the valid Selling Price</div>
+            <div class="invalid-feedback">Please Select valid Category for Tax Selection</div>
           </div>
-          <div class="mb-3 col-md-4">
-            <label class="form-label" for="price">Profit Margin %: </label
+          <div class="mb-3 col-md-4" id="profitMargin">
+            <label class="form-label" for="margin">Profit Margin %: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
               type="number"
               min="0"
               class="form-control"
               width="50%"
-              value="<%= lists.margin %>"
-              placeholder="Enter Selling price of Product"
-              id="sellingPrice"
+              value="<%= list.quantityType === 'fixed_pack' ? (list.variants[0]?.margin ?? '') : '' %>"
+              placeholder="Enter Margin Percentage"
+              id="margin"
               name="listing[margin]"
               oninput="if (this.value < 0) this.value = 0;"
               required
             />
-            <div class="mt-2" style="font-size: 13px;">Profit Margin is Considered in <b>Percentage</b><span style="color: red;">*</span></div>
+            <div class="mt-2" style="font-size: 13px">
+              Profit Margin is Considered in <b>Percentage</b><span style="color: red">*</span>
+            </div>
             <div class="invalid-feedback">Please Provide the valid Profit Margin</div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="loc">Special Feature [USP] : <i class="fa-solid fa-chess-king" style="color: gold;"></i></label>
-          
-          <!-- <span> <b style="color: red"> *</b> : </span> -->
+          <label class="form-label" for="loc"
+            >Special Feature [USP] :
+            <i class="fa-solid fa-chess-king" style="color: gold"></i
+          ></label>
           <input
             type="text"
-            id="col"
             class="form-control"
-            placeholder="Enter Imported Location of Product (Optional)"
-            value="<%= list.location %>"
+            width="50%"
+            placeholder="Enter the USP of Product (Optional)"
+            id="loc"
             name="listing[location]"
+            value="<%= list.location || '' %>"
           />
-          <div class="invalid-feedback">
-            Please provide the Imported Location
-          </div>
+          <div class="invalid-feedback">Please provide the Valid Imported Location</div>
         </div>
+
         <div class="edit-btn">
-          <button
-            class="btn btn-outline-dark mt-3 mb-3"
-            id="editBtn"
-          >
+          <button class="btn btn-outline-dark mt-3 mb-3" id="editBtn">
             Save Changes
           </button>
         </div>
       </form>
     </div>
   </div>
+
   <div class="loader-overlay" id="editLoaderOverlay">
     <div class="loader-container">
       <div class="loader"></div>
       <p class="loader-text">Saving your Changes ...</p>
     </div>
   </div>
+
   <script>
-    document.querySelector("#editBtn").addEventListener ("click", function(){
-      document.querySelector("#editLoaderOverlay").style.display = "flex";
-    })
+    document.querySelector("form").addEventListener("submit", function (e) {
+      if (this.checkValidity()) {
+        document.querySelector("#editLoaderOverlay").style.display = "flex";
+      }
+      // if invalid, browser blocks submission and shows its own validation UI — loader stays hidden
+    });
+
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        document.querySelector("#editLoaderOverlay").style.display = "none";
+      }
+    });
+
+    const quantSelect = document.getElementById("quant");
+    const allQuantFieldGroups = document.querySelectorAll(".quant-fields");
+    const baseCostSection = document.querySelector(".baseCostSection");
+    const costPrice = document.querySelector("#costPrice");
+    const profitMargin = document.querySelector("#profitMargin");
+    const stockInput = document.getElementById("count");
+    const taxDiv = document.getElementById("innerTax");
+    const stockInputDiv = document.getElementById("stockValCount");
+    const costPriceInput = document.getElementById("price");
+    const marginInput = document.getElementById("margin");
+    const mainTaxInput = document.getElementById("taxField");
+    const innerTaxInput = document.getElementById("taxFieldInner");
+
+    function applyQuantityMode(selected) {
+      allQuantFieldGroups.forEach((el) => el.classList.add("d-none"));
+      let target = document.getElementById(selected + "_fields");
+      if (target) target.classList.remove("d-none");
+
+      if (mainTaxInput && innerTaxInput) {
+        if (selected === "count") {
+          innerTaxInput.name = "listing[Tax]";
+          mainTaxInput.removeAttribute("name");
+          innerTaxInput.value = mainTaxInput.value || innerTaxInput.value || "";
+        } else {
+          mainTaxInput.name = "listing[Tax]";
+          innerTaxInput.removeAttribute("name");
+          mainTaxInput.value = innerTaxInput.value || mainTaxInput.value || "";
+        }
+      }
+
+      if (selected === "count") {
+        baseCostSection.classList.add("d-none");
+        stockInputDiv.classList.add("d-none");
+        taxDiv.classList.remove("d-none");
+        costPrice.classList.add("d-none");
+        profitMargin.classList.add("d-none");
+        stockInput.required = false;
+        costPriceInput.required = false;
+        marginInput.required = false;
+      } else {
+        baseCostSection.classList.remove("d-none");
+        stockInputDiv.classList.remove("d-none");
+        taxDiv.classList.add("d-none");
+        costPrice.classList.remove("d-none");
+        profitMargin.classList.remove("d-none");
+        stockInput.required = true;
+        costPriceInput.required = true;
+        marginInput.required = true;
+      }
+    }
+
+    quantSelect.addEventListener("change", function () {
+      applyQuantityMode(this.value);
+    });
+
+    let variantIndex = { count: 0, fixed_pack: 0 };
+
+    function addVariantRow(type, prefill = {}) {
+      const container = document.getElementById(type + "_variant_rows");
+      const idx = variantIndex[type]++;
+      const row = document.createElement("div");
+      row.className = "row g-2 mb-2 align-items-center";
+      row.innerHTML = `
+        <div class="row mt-3">
+          <hr>
+          <div class="col-md-4 mb-3">
+            <input type="text" name="listing[variants][${idx}][label]" class="form-control" placeholder="Label e.g. 500g / 1 Dozen" value="${prefill.label || ''}" required>
+          </div>
+          <div class="col-md-4" mb-3>
+            <select name="listing[variants][${idx}][unit]" class="form-select">
+              <option value="kg" ${prefill.unit === 'kg' ? 'selected' : ''}>Kilogram</option>
+              <option value="g" ${prefill.unit === 'g' ? 'selected' : ''}>gram</option>
+              <option value="l" ${prefill.unit === 'l' ? 'selected' : ''}>Litre</option>
+              <option value="ml" ${prefill.unit === 'ml' ? 'selected' : ''}>Mili-litre</option>
+              <option value="dozen" ${prefill.unit === 'dozen' ? 'selected' : ''}>Dozen</option>
+              <option value="sack" ${prefill.unit === 'sack' ? 'selected' : ''}>Sack</option>
+            </select>
+          </div>
+          <div class="col-md-2 mb-3">
+            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.row').remove()">Remove ✕</button>
+          </div>
+          <div class="mb-3 col-md-4">
+            <label class="form-label">Cost Price </label><span> <b style="color: red"> *</b> : </span>
+            <input type="number" min="0" class="form-control" placeholder="Enter Cost price of Product"
+              name="listing[variants][${idx}][costPrice]" value="${prefill.costPrice ?? ''}"
+              oninput="if (this.value < 0) this.value = 0;" required />
+          </div>
+          <div class="mb-3 col-md-4">
+            <label class="form-label">Profit Margin %: </label><span> <b style="color: red"> *</b> : </span>
+            <input type="number" min="0" class="form-control" placeholder="Enter Margin Percentage"
+              name="listing[variants][${idx}][margin]" value="${prefill.margin ?? ''}"
+              oninput="if (this.value < 0) this.value = 0;" required />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Stock Count</label><span> <b style="color: red"> *</b> : </span>
+            <input type="number" min="0" class="form-control" placeholder="Enter the Quantity of Stock"
+              name="listing[variants][${idx}][stockCount]" value="${prefill.stockCount ?? ''}"
+              oninput="if (this.value < 0) this.value = 0;" required />
+          </div>
+          <hr>
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    // ── Pre-fill on load from existing listing data ──
+  const existingQuantityType = "<%= list.quantityType %>";
+  const existingVariants = <%- JSON.stringify(list.variants || []) %>;
+
+  quantSelect.value = existingQuantityType;
+  applyQuantityMode(existingQuantityType);
+
+  if (existingQuantityType === "count") {
+      existingVariants.forEach(v => addVariantRow("count", v));
+  }
   </script>
 </body>
-

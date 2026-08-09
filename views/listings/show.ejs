@@ -16,6 +16,16 @@
             background: #fee2e2;
             color: red;
         }
+        .variant-table-scroll{
+            max-height: 170px;
+            overflow-y: auto;
+        }
+        .variant-table-scroll thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: #f8f9fa;
+        }
     </style>
     <div class="row">
         <div class="col-8 offset-2 mb-1">
@@ -29,100 +39,180 @@
                     <div class="col-md-6">
                         <img src="<%= lists.image.url %>" class="card-img-top show-img" alt="listImg">
                     </div>
-                    <div class="col-md-6" >
+                    <div class="col-md-6">
                         <div class="card-body" style="margin-top: -12px;"><br>
-                            <!-- <p class="card-text"><b>Owned by: <i class="fa-solid fa-chess-king" style="color: gold;"></i> <i><%# lists.owner.username %></b></i><br> -->  
-                            <p class="card-text mt-3"><b><i class="fas fa-rupee-sign"></i> : <%= lists.sellingPrice?.toLocaleString("en-IN") %></b><br></p>
-                                <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <b>Cost-Price: </b> <%= lists.costPrice %> 
-                                        </div>
-                                        <div class="col-md-4">
-                                            <b>Profit Margin : </b> <%= lists.margin %>%
-                                        </div>
-                                        <div class="col-md-4">
-                                            <b>Tax: </b> <%= lists.Tax %>%
-                                        </div>
-                                        <%# lists.sellingPrice = (lists.costPrice * (1+ lists.margin)) * (1+ lists.Tax) %>
-                                        <div class="col-md-6 mt-4">
-                                            <b>Selling-Price: </b> <%= lists.sellingPrice %>
-                                        </div>
-                                        <div class="col-md-6 mt-4">
-                                            <b>Stock Remaining : </b> <%= lists.stockCount %>
-                                        </div>
-                                    </div>
-                                    <br>
+                            <% 
+                            const prices = lists.variants.map(v => v.sellingPrice).filter(p => p != null);
+                            const minPrice = prices.length ? Math.min(...prices) : null;
+                            const maxPrice = prices.length ? Math.max(...prices) : null;
+                            const anyInStock = lists.variants.some(v => v.inStock);
+                            const isOwnerView = currUser && lists.owners.some(o => o._id.equals(currUser._id));
+                            %>
+                            <p class="card-text mt-3">
+                            <b>
+                                <i class="fas fa-rupee-sign"></i> : 
+                                <%= minPrice !== null ? minPrice.toLocaleString("en-IN") : "N/A" %>
+                                <% if(maxPrice !== null && maxPrice !== minPrice) { %>
+                                &ndash; <%= maxPrice.toLocaleString("en-IN") %>
                                 <% } %>
-                                
-                                <b>Description :</b> <%= lists.description %> <br><br>
-                                <b>Category :</b> <%= lists.category %> <br><br>
-                                <% if(lists.location) {%>
-                                    <div class="row" style="margin-top: -10px;">
-                                        <div class="col-10">
-                                            <b>Special Feature [USP] : </b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %> 
-                                        </div>    
+                                <b class="ms-2" style="color: red;">Tax: <%= lists.Tax %></b>
+                            </b><br>
+                            </p>
+
+                            <% if(isOwnerView) { %>
+                                <div class="table-responsive mt-3 <%= lists.variants.length > 3 ? 'variant-table-scroll' : '' %>">
+                                    <table class="table table-bordered table-sm align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <% if(lists.variants.length > 1) { %>
+                                                    <th>Variant</th>
+                                                <% } %>
+                                                <th>Cost Price</th>
+                                                <th>Profit Margin</th>
+                                                <!-- <th>Tax</th> -->
+                                                <th>Selling Price</th>
+                                                <th>Stock Remaining</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% lists.variants.forEach((v) => { %>
+                                                <tr>
+                                                    <% if(lists.variants.length > 1) { %>
+                                                        <td style="font-weight: 700; color: #6b7280;">
+                                                            <%= v.label %><% if(v.unit) { %> (<%= v.unit %>)<% } %>
+                                                        </td>
+                                                    <% } %>
+                                                    <td><i class="fas fa-rupee-sign"></i> <%= v.costPrice %></td>
+                                                    <td><%= v.margin %>%</td>
+                                                    <!-- <td><%# lists.Tax %>%</td> -->
+                                                    <td><i class="fas fa-rupee-sign"></i> <%= v.sellingPrice %></td>
+                                                    <td><%= v.stockCount %></td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <% } %>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <b>Description :</b> <%= lists.description %>
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Category :</b> <%= lists.category.join(", ") %>
+                                </div>
+                            </div>
+                            <% if(lists.location) { %>
+                                <div class="row" style="margin-top: -10px;">
+                                    <div class="col-10">
+                                        <b>Special Feature [USP] : </b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %>
                                     </div>
-                                <% } %>
+                                </div>
+                            <% } %>
+
+                            <% if(!isOwnerView) { %>
                                 <div class="col-md-8 mt-3">
-                                    <span id="status-<%= lists._id %>" class="showStockStatus stock-status <%= lists.inStock ? 'in-stock' : 'out-stock' %>">
-                                        <%= lists.inStock ? "In Stock" : "Out of Stock" %>
+                                    <span id="status-<%= lists._id %>" class="showStockStatus stock-status <%= anyInStock ? 'in-stock' : 'out-stock' %>">
+                                        <%= anyInStock ? "In Stock" : "Out of Stock" %>
                                     </span>
                                 </div>
-                                <% if(!lists.inStock) {%>
+                                <% if(!anyInStock) { %>
                                     <span class="mt-2" style="font-size: .8rem; font-weight: 600;">
                                         We will Bring it Right Back in <b>STOCK</b><b style="color: red;">*</b>
                                     </span>
                                 <% } %>
-                                <br>
-                                <br>
-                                <% if(!currUser || !lists.owners.some(o=>o._id.equals(currUser._id))) {%>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <% const alreadyAdded = addedToCart && addedToCart.includes(lists._id.toString()) %>
-                                            <% if(alreadyAdded) {%>
-                                                <a href="/cart" class="btn btn-outline-success btnViewCart btnViewCartBigView" >
-                                                    <i class="fa-solid fa-cart-shopping"></i>View Cart
-                                                </a>
+                            <% } %>
+                            <br><br>
+
+                            <% if(!isOwnerView) { %>
+                                <div class="row">
+                                    <div class="col-md-10" style="margin-top: -6rem;">
+                                        <% if(anyInStock) { %>
+
+                                            <% if(lists.variants.length > 1) { %>
+                                                <!-- Multi-variant: table, each row independently Add / View Cart -->
+                                                <div class="table-responsive mt-3 <%= lists.variants.length > 3 ? 'variant-table-scroll' : '' %>">
+                                                    <table class="table table-bordered table-sm align-middle">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Variant</th>
+                                                                <th>Price</th>
+                                                                <th>Status</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% lists.variants.forEach(v => { %>
+                                                                <% const variantAlreadyAdded = addedToCart && addedToCart.includes(`${lists._id}_${v._id}`) %>
+                                                                <tr>
+                                                                    <td style="font-weight: 700; color: #6b7280;">
+                                                                        <%= v.label %><% if(v.unit) { %> (<%= v.unit %>)<% } %>
+                                                                    </td>
+                                                                    <td><i class="fas fa-rupee-sign"></i> <%= v.sellingPrice %></td>
+                                                                    <td>
+                                                                        <% if(v.inStock) { %>
+                                                                            <span class="stock-status in-stock">In Stock</span>
+                                                                        <% } else { %>
+                                                                            <span class="stock-status out-stock">Out of Stock</span>
+                                                                        <% } %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <% if(variantAlreadyAdded) { %>
+                                                                            <a href="/cart" class="btn btn-sm btn-outline-success">
+                                                                                <i class="fa-solid fa-cart-shopping"></i> View Cart
+                                                                            </a>
+                                                                        <% } else if(v.inStock) { %>
+                                                                            <form action="/cart/<%= lists._id %>" method="post" class="cart-form">
+                                                                                <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
+                                                                                <input type="hidden" name="variantId" value="<%= v._id %>">
+                                                                                <button type="submit" class="mt-2 btn btn-sm btn-outline-primary btnAddToCart">
+                                                                                    <i class="fa-solid fa-cart-shopping"></i> Add 
+                                                                                </button>
+                                                                            </form>
+                                                                        <% } else { %>
+                                                                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Unavailable</button>
+                                                                        <% } %>
+                                                                    </td>
+                                                                </tr>
+                                                            <% }) %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
                                             <% } else { %>
-                                            <% if(lists.inStock) {%>
-                                                <form action="/cart/<%= lists._id %>" method="post" id="cart-form">
-                                                    <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
-                                                    <button class="btn btn-outline-primary btnAddToCart">
-                                                        <i class="fa-solid fa-cart-shopping"></i>Add To Cart
-                                                    </button>
-                                                </form>
+                                                <!-- Single variant: simple button, same per-variant check -->
+                                                <% const singleVariantAdded = addedToCart && addedToCart.includes(`${lists._id}_${lists.variants[0]._id}`) %>
+                                                <% if(singleVariantAdded) { %>
+                                                    <a href="/cart" class="btn btn-outline-success btnViewCart btnViewCartBigView">
+                                                        <i class="fa-solid fa-cart-shopping"></i>View Cart
+                                                    </a>
+                                                <% } else { %>
+                                                    <form action="/cart/<%= lists._id %>" method="post" class="cart-form">
+                                                        <input type="hidden" name="returnTo" value="/listings/<%= lists._id %>">
+                                                        <input type="hidden" name="variantId" value="<%= lists.variants[0]._id %>">
+                                                        <button type="submit" class="btn btn-outline-primary btnAddToCart mt-3">
+                                                            <i class="fa-solid fa-cart-shopping"></i>Add To Cart
+                                                        </button>
+                                                    </form>
+                                                <% } %>
                                             <% } %>
+
                                             <div class="loader-overlay" id="cartLoaderOverlay">
                                                 <div class="loader-container">
                                                     <div class="loader"></div>
                                                     <p class="loader-text">Adding to Cart ... </p>
                                                 </div>
                                             </div>
-                                            <% } %>
-                                        </div>
-                                        <!-- <div class="col-md-6">
-                                            <form action="/cart/<%# cart.product._id %>?_method=PUT" method="POST">
-                                                <input type="hidden" value="plus" name="action">
-                                                <button id="plus" class="btn btn-outline-primary"><i class="fa-solid fa-square-plus" style="font-size: 1.3rem; margin-left: 25px;"></i></button> 
-                                            </form>
-                                            <form action="/cart/<%# cart.product._id %>?_method=PUT" method="POST">
-                                                <input type="hidden" name="action" value="minus">
-                                                <button id="minus" class="btn btn-outline-danger"><i class="fa-solid fa-square-minus" style="font-size: 1.3rem; margin-left: 5px;"></i></button> 
-                                            </form>
-                                        </div> -->
+                                        <% } %>
                                     </div>
-                                <% } %>
-                            </p>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 </div>
             </div>
-            <% if(currUser && lists.owners.some(o=>o._id.equals(currUser._id))) {%>
+            <% if(isOwnerView) { %>
                 <h6 style="margin-left: 259px;" class="noCartLine">As owner, cart option <b style="color: red;">not available!</b></h6>
                 <a href="/listings/<%= lists._id %>/edit"><button class="btn btn-outline-dark mb-3 showEditBtn">Edit</button></a>
-                
-                <!-- delete btn -->
                 <button type="button" class="btn btn-outline-danger mb-3 showDeleteBtn" data-bs-toggle="modal" data-bs-target="#delete-<%= lists._id %>">DELETE</button>
             <% } %>
         </div>
@@ -336,8 +426,10 @@
             no use for this as this require the fetch to stop the rotating but we are using the form so we remove it 
     </script>  -->
     <script>
-        document.getElementById("cart-form").addEventListener("submit", function() {
-            document.getElementById("cartLoaderOverlay").style.display = "flex";
+        document.querySelectorAll(".cart-form").forEach(form => {
+            form.addEventListener("submit", function() {
+                document.getElementById("cartLoaderOverlay").style.display = "flex";
+            });
         });
         document.getElementById("deleteYes").addEventListener("submit", function() {
             document.getElementById("deleteLoaderOverlay").style.display = "flex";

@@ -61,52 +61,9 @@
             Please Select image of type: jpeg, png only
           </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label" for="quant">Select Quantity Type</label
-            ><span><b style="color: red;"> *</b> : </span>
-            <select name="listing[quantityType]" class="form-select" id="quant">
-              <option value="" selected disabled>Select Quantities </option>
-              <option value="loose_weight">Loose Weight</option>
-              <option value="single_variant">Single Variant</option>
-              <option value="fixed_packed">Fixed Pack</option>
-              <option value="count">Count </option>
-            </select>
-            <div class="invalid-feedback">Please Select the valid Quantity</div>
-        </div>
-        
-        <!-- dynamically shown by default hidden for the Base Unit type selection -->
-        <div id="loose_weight_fields" class="d-none quant-fields mb-3">
-          <label for="unit" class="form-label">Base Unit</label><span><b style="color: red;"> *</b> : </span>
-          <select name="listing[baseUnit]" id="unit">
-            <option value="" selected disabled>Select the Unit of Item</option>
-            <option value="kg">Kilogram</option>
-            <option value="gm">Gram</option>
-            <option value="l">Litre</option>
-          </select>
-          <div class="mt-2" style="font-size: 13px;">
-            Cost Price below will be treated as <b>price per unit</b> (e.g. per kg).
-          </div>
-        </div>
-        <!-- Base unit selection ends -->
-
-        <!-- Fixed variants start -->
-        <div class="fixed_variants_fields d-none quant-fields mb-3" >
-          <label for="fixed" class=form-label>Fixed Unit</label><span><b style="color: red;"> *</b> : </span>
-          <div id="fixed_pack_variant_rows"></div>
-          <button type="button" class="btn btn-sm btn-outline-dark mt-2" onclick="addVariantRow('fixed_pack')">
-            + Add Variant</button>
-        </div>
-         <!-- fixed variants field ends -->
-
-        <div id="count_fields" class="quant-fields d-none mb-3">
-          <label class="form-label">Count Variants (e.g. 6 pcs, 1 Dozen)</label>
-          <div id="count_variant_rows"></div>
-          <button type="button" class="btn btn-sm btn-outline-dark mt-2" onclick="addVariantRow('count')">+ Add Variant</button>
-        </div>
-
 
         <div class="row">
-          <div class="mb-3 col-md-6">
+          <div class="mb-3 col-md-4">
             <label class="form-label" for="price">Select Category </label
             ><span> <b style="color: red"> *</b> : </span>
             <select
@@ -123,7 +80,24 @@
             </select>
             <div class="invalid-feedback">Please Select the valid Category</div>
           </div>
-          <div class="col-md-6 mb-3">
+          <div class="col-md-4 mb-3">
+            <label class="form-label" for="quant">Select Quantity Type</label
+            ><span><b style="color: red"> *</b> : </span>
+            <select
+              name="listing[quantityType]"
+              class="form-select"
+              id="quant"
+              required
+            >
+              <option value="" selected disabled>Select Quantities</option>
+              <!-- <option value="loose_weight">Loose Weight</option>
+                <option value="single_variant">Single Variant</option> -->
+              <option value="fixed_pack">Fixed Pack</option>
+              <option value="count">Count</option>
+            </select>
+            <div class="invalid-feedback">Please Select the valid Quantity</div>
+          </div>
+          <div class="col-md-4 mb-3" id="stockValCount">
             <label for="count" class="form-label"
               >Number Of Stock Available </label
             ><span> <b style="color: red"> *</b> : </span>
@@ -140,22 +114,52 @@
               Please Provide the Quntatiy of Stock
             </div>
           </div>
+          <div class="mb-3 col-md-4 d-none" id="innerTax">
+            <label class="form-label" for="taxField">Tax on Product %: </label
+            ><span> <b style="color: red"> *</b> : </span>
+            <input
+              type="number"
+              min="0"
+              class="form-control"
+              width="50%"
+              placeholder="Select Category for Tax"
+              id="taxFieldInner"
+              oninput="if (this.value < 0) this.value = 0;"
+              required
+              readonly
+            />
+            <div class="invalid-feedback">
+              Please Select valid Category for Tax Selection
+            </div>
+          </div>
         </div>
-        <div class="divider costSection mt-4 mb-3 ">
-          <span
-            style="
-              margin-left: 330px;
-              color: rgb(137, 132, 132);
-              font-weight: 700; 
-              font-size: 20px;
-            "
-            ><u>Cost Section</u></span
+
+        <div id="count_fields" class="quant-fields d-none mb-3">
+          <label class="form-label">Count Variants (e.g. 6 pcs, 1 Dozen)</label>
+          <div id="count_variant_rows"></div>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-dark mt-2"
+            onclick="addVariantRow('count')"
           >
-          <!-- <hr> -->
+            + Add Variant
+          </button>
         </div>
-        <br />
+
         <div class="row baseCostSection">
-          <div class="mb-3 col-md-4">
+          <div class="divider costSection mt-4 mb-4">
+            <span
+              style="
+                margin-left: 330px;
+                color: rgb(137, 132, 132);
+                font-weight: 700;
+                font-size: 20px;
+              "
+              ><u>Cost Section</u></span
+            >
+            <!-- <hr> -->
+          </div>
+          <div class="mb-3 col-md-4" id="costPrice">
             <label class="form-label" for="price">Cost Price </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
@@ -173,7 +177,7 @@
               Please Provide the valid Cost Price
             </div>
           </div>
-          <div class="mb-3 col-md-4">
+          <div class="mb-3 col-md-4" id="tax">
             <label class="form-label" for="taxField">Tax on Product %: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
@@ -192,7 +196,7 @@
               Please Select valid Category for Tax Selection
             </div>
           </div>
-          <div class="mb-3 col-md-4">
+          <div class="mb-3 col-md-4" id="profitMargin">
             <label class="form-label" for="price">Profit Margin %: </label
             ><span> <b style="color: red"> *</b> : </span>
             <input
@@ -261,23 +265,57 @@
   const quantSelect = document.getElementById("quant");
   const allQuantFieldGroups = document.querySelectorAll(".quant-fields");
   const baseCostSection = document.querySelector(".baseCostSection");
+  const costPrice = document.querySelector("#costPrice"); //
+  const profitMargin = document.querySelector("#profitMargin"); //
   const stockInput = document.getElementById("count");
-  const costPriceInput = document.getElementById("price");
+  const taxDiv = document.getElementById("innerTax");
+  const stockInputDiv = document.getElementById("stockValCount"); //
+  const costPriceInput = document.getElementById("price"); //
   const marginInput = document.getElementById("margin");
+  const mainTaxInput = document.getElementById("taxField");
+  const innerTaxInput = document.getElementById("taxFieldInner");
 
-  quantSelect.addEventListener("change", function (){
-    allQuantFieldGroups.forEach(el => el.classList.add("d-none"));
+  quantSelect.addEventListener("change", function () {
+    allQuantFieldGroups.forEach((el) => el.classList.add("d-none"));
     const selected = this.value;
     let target = document.getElementById(selected + "_fields");
 
-    if(target) target.classList.remove("d-none");
-    if(selected === "fixed_pack" || selected === "count"){
+    if (target) target.classList.remove("d-none");
+    // Ensure only the visible tax input carries the form name so server receives a single value
+    if (mainTaxInput && innerTaxInput) {
+      if (selected === "count") {
+        // use inner tax input for count mode
+        innerTaxInput.name = "listing[Tax]";
+        // remove name from main input to avoid duplicate values
+        mainTaxInput.removeAttribute("name");
+        // copy value so visible input shows current tax
+        innerTaxInput.value = mainTaxInput.value || innerTaxInput.value || "";
+      } else {
+        // use main tax input for fixed pack mode
+        mainTaxInput.name = "listing[Tax]";
+        innerTaxInput.removeAttribute("name");
+        mainTaxInput.value = innerTaxInput.value || mainTaxInput.value || "";
+      }
+    }
+    if (selected === "count") {
       baseCostSection.classList.add("d-none");
+      stockInputDiv.classList.add("d-none");
+      taxDiv.classList.remove("d-none");
+      costPrice.classList.add("d-none");
+      profitMargin.classList.add("d-none");
+      // taxDiv.classList.remove("d-none"); // show tax option for all product
+      stockInputDiv.classList.add("d-none");
       stockInput.required = false;
       costPriceInput.required = false;
       marginInput.required = false;
-    }else{
+    } else {
       baseCostSection.classList.remove("d-none");
+      stockInputDiv.classList.remove("d-none");
+      taxDiv.classList.add("d-none");
+      costPrice.classList.remove("d-none");
+      profitMargin.classList.remove("d-none");
+      // taxDiv.classList.remove("d-none"); // show tax option for all product
+      stockInputDiv.classList.remove("d-none");
       stockInput.required = true;
       costPriceInput.required = true;
       marginInput.required = true;
@@ -292,33 +330,85 @@
     const row = document.createElement("div");
     row.className = "row g-2 mb-2 align-items-center";
     row.innerHTML = `
-      <div class="col-3">
-        <input type="text" name="listing[variants][${idx}][label]" class="form-control" placeholder="Label e.g. 500g / 1 Dozen" required>
+      <div class="row mt-3">
+        <hr>
+        <div class="col-md-4 mb-3">
+          <input type="text" name="listing[variants][${idx}][label]" class="form-control" placeholder="Label e.g. 500g / 1 Dozen" required>
+        </div>
+        <div class="col-md-4" mb-3>
+          <select name="listing[variants][${idx}][unit]" class="form-select">
+            <option value="kg">Kilogram</option>
+            <option value="g">gram</option>
+            <option value="l">Litre</option>
+            <option value="ml">Mili-litre</option>
+            <option value="dozen">Dozen</option>
+            <option value="sack">Sack</option>
+          </select>
+        </div>
+        <div class="col-md-2 mb-3">
+          <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.row').remove()">Remove ✕</button>
+        </div>
+        <div class="mb-3 col-md-4" id="costPrice">
+          <label class="form-label" for="price">Cost Price </label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            width="50%"
+            placeholder="Enter Cost price of Product"
+            id="price"
+            name="listing[variants][${idx}][costPrice]"
+            oninput="if (this.value < 0) this.value = 0;"
+            required
+          />
+          <div class="invalid-feedback">
+            Please Provide the valid Cost Price
+          </div>
+        </div>
+        <div class="mb-3 col-md-4" id="profitMargin">
+          <label class="form-label" for="price">Profit Margin %: </label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            width="50%"
+            placeholder="Enter Margin Percentage"
+            id="margin"
+            name="listing[variants][${idx}][margin]"
+            oninput="if (this.value < 0) this.value = 0;"
+            required
+          />
+          <div class="mt-2" style="font-size: 13px">
+            Profit Margin is Considered in <b>Percentage</b
+            ><span style="color: red">*</span>
+          </div>
+          <div class="invalid-feedback">
+            Please Provide the valid Profit Margin
+          </div>
+        </div>
+      
+        <div class="col-md-4 mb-3" id="stockValCount">
+          <label for="count" class="form-label"
+            >Stock Count</label
+          ><span> <b style="color: red"> *</b> : </span>
+          <input
+            type="Number"
+            class="form-control"
+            placeholder="Enter the Quantity of Stock"
+            id="count"
+            oninput="if (this.value < 0) this.value = 0;"
+            name="listing[variants][${idx}][stockCount]"
+            required
+          />
+          <div class="invalid-feedback">
+            Please Provide the Quntatiy of Stock
+          </div>
+        </div>
+        <hr>
       </div>
-      <div class="col-2">
-        <input type="number" step="0.01" name="listing[variants][${idx}][value]" class="form-control" placeholder="Value" required>
-      </div>
-      <div class="col-2">
-        <select name="listing[variants][${idx}][unit]" class="form-select">
-          <option value="g">g</option>
-          <option value="kg">kg</option>
-          <option value="dozen">dozen</option>
-          <option value="piece">piece</option>
-          <option value="sack">sack</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <input type="number" step="0.01" name="listing[variants][${idx}][costPrice]" class="form-control" placeholder="Cost ₹" required>
-      </div>
-      <div class="col-2">
-        <input type="number" step="0.01" name="listing[variants][${idx}][margin]" class="form-control" placeholder="Margin %" required>
-      </div>
-      <div class="col-2">
-        <input type="number" name="listing[variants][${idx}][stock]" class="form-control" placeholder="Stock" required>
-      </div>
-      <div class="col-1">
-        <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.row').remove()">✕</button>
-      </div>
+      
     `;
     container.appendChild(row);
   }

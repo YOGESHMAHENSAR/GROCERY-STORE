@@ -54,20 +54,26 @@ router.get("/inventory",isAnyOwner,isLoggedIn, async (req,res)=>{
 
 router.patch("/inventory/:id/stock", isAnyOwner, isLoggedIn, async (req,res)=>{
     try{
-        const {inStock} = req.body;
-        const listing = await List.findByIdAndUpdate(
-            req.params.id, //finds the product on the basis of the productId
-            {inStock}, // save current inStock value either true or false to the db
-            {new: true} // return the updated value
-        );
+        const {inStock, variantId} = req.body;
+
+        if(!variantId){
+            return res.status(400).json({success: false, message: "variantId is required"});
+        }
+
+        const listing = await List.findById(req.params.id);
         if(!listing) return res.status(404).json({success: false, message: "404 Product not found"});
-        res.json({success: true, message: "Stock Updated", inStock: listing.inStock})
-        // here the inStock: listing.inStock here the updated inStock value will be sent to the frontend 
+
+        const variant = listing.variants.id(variantId);
+        if(!variant) return res.status(404).json({success: false, message: "404 Variant not found"});
+
+        variant.inStock = inStock;
+        await listing.save();
+
+        res.json({success: true, message: "Stock Updated", inStock: variant.inStock});
     }
     catch(e){
         res.json({success: false, message: e.message});
     }
-
 })
 
 // Construction page (MUST come before /:id routes)
