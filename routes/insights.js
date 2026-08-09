@@ -23,16 +23,22 @@ router.get("/insights/data", isAnyOwner, isLoggedIn, wrapAsync(async (req, res) 
         order.items.forEach(item => {
             if (!item.product) return;
 
-            const profit = (item.price - (parseFloat(item.product.costPrice) || 0)) * item.quantity;
+            // Resolve the specific variant this line item was ordered from
+            const variant = item.variantId ? item.product.variants.id(item.variantId) : null;
+            const costPrice = variant ? parseFloat(variant.costPrice) || 0 : 0;
+
+            const profit = (item.price - costPrice) * item.quantity;
             monthlyProfit[month] = (monthlyProfit[month] || 0) + profit;
 
             const title = item.product.title;
             productSales[title] = (productSales[title] || 0) + item.quantity;
 
             const revenue = item.price * item.quantity;
-            (item.product.category || []).forEach(cat => {
+            // category is now a single String, not an array
+            const cat = item.product.category;
+            if (cat) {
                 categorySales[cat] = (categorySales[cat] || 0) + revenue;
-            });
+            }
         });
     });
 
@@ -40,7 +46,7 @@ router.get("/insights/data", isAnyOwner, isLoggedIn, wrapAsync(async (req, res) 
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
 
-    res.json({ monthlySales, monthlyProfit, top5Products: top5 , categorySales});
+    res.json({ monthlySales, monthlyProfit, top5Products: top5, categorySales });
 }));
 
 
