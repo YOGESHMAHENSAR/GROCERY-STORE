@@ -27,23 +27,28 @@
             <input type="text" id="search" class="form-control" style="margin-top: -38px; margin-left: 72px;" placeholder="Search By Name, Category, Price, Stock" width="100px">
         </div>
     </div>
+    <% 
+        const totalVariants = lists.reduce((sum, l) => sum + l.variants.length, 0);
+        const inStockVariants = lists.reduce((sum, l) => sum + l.variants.filter(v => v.inStock).length, 0);
+        const outOfStockVariants = totalVariants - inStockVariants;
+    %>
     <div class="row mt-4 mb-4">
         <div class="col-md-3">
             <div style="background: #f0fdf4; border-radius: 15px; padding: 1rem;">
                 <h5 style="color: green;">Total Products: </h5>
-                <h3 ><%= lists.length %></h3>
+                <h3><%= lists.length %></h3>
             </div>
         </div>
         <div class="col-md-3">
             <div style="background: #f0fdf4; border-radius: 15px; padding: 1rem;">
-                <h5 style="color: green;">Product InStock: </h5>
-                <h3 class="count-instock"><%= lists.filter(l => l.inStock).length %></h3>
+                <h5 style="color: green;">Variants InStock: </h5>
+                <h3 class="count-instock"><%= inStockVariants %></h3>
             </div>
         </div>
         <div class="col-md-3">
             <div style="background: #f0fdf4; border-radius: 15px; padding: 1rem;">
-                <h5 style="color: red;">Product OutOf Stock: </h5>
-                <h3 class="count-outofstock"><%= lists.filter(l => !l.inStock).length %></h3>
+                <h5 style="color: red;">Variants OutOf Stock: </h5>
+                <h3 class="count-outofstock"><%= outOfStockVariants %></h3>
             </div>
         </div>
     </div>
@@ -51,12 +56,12 @@
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-dark">
-
                 <tr>
                     <th>#</th>
                     <th>Image</th>
                     <th>Title</th>
                     <th>Category</th>
+                    <th>Variant</th>
                     <th>Cost Price</th>
                     <th>Selling Price</th>
                     <th>Margin %</th>
@@ -65,74 +70,64 @@
                     <th>Stock</th>
                     <th>Toggle</th>
                     <th>Action</th>
-                    <!-- <th>Discount</th> -->
                 </tr>
             </thead>
             <tbody>
-                <% for(let i=0 ;i<lists.length; i++) {%>
-                    <% let list = lists[i]; %>
-                    <tr>
-                        <td>
-                            <%= i+1 %>
-                        </td>
-                        <td>
-                            <img src="<%= list.image.url %>?w=80&h=80&c=fill&q=auto"
-                                style="width: 60px; height: 60px; object-fit: cover; border-radius: 10px;" 
-                                alt="<%= list.title %>">
-                        </td>
-                        <td>
-                            <%= list.title %>
-                        </td>
-                        <td>
-                            <% let cat = list.category %>
-                            <% if(cat == "Normal") {%>
-                                Grocery
-                            <% }else{ %>
-                                <%= cat %>
+                <% for(let i = 0; i < lists.length; i++) { %>
+                    <% 
+                        const list = lists[i];
+                        const catDisplay = (Array.isArray(list.category) ? list.category : [list.category])
+                            .map(c => c === "Normal" ? "Grocery" : c)
+                            .join(", ");
+                    %>
+                    <% list.variants.forEach((v, vIdx) => { %>
+                        <tr data-list-id="<%= list._id %>" data-title="<%= list.title.toLowerCase() %>" data-category="<%= catDisplay.toLowerCase() %>">
+                            <% if(vIdx === 0) { %>
+                                <td rowspan="<%= list.variants.length %>"><%= i + 1 %></td>
+                                <td rowspan="<%= list.variants.length %>">
+                                    <img src="<%= list.image.url %>?w=80&h=80&c=fill&q=auto"
+                                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 10px;"
+                                        alt="<%= list.title %>">
+                                </td>
+                                <td rowspan="<%= list.variants.length %>"><%= list.title %></td>
+                                <td rowspan="<%= list.variants.length %>"><%= catDisplay %></td>
                             <% } %>
-                        </td>
-                        <td>
-                            <%= list.costPrice %>
-                        </td>
-                        <td>
-                            <%= list.sellingPrice %>
-                        </td>
-                        <td>
-                            <%= list.margin %> %
-                        </td>
-                        <td>
-                            <%= list.Tax %> %
-                        </td>
-                        <td>
-                            <span id="status-<%= list._id %>" class="stock-status <%= list.inStock ? 'in-stock' : 'out-stock' %>">
-                                <%= list.inStock ? "✅ In Stock" : "❌ Out of Stock" %>
-                            </span>
-                        </td>
-                        <td>
-                            <%= list.stockCount %>
-                        </td>
-                        <td>
-                            <input type="checkbox" 
-                            data-id="<%= list._id %>"
-                            class="form-check-input stock-toggle"
-                            style="cursor: pointer; width: 1.2rem; height: 1.2rem" 
-                            <%= list.inStock?"checked":"" %> >
-                        </td>
-                        <td>
-                            <a href="/listings/<%= list._id %>" class="btn btn-sm btn-outline-primary me-1">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                            <a href="/listings/<%= list._id %>/edit" class="btn btn-sm btn-outline-warning me-1">
-                                <i class="fa-solid fa-pen"></i>
-                            </a>
-                            <a href="/listings/<%= list._id %>" class="btn btn-sm btn-outline-danger me-1">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
-                        </td>
-                        <!-- <td>
-                            <h6>NO</h6>
-                        </td> -->
-                    </tr>
+                            <td><%= v.label %><% if(v.unit) { %> (<%= v.unit %>)<% } %></td>
+                            <td><%= v.costPrice %></td>
+                            <td><%= v.sellingPrice %></td>
+                            <td><%= v.margin %> %</td>
+                            <% if(vIdx === 0) { %>
+                                <td rowspan="<%= list.variants.length %>"><%= list.Tax %> %</td>
+                            <% } %>
+                            <td>
+                                <span id="status-<%= list._id %>-<%= v._id %>" class="stock-status <%= v.inStock ? 'in-stock' : 'out-stock' %>">
+                                    <%= v.inStock ? "✅ In Stock" : "❌ Out of Stock" %>
+                                </span>
+                            </td>
+                            <td><%= v.stockCount %></td>
+                            <td>
+                                <input type="checkbox"
+                                    data-id="<%= list._id %>"
+                                    data-variant-id="<%= v._id %>"
+                                    class="form-check-input stock-toggle"
+                                    style="cursor: pointer; width: 1.2rem; height: 1.2rem"
+                                    <%= v.inStock ? "checked" : "" %>>
+                            </td>
+                            <% if(vIdx === 0) { %>
+                                <td rowspan="<%= list.variants.length %>">
+                                    <a href="/listings/<%= list._id %>" class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="/listings/<%= list._id %>/edit" class="btn btn-sm btn-outline-warning me-1">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <a href="/listings/<%= list._id %>" class="btn btn-sm btn-outline-danger me-1">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </td>
+                            <% } %>
+                        </tr>
+                    <% }) %>
                 <% } %>
             </tbody>
         </table>
@@ -140,25 +135,26 @@
 </div>
 
 <script>
-    document.addEventListener("change",async (e)=>{
+    document.addEventListener("change", async (e) => {
         const toggle = e.target.closest(".stock-toggle");
-        if(!toggle) return;
+        if (!toggle) return;
 
         const id = toggle.dataset.id;
+        const variantId = toggle.dataset.variantId;
         const inStock = toggle.checked;
 
-        try{
-            const response = await fetch(`/listings/inventory/${id}/stock`,{
+        try {
+            const response = await fetch(`/listings/inventory/${id}/stock`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json"},
-                body: JSON.stringify({ inStock })
-            })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ inStock, variantId })
+            });
 
             const data = await response.json();
 
-            if(response.ok && data.success){
-                const badge = document.getElementById(`status-${id}`);
-                if(badge){
+            if (response.ok && data.success) {
+                const badge = document.getElementById(`status-${id}-${variantId}`);
+                if (badge) {
                     badge.textContent = data.inStock ? "✅ In Stock" : "❌ Out of Stock";
                     badge.className = `stock-status ${data.inStock ? 'in-stock' : 'out-stock'}`;
                 }
@@ -166,39 +162,37 @@
                 const inStockCount = document.getElementsByClassName("count-instock")[0];
                 const outofStockCount = document.getElementsByClassName("count-outofstock")[0];
 
-                if(data.inStock){
+                if (data.inStock) {
                     inStockCount.textContent = parseInt(inStockCount.textContent) + 1;
                     outofStockCount.textContent = parseInt(outofStockCount.textContent) - 1;
-                }else{
+                } else {
                     inStockCount.textContent = parseInt(inStockCount.textContent) - 1;
                     outofStockCount.textContent = parseInt(outofStockCount.textContent) + 1;
                 }
-            } 
-            else {
-                toggle.checked = !toggle.checked; // ✅ revert if failed
+            } else {
+                toggle.checked = !toggle.checked;
                 alert("Failed to update stock status");
             }
-        }
-        catch(err) {
+        } catch (err) {
             console.error(err);
-            toggle.checked = !toggle.checked; // ✅ revert on error
+            toggle.checked = !toggle.checked;
             alert("Something went wrong");
         }
-    })
-    document.getElementById("search").addEventListener("input", function() {
+    });
+
+    document.getElementById("search").addEventListener("input", function () {
         const searchValue = this.value.toLowerCase().trim();
         const rows = document.querySelectorAll("tbody tr");
 
         rows.forEach(row => {
-            const title    = row.querySelector("td:nth-child(3)")?.textContent.toLowerCase() || "";
-            const category = row.querySelector("td:nth-child(4)")?.textContent.toLowerCase() || "";
-            const price    = row.querySelector("td:nth-child(6)")?.textContent.toLowerCase() || "";
-            const stock    = row.querySelector("td:nth-child(9)")?.textContent.toLowerCase() || "";
+            const title = row.dataset.title || "";
+            const category = row.dataset.category || "";
+            const rowText = row.textContent.toLowerCase();
 
-            if(title.includes(searchValue) || category.includes(searchValue) || price.includes(searchValue) || stock.includes(searchValue)) {
-                row.style.display = "";      // ✅ show row
+            if (title.includes(searchValue) || category.includes(searchValue) || rowText.includes(searchValue)) {
+                row.style.display = "";
             } else {
-                row.style.display = "none";  // ✅ hide row
+                row.style.display = "none";
             }
         });
     });

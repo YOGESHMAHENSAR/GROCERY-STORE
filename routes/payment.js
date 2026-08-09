@@ -20,7 +20,6 @@ router.get('/order-success', isLoggedIn, async (req, res) => {
     try {        
         // ✅ Check session first, then query param (mobile fallback)
         const orderId = req.session.lastOrderId || req.query.id;
-        // console.log("orderId from session or query:", orderId); // debug
 
         if (!orderId) {
             req.flash("error", "No recent order found!");
@@ -28,31 +27,32 @@ router.get('/order-success', isLoggedIn, async (req, res) => {
         }
 
         const order = await Order.findById(orderId).populate("items.product");
-        // console.log("order found:", order); // debug
 
         if (!order) {
             req.flash("error", "Order not found!");
             return res.redirect("/listings");
         }
 
+        // ─── Deduct stock from the SPECIFIC VARIANT ordered, not the product ───
         for(let item of order.items){
             if(!item.product) continue;
 
             const product = await List.findById(item.product._id);
             if(product){
-                product.stockCount -= item.quantity;
-                if(product.stockCount <= 0){
-                    product.inStock = false;
-                    product.stockCount = 0;
+                const variant = product.variants.id(item.variantId);
+                if (variant) {
+                    variant.stockCount -= item.quantity;
+                    if (variant.stockCount <= 0) {
+                        variant.stockCount = 0;
+                    }
+                    await product.save(); // saving the parent persists the subdocument change
                 }
-                await product.save();
-                // console.log(`✅ ${product.title} stock reduced to ${product.stockCount}`); // debug
             }
         }
 
         // ✅ Clear session after using it
         delete req.session.lastOrderId;
-        req.session.addedToCart = []; //to clear the whole addedToCart so that we can see the cart btn as usual.
+        req.session.addedToCart = [];
 
         res.render('payment/order-success', { order });
     } catch (err) {
@@ -81,17 +81,16 @@ router.post("/create-order",isLoggedIn, async (req,res)=>{
     }
 })
 
-// fxn used to push the notification to the owner
-
+// ─── calculateOrderAmount — now reads price from resolved variant ───
 function calculateOrderAmount(items = []) {
     const subtotal = (items || []).reduce((sum, item) => {
-        const price = parseFloat(item.price ?? item.product?.sellingPrice ?? 0) || 0;
+        const price = parseFloat(item.price ?? item.variant?.sellingPrice ?? 0) || 0;
         const quantity = item.quantity || 1;
         return sum + (price * quantity);
     }, 0);
 
     const tax = (items || []).reduce((sum, item) => {
-        const price = parseFloat(item.price ?? item.product?.sellingPrice ?? 0) || 0;
+        const price = parseFloat(item.price ?? item.variant?.sellingPrice ?? 0) || 0;
         const quantity = item.quantity || 1;
         const taxRate = item.product?.Tax ? parseFloat(item.product.Tax) / 100 : 0;
         return sum + ((price * quantity) * taxRate);
@@ -116,7 +115,6 @@ async function sendPushToOwners(app, title, body, url) {
             }
         } catch(err) {
             console.error(`Push failed for owner ${ownerId}:`, err.message);
-            // If subscription expired — clear it
             if(err.statusCode === 410) {
                 await User.findByIdAndUpdate(ownerId, { pushSubscription: null });
             }
@@ -124,11 +122,22 @@ async function sendPushToOwners(app, title, body, url) {
     }
 }
 
-//cod route 
+// ─── Helper: resolve each cart item's variant subdocument ───
+// Returns cart items enriched with `variant`, and flags any that
+// point at a variant that no longer exists (deleted since being added to cart).
+function resolveCartVariants(cart) {
+    const resolved = cart.map(item => {
+        const variant = item.product.variants.id(item.variantId);
+        return { ...item.toObject(), variant };
+    });
+    const missingVariant = resolved.find(item => !item.variant);
+    return { resolved, missingVariant };
+}
+
+//cod route
 
 router.post("/create-cod-order", isLoggedIn, async (req, res) => {
     try {
-        // Check address
         const user = await User.findById(req.user._id).populate("cart.product");
         if(!user.address || !user.address.pincode || !user.address.city) {
             return res.json({ 
@@ -137,7 +146,6 @@ router.post("/create-cod-order", isLoggedIn, async (req, res) => {
             });
         }
 
-        // Check cart
         if(!user.cart || user.cart.length === 0) {
             return res.json({ 
                 success: false, 
@@ -145,35 +153,39 @@ router.post("/create-cod-order", isLoggedIn, async (req, res) => {
             });
         }
 
-        // Create order — no payment ID for COD
+        const { resolved: cartWithVariants, missingVariant } = resolveCartVariants(user.cart);
+        if (missingVariant) {
+            return res.json({ success: false, message: "One of your cart items is no longer available. Please review your cart." });
+        }
+
         const order = new Order({
             user: req.user._id,
-            items: user.cart.map(item => ({
+            items: cartWithVariants.map(item => ({
                 product: item.product._id,
+                variantId: item.variantId,
+                variantLabel: item.variant.label,
                 quantity: item.quantity,
-                price: item.product.sellingPrice
+                price: item.variant.sellingPrice
             })),
-            totalAmount: calculateOrderAmount(user.cart),
-            paymentId: "COD",           // ← mark as COD
+            totalAmount: calculateOrderAmount(cartWithVariants),
+            paymentId: "COD",
             orderId: `COD-${Date.now()}`,
             address: user.address,
-            paymentMethod: "COD",       // ← add this field to your Order model
+            paymentMethod: "COD",
             status: "Pending"
         });
 
         await order.save();
 
-        await sendPushToOwners( // this is used to send the notification to the owner who gets the order via COD
+        await sendPushToOwners(
             req.app,
             "🛒 New COD Order!",
             `${user.username} placed a COD order of ₹${order.totalAmount}`,
             "/orders-delivery"
         );
 
-        // Clear cart
         await User.findByIdAndUpdate(req.user._id, { cart: [] });
 
-        // Save to session for order-success page
         req.session.lastOrderId = order._id.toString();
         await new Promise((resolve, reject) => {
             req.session.save(err => err ? reject(err) : resolve());
@@ -191,31 +203,34 @@ router.post("/create-cod-order", isLoggedIn, async (req, res) => {
 
 router.post("/verify-payment", async(req,res)=>{
     try{
-        const{razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body; // deconstruct the crucial info
+        const{razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body;
 
-        // Ensure razorpay_order_id is a string
         const orderId = typeof razorpay_order_id === "object" ? razorpay_order_id.id : razorpay_order_id;
 
-        //signature created on our  own side.
         const body = orderId + "|" + razorpay_payment_id;
         const expected = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(body).digest("hex");
 
-        //compare both the signature
         if(expected !== razorpay_signature){
             return res.json({success: false, message: "Payment Verification Failed!"});
         }
 
-        //payment passed when signature matched
         const user = await User.findById(req.user._id).populate("cart.product");
+
+        const { resolved: cartWithVariants, missingVariant } = resolveCartVariants(user.cart);
+        if (missingVariant) {
+            return res.json({ success: false, message: "One of your cart items is no longer available." });
+        }
 
         const order = new Order({
             user: req.user._id,
-            items: user.cart.map(items => ({
-                product: items.product._id,
-                quantity: items.quantity,
-                price: items.product.sellingPrice,
+            items: cartWithVariants.map(item => ({
+                product: item.product._id,
+                variantId: item.variantId,
+                variantLabel: item.variant.label,
+                quantity: item.quantity,
+                price: item.variant.sellingPrice,
             })),
-            totalAmount: calculateOrderAmount(user.cart),
+            totalAmount: calculateOrderAmount(cartWithVariants),
             paymentId: razorpay_payment_id,
             paymentMethod: "Razorpay",
             orderId: orderId,
@@ -224,7 +239,7 @@ router.post("/verify-payment", async(req,res)=>{
 
         await order.save();
 
-        await sendPushToOwners( // used to send the notification when payment using ONLINE method
+        await sendPushToOwners(
             req.app,
             "🛒 New Order Received!",
             `${user.username} placed an order of ₹${order.totalAmount} (${order.items.length} items)`,
@@ -238,9 +253,7 @@ router.post("/verify-payment", async(req,res)=>{
             req.session.save(err => err ? reject(err) : resolve());
         });
 
-        // ✅ Return orderId so client can use it as fallback
         res.json({ success: true, message: "Payment Verified!", orderId: order._id.toString() });
-
 
     }catch(err){
         res.json({success: false, message: err.message});
@@ -251,7 +264,7 @@ router.post("/verify-payment", async(req,res)=>{
 router.get("/orders", async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user._id })
-            .sort({ createdAt: -1 }) // ✅ newest first
+            .sort({ createdAt: -1 })
             .populate("items.product");
         res.render("payment/order", { orders });
     } catch (err) {
@@ -263,14 +276,14 @@ router.get("/orders", async (req, res) => {
 router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
     try {
         const orders = await Order.find()
-            .sort({ createdAt: -1 }) // ✅ newest first
+            .sort({ createdAt: -1 })
             .populate({
                 path: "items.product",
                 match: {_id: {$exists: true}}
             })
             .populate("user", "username email phone");
         orders.forEach(order => {
-            order.items = order.items.filter(item => item.product !== null); // needed as the product is deelted from the website but in the order placed 
+            order.items = order.items.filter(item => item.product !== null);
         });
         res.render("payment/order-delivery", { orders });
     } catch (err) {
@@ -279,7 +292,7 @@ router.get("/orders-delivery",isAnyOwner, isLoggedIn,async (req, res) => {
     }
 });
 
-//whatsapp route that as soon as the order is created and sent for delivered we send the msg to the client 
+//whatsapp route that as soon as the order is created and sent for delivered we send the msg to the client
 // via whatsapp
 
 router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
@@ -297,13 +310,13 @@ router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
         const phone = order.user.phone;
 
         const subtotal = order.items.reduce((sum, item) => {
-            const price = parseFloat(item.price || item.product?.sellingPrice || 0) || 0;
+            const price = parseFloat(item.price || 0) || 0;
             const quantity = item.quantity || 1;
             return sum + (price * quantity);
         }, 0);
 
         const tax = order.items.reduce((sum, item) => {
-            const price = parseFloat(item.price || item.product?.sellingPrice || 0) || 0;
+            const price = parseFloat(item.price || 0) || 0;
             const quantity = item.quantity || 1;
             const taxRate = item.product?.Tax ? parseFloat(item.product.Tax) / 100 : 0;
             return sum + ((price * quantity) * taxRate);
@@ -314,12 +327,11 @@ router.patch("/order/:id/status", isAnyOwner, isLoggedIn, async (req,res)=>{
             : subtotal + tax + 10;
 
         if(status === "Confirmed"){
-            let count = 1;
             let message = `*Order Confirmed!*
 ━━━━━━━━━━━━━━━━━━━━
 ★ *Order Summary*
 
-        ${order.items.map((item, index) => `${index + 1}. ${item.product.title} x ${item.quantity}`).join("\n\t")}
+        ${order.items.map((item, index) => `${index + 1}. ${item.product.title} (${item.variantLabel}) x ${item.quantity}`).join("\n\t")}
 
 ━━━━━━━━━━━━━━━━━━━━
 ★ *Amount to Pay (Inclusive all Taxes):* Rs. ${resolvedGrandTotal.toFixed(2)}
@@ -334,7 +346,6 @@ We will notify you once it is out for delivery
  _Powered by *★ Grocery-Store ★* `;
             
             let encodedMsg = encodeURIComponent(message);
-
             let url = `whatsapp://send?phone=91${phone}&text=${encodedMsg}`;
 
             return res.json({success:true, message: "Order status Updated", status: order.status, whatsappUrl: url });
@@ -344,7 +355,7 @@ We will notify you once it is out for delivery
 ━━━━━━━━━━━━━━━━━━━━
 ★ *Order Summary*
 
-        ${order.items.map((item, index) => `${index + 1}. ${item.product.title} x ${item.quantity}`).join("\n\t")}
+        ${order.items.map((item, index) => `${index + 1}. ${item.product.title} (${item.variantLabel}) x ${item.quantity}`).join("\n\t")}
 
 ━━━━━━━━━━━━━━━━━━━━
 ★ *Total Paid:* Rs. ${resolvedGrandTotal.toFixed(2)}
@@ -363,7 +374,6 @@ Rate your experience & help us improve:
  _Powered by *★ Grocery-Store ★* `;
             
             let encodedMsg = encodeURIComponent(message);
-
             let url = `whatsapp://send?phone=91${phone}&text=${encodedMsg}`;
 
             return res.json({success:true, message: "Order status Updated", status: order.status, whatsappUrl: url });
@@ -383,7 +393,7 @@ router.get("/orders/:id/invoice",isLoggedIn, async (req,res)=>{
             .populate("user")
             .populate({
                 path: "items.product",
-                populate: { path: "owners" }  // Populate owners for store details
+                populate: { path: "owners" }
             });
         res.render("listings/invoice", {order});
     }catch(e){

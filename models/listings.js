@@ -40,51 +40,30 @@ const listingSchema = new mongoose.Schema({
             ref: "User"
         }
     ],
-    costPrice: {
-        type: String,
-        required: true
-    },
-    sellingPrice: {
-        type: String,
-    },
-    margin:{
-        type: String,
-        required: false,
-        default: "0"
-    },
     Tax: {
         type: String,
         required: true
     },
-    inStock: {
-        type: Boolean,
-        required: true,
-        default: true
-    },
-    stockCount:{
-        type: Number,
-        required: true
-    },
     quantityType: {
         type: String,
-        enum: ["loose_weight", "count", "fixed_pack", "single_variant"],
+        enum: ["count", "fixed_pack"],
         required: true
     },
     variants: [
         {
-            label: { type: String },// e.g. "500g", "1 Dozen", "10kg Sack"
-            value: { type: Number },// e.g. 0.5, 12, 10
-            unit: { type: String },// "kg", "g", "dozen", "piece", "sack"
-            price: { type: Number },
-            stock: { type: Number }
+            label: { type: String, required: true },   // "70g", "1 Dozen", "10kg Sack"
+            unit: {
+                type: String,
+                enum: ["kg", "g", "l", "ml", "dozen", "piece", "pack", "sack"],
+                required: true
+            },
+            costPrice: { type: Number, required: true },
+            margin: { type: Number, required: true, default: 0 },
+            sellingPrice: { type: Number, required: true },
+            stockCount: { type: Number, required: true, default: 0 },
+            inStock: { type: Boolean, required: true, default: true }
         }
     ],
-    pricePerUnit: {// used only for loose_weight
-        type: Number
-    },
-    baseUnit: {// used only for loose_weight, e.g. "kg"
-        type: String
-    },
     category:[
         {
             type: String,

@@ -54,6 +54,10 @@ const userSchema = new Schema({
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "List"
                 },
+                variantId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    required: true
+                },
                 quantity: {
                     type: Number,
                     default: 1

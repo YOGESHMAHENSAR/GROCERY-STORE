@@ -2,8 +2,7 @@
 <!-- CART PAGE HTML -->
 <div class="container py-5">
 
-    <!-- title -->
-     <div class="d-flex justify-content-between ">
+    <div class="d-flex justify-content-between ">
         <h2 class="cart-title">🛒 My Cart</h2>
         <a href="/listings" class="text-decoration-none" style="margin-left: 5rem;">
             <button class="btn-continue labelsBtn1">
@@ -18,7 +17,7 @@
             </a>
         <% } %>
      </div>
-    
+
     <p class="cart-subtitle"><b style="color: rgb(255, 132, 0);"><%= cart.length %> item(s)</b> in your cart</p>
 
     <% if(cart.length === 0) { %>
@@ -31,7 +30,6 @@
 
     <% } else { %>
 
-    <!-- table -->
     <div class="cart-table table-responsive mb-4">
         <table class="table mb-0">
             <thead>
@@ -45,48 +43,54 @@
             </thead>
             <tbody>
                 <% for(let item of cart) { %>
-                <tr id="cart-item-<%= item.product._id %>">
+                <tr id="cart-item-<%= item.variant._id %>">
                     <td>
-                        <div class="product-name"><%= item.product.title %></div>
-                        <div class="product-badge stockInfo">✓ In Stock</div>
+                        <div class="product-name">
+                            <%= item.product.title %>
+                            <span style="font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+                                (<%= item.variant.label %><% if(item.variant.unit) { %> - <%= item.variant.unit %><% } %>)
+                            </span>
+                        </div>
+                        <div class="product-badge stockInfo">
+                            <% if(item.variant.stockCount > 0) { %>
+                                ✓ In Stock
+                            <% } else { %>
+                                <span style="color: red;">✗ Out of Stock</span>
+                            <% } %>
+                        </div>
                     </td>
                     <td>
-                        <span class="price-tag" id="price-<%= item.product._id %>"
-                        data-price="<%= item.product.sellingPrice %>"
+                        <span class="price-tag" id="price-<%= item.variant._id %>"
+                        data-price="<%= item.variant.sellingPrice %>"
                         data-tax="<%= item.product.Tax %>">
-                            ₹<%= item.product.sellingPrice %>
+                            ₹<%= item.variant.sellingPrice %>
                         </span>
                     </td>
                     <td>
                         <div class="qty-wrapper">
-                            <!-- minus -->
-                            <!-- <form action="/cart/<%# item.product._id %>?_method=PUT" method="post" style="margin:0;"> -->
-                                <input type="hidden" name="action" value="minus">
-                                <button type="button" onclick="chnageQty(`<%= item.product._id %>`, -1, this)" class="qty-btn qty-btn-minus">
-                                    <i class="fa-solid fa-minus" style="font-size:0.7rem;"></i>
-                                </button>
-                            <!-- </form> -->
+                            <input type="hidden" name="action" value="minus">
+                            <button type="button" onclick="chnageQty(`<%= item.product._id %>`, `<%= item.variant._id %>`, -1, this)" class="qty-btn qty-btn-minus">
+                                <i class="fa-solid fa-minus" style="font-size:0.7rem;"></i>
+                            </button>
 
-                            <span class="qty-number" id="qty-<%= item.product._id %>">
+                            <span class="qty-number" id="qty-<%= item.variant._id %>">
                                 <%= item.quantity %>
                             </span>
 
-                            <!-- plus -->
-                            <!-- <form action="/cart/<%= item.product._id %>?_method=PUT" method="post" style="margin:0;"> -->
-                                <input type="hidden" name="action" value="plus">
-                                <button type="button" onclick="chnageQty(`<%= item.product._id %>`, 1, this)" class="qty-btn qty-btn-plus">
-                                    <i class="fa-solid fa-plus" style="font-size:0.7rem;"></i>
-                                </button>
-                            <!-- </form> -->
+                            <input type="hidden" name="action" value="plus">
+                            <button type="button" onclick="chnageQty(`<%= item.product._id %>`, `<%= item.variant._id %>`, 1, this)" class="qty-btn qty-btn-plus">
+                                <i class="fa-solid fa-plus" style="font-size:0.7rem;"></i>
+                            </button>
                         </div>
                     </td>
                     <td>
-                        <span class="item-total" id="item-total-<%= item.product._id %>">
-                            ₹<%= parseInt(item.product.sellingPrice).toFixed(2) * item.quantity %>
+                        <span class="item-total" id="item-total-<%= item.variant._id %>">
+                            ₹<%= (parseFloat(item.variant.sellingPrice) * item.quantity).toFixed(2) %>
                         </span>
                     </td>
                     <td>
                         <form action="/cart/<%= item.product._id %>?_method=DELETE" method="post">
+                            <input type="hidden" name="variantId" value="<%= item.variant._id %>">
                             <button type="submit" class="remove-btn">
                                 <i class="fa-solid fa-trash-can me-1"></i>Remove
                             </button>
@@ -97,22 +101,15 @@
             </tbody>
         </table>
     </div>
-    <!-- bottom row -->
-     <p class="me-3 mt-3 d-inline line">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
+
+    <p class="me-3 mt-3 d-inline line">Once Order Placed Can't be Cancelled!<span style="color: red;">*</span></p>
     <div class="d-flex justify-content-evenly align-items-center flex-wrap gap-1 mt-3 ">
 
-        <!-- continue shopping -->
-         <!-- <div class="d-flex justify-content-center"> -->
-            
-         <!-- </div> -->
-        
-        <!-- grand total box -->
-         
         <div class="grand-total-box totalBoxShrink">
             <%
-                let subTotal  = cart.reduce((sum, item) => sum + parseInt(item.product.sellingPrice) * item.quantity, 0);
+                let subTotal  = cart.reduce((sum, item) => sum + parseFloat(item.variant.sellingPrice) * item.quantity, 0);
                 let totalTax  = cart.reduce((sum, item) => {
-                    let itemTotal = parseInt(item.product.sellingPrice) * item.quantity;
+                    let itemTotal = parseFloat(item.variant.sellingPrice) * item.quantity;
                     let taxRate   = parseFloat(item.product.Tax) / 100;
                     return sum + (itemTotal * taxRate);
                 }, 0);
@@ -150,10 +147,7 @@
             <div class="grand-total-note">Inclusive of all taxes</div>
         </div>
 
-        <!-- place order -->
         <div class="d-flex justify-content-center mt-4 mb-3" style="display: flex; flex-direction: column;">
-            <!-- <form action="/order" method="post"> -->
-            <!-- <a href="listings/privacy" style="text-decoration: none;"> -->
                 <% if(!currUser) {%>
                     <form action="/login" method="get">
                         <button type="submit" class="btn-place-order">
@@ -161,11 +155,11 @@
                         </button>
                     </form>
                 <% } else { %>
-                    <% 
-                        const hasAddress = currentUser && 
-                            currentUser.address && 
-                            currentUser.address.city && 
-                            currentUser.address.street && 
+                    <%
+                        const hasAddress = currentUser &&
+                            currentUser.address &&
+                            currentUser.address.city &&
+                            currentUser.address.street &&
                             currentUser.address.pincode
                     %>
                     <% if(hasAddress) {%>
@@ -177,7 +171,7 @@
                         <a href="/profile/address" class="btn btn-verify-address cartVerify" style="text-decoration: none;">
                             <i class="fa-solid fa-location-dot me-2 "></i>Verify Address
                         </a>
-                        
+
                         <button type="button" id="pay-btn" class="mt-3 btn-place-order cartPlace" data-key="<%= process.env.RAZORPAY_KEY_ID %>">
                             <i class="fa-solid fa-bag-shopping me-2 "></i>Place Order
                         </button>
