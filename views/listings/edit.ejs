@@ -7,6 +7,7 @@
       <form
         action="/listings/<%= list._id %>?_method=PUT"
         method="post"
+        id="editForm"
         class="needs-validation"
         enctype="multipart/form-data"
         novalidate
@@ -229,7 +230,7 @@
         </div>
 
         <div class="edit-btn">
-          <button class="btn btn-outline-dark mt-3 mb-3" id="editBtn">
+          <button type="submit" class="btn btn-outline-dark mt-3 mb-3" id="editBtn">
             Save Changes
           </button>
         </div>
@@ -245,17 +246,20 @@
   </div>
 
   <script>
-    document.querySelector("form").addEventListener("submit", function (e) {
-      if (this.checkValidity()) {
-        document.querySelector("#editLoaderOverlay").style.display = "flex";
-      }
-      // if invalid, browser blocks submission and shows its own validation UI — loader stays hidden
-    });
+    const editForm = document.querySelector("#editForm"); // give your <form> an id="editForm"
+    const loader = document.querySelector("#editLoaderOverlay");
 
-    window.addEventListener("pageshow", function (event) {
-      if (event.persisted) {
-        document.querySelector("#editLoaderOverlay").style.display = "none";
+    editForm.addEventListener("submit", function (e) {
+      if (!this.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.add("was-validated");
+        return;
       }
+
+      loader.style.display = "flex";
+      e.preventDefault();
+      requestAnimationFrame(() => this.submit());
     });
 
     const quantSelect = document.getElementById("quant");
