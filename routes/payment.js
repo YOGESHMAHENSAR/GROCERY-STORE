@@ -111,10 +111,10 @@ async function sendPushToOwners(app, title, body, url) {
                     owner.pushSubscription,
                     JSON.stringify({ title, body, url })
                 );
-                console.log(`✅ Push sent to owner ${ownerId}`);
+                // console.log(`✅ Push sent to owner ${ownerId}`);
             }
         } catch(err) {
-            console.error(`Push failed for owner ${ownerId}:`, err.message);
+            // console.error(`Push failed for owner ${ownerId}:`, err.message);
             if(err.statusCode === 410) {
                 await User.findByIdAndUpdate(ownerId, { pushSubscription: null });
             }
@@ -180,7 +180,7 @@ router.post("/create-cod-order", isLoggedIn, async (req, res) => {
         await sendPushToOwners(
             req.app,
             "🛒 New COD Order!",
-            `${user.username} placed a COD order of ₹${order.totalAmount}`,
+            `${user.username} placed a COD order of ₹${order.totalAmount.toFixed(2)}`,
             "/orders-delivery"
         );
 
