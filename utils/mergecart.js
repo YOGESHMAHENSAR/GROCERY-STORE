@@ -10,16 +10,20 @@ const mergeGuestCart = async (req) => {
         if (!user) return;
 
         for (let sessionItem of sessionCart) {
+            if (!sessionItem.variantId) continue; // skip malformed/legacy session entries
+
             const existingItem = user.cart.find(
-                item => item.product.toString() === sessionItem.product
+                item => item.product.toString() === sessionItem.product &&
+                        item.variantId.toString() === sessionItem.variantId
             );
             if (existingItem) {
-                // ✅ product already in cart — just increase quantity
-                existingItem.quantity += sessionItem.quantity;
+                // ✅ same product AND same variant already in cart — increase quantity
+                existingItem.quantity = Math.min(existingItem.quantity + sessionItem.quantity, 3); // respect max-3 cap
             } else {
-                // ✅ new product — add to cart
+                // ✅ new product/variant combo — add to cart
                 user.cart.push({
                     product: sessionItem.product,
+                    variantId: sessionItem.variantId,
                     quantity: sessionItem.quantity
                 });
             }

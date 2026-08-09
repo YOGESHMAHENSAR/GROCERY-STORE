@@ -16,6 +16,7 @@ router.get("/cart", async (req, res, next) => {
                     ...item.toObject(),
                     variant: item.product.variants.id(item.variantId) || null
                 }))
+                .filter(item => item.variant !== null)   // 👈 add this
                 .reverse();
             currentUser = user;
         } else {
@@ -32,7 +33,7 @@ router.get("/cart", async (req, res, next) => {
                         variant: product ? product.variants.id(item.variantId) : null,
                         quantity: item.quantity
                     };
-                }).filter(item => item.product !== null);
+                }).filter(item => item.product !== null && item.variant !== null);   // 👈 add condition here
             }
         }
 

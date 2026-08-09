@@ -46,9 +46,10 @@
 
         let totalCostSum = orders.reduce((orderSum, order) => {
             return orderSum + order.items.reduce((itemSum, item) => {
-                const price = parseFloat(item.product?.costPrice?.toString().replace(/[^\d.-]/g, '')) || 0;
+                const variant = item.product?.variants?.id(item.variantId);
+                const costPrice = parseFloat(variant?.costPrice) || 0;
                 const taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
-                return itemSum + (price * (1 + taxRate) * item.quantity);
+                return itemSum + (costPrice * (1 + taxRate) * item.quantity);
             }, 0);
         }, 0);
 

@@ -32,7 +32,7 @@
             <h2 class="mt-1">Product : <b><%= lists.title %></b></h2>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-5">
         <div class="col-6 offset-2 mainCard mb-5" style="width: 82%;">
             <div class="internal-card" style="border-radius: 15px; padding: 2px;">
                 <div class="row">
@@ -216,7 +216,7 @@
                 <button type="button" class="btn btn-outline-danger mb-3 showDeleteBtn" data-bs-toggle="modal" data-bs-target="#delete-<%= lists._id %>">DELETE</button>
             <% } %>
         </div>
-        <hr>
+        <!-- <hr> -->
     </div>
     <!-- model for permanently delete start -->
     <div class="modal fade" id="delete-<%= lists._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -246,7 +246,8 @@
     </div>
     <!-- model ends -->
     <% if(currUser){ %>
-        <div class="col-8 offset-2 mb-2 mt-2">
+        <hr>
+        <div class="col-8 offset-2 mb-2 mt-4">
             <h3 class="highlighted-feedback">Feedback Section </h3>
             <form action="/listings/<%= lists._id %>/reviews" method="post" class="needs-validation" novalidate>
                 <!-- <div>
