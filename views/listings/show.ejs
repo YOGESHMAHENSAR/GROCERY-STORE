@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6 offset-2 mainCard" style="width: 82%;">
+        <div class="col-6 offset-2 mainCard mb-5" style="width: 82%;">
             <div class="internal-card" style="border-radius: 15px; padding: 2px;">
                 <div class="row">
                     <div class="col-md-6">
@@ -102,15 +102,15 @@
                                 </div>
                             </div>
                             <% if(lists.location) { %>
-                                <div class="row" style="margin-top: -10px;">
+                                <div class="row mt-3" >
                                     <div class="col-10">
                                         <b>Special Feature [USP] : </b> <i class="fa-solid fa-chess-king" style="color: gold;"></i> <%= lists.location %>
                                     </div>
                                 </div>
                             <% } %>
 
-                            <% if(!isOwnerView) { %>
-                                <div class="col-md-8 mt-3">
+                            <% if(!isOwnerView && lists.variants.length === 1) { %>
+                                <div class="col-md-8 mt-3 mb-3">
                                     <span id="status-<%= lists._id %>" class="showStockStatus stock-status <%= anyInStock ? 'in-stock' : 'out-stock' %>">
                                         <%= anyInStock ? "In Stock" : "Out of Stock" %>
                                     </span>
@@ -125,7 +125,7 @@
 
                             <% if(!isOwnerView) { %>
                                 <div class="row">
-                                    <div class="col-md-10" style="margin-top: -6rem;">
+                                    <div class="col-md-10" style="margin-top: -3rem">
                                         <% if(anyInStock) { %>
 
                                             <% if(lists.variants.length > 1) { %>
@@ -182,7 +182,7 @@
                                                 <!-- Single variant: simple button, same per-variant check -->
                                                 <% const singleVariantAdded = addedToCart && addedToCart.includes(`${lists._id}_${lists.variants[0]._id}`) %>
                                                 <% if(singleVariantAdded) { %>
-                                                    <a href="/cart" class="btn btn-outline-success btnViewCart btnViewCartBigView">
+                                                    <a href="/cart" class="btn btn-outline-success btnViewCart btnViewCartBigView mt-3">
                                                         <i class="fa-solid fa-cart-shopping"></i>View Cart
                                                     </a>
                                                 <% } else { %>
@@ -216,6 +216,7 @@
                 <button type="button" class="btn btn-outline-danger mb-3 showDeleteBtn" data-bs-toggle="modal" data-bs-target="#delete-<%= lists._id %>">DELETE</button>
             <% } %>
         </div>
+        <hr>
     </div>
     <!-- model for permanently delete start -->
     <div class="modal fade" id="delete-<%= lists._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -245,8 +246,7 @@
     </div>
     <!-- model ends -->
     <% if(currUser){ %>
-        <hr>
-        <div class="col-8 offset-2 mb-2 mt-3">
+        <div class="col-8 offset-2 mb-2 mt-2">
             <h3 class="highlighted-feedback">Feedback Section </h3>
             <form action="/listings/<%= lists._id %>/reviews" method="post" class="needs-validation" novalidate>
                 <!-- <div>
@@ -284,8 +284,8 @@
             </form>
         </div>
     <% } %>
-    <hr> 
-    <div class="col-8 offset-2 mb-2 mt-2" style="margin-top: -10px;">
+    <!-- <hr>  -->
+    <div class="col-8 offset-2 mb-2 mt-4">
         <h3>Feedbacks : </h3>
         <% if(lists.reviews.length === 0){ %>
             <div class="d-flex justify-content-center">

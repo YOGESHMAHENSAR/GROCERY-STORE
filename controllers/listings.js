@@ -159,15 +159,15 @@ module.exports.update = async (req, res) => {
     res.redirect(`/listings/${id}`);
 };
 
-module.exports.show = async (req,res)=>{
-    let {id} = req.params;
-    // console.log("id:", id);
+module.exports.show = async (req, res) => {
+    let { id } = req.params;
     let cart = [];
     let addedToCart = [];
-    if(req.user){
+
+    if (req.user) {
         const user = await User.findById(req.user._id).populate("cart.product");
         cart = user.cart.filter(item => item.product !== null);
-        addedToCart = cart.map(item => item.product._id.toString());
+        addedToCart = cart.map(item => `${item.product._id}_${item.variantId}`);
     } else {
         const sessionCart = req.session.cart || [];
         cart = sessionCart.map(item => ({
@@ -176,16 +176,18 @@ module.exports.show = async (req,res)=>{
         }));
         addedToCart = req.session.addedToCart || [];
     }
+
     let lists = await List.findById(id)
-      .populate({path: "reviews",  populate: {path: "author"}})
-      .populate("owners");
-    if(!lists){
+        .populate({ path: "reviews", populate: { path: "author" } })
+        .populate("owners");
+
+    if (!lists) {
         req.flash("error", "Product You requested for Does not Exist");
         return res.redirect("/listings");
-    }else{
-        res.render("listings/show",{lists, cart, addedToCart});
+    } else {
+        res.render("listings/show", { lists, cart, addedToCart });
     }
-}
+};
 
 // module.exports.cart = async(req,res)=>{
 //     let {id} = req.body;
