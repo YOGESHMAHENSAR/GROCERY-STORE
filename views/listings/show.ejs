@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6 offset-2 mainCard" style="width: 82%;">
+        <div class="col-6 offset-2 mainCard mb-5" style="width: 82%;">
             <div class="internal-card" style="border-radius: 15px; padding: 2px;">
                 <div class="row">
                     <div class="col-md-6">
@@ -216,6 +216,7 @@
                 <button type="button" class="btn btn-outline-danger mb-3 showDeleteBtn" data-bs-toggle="modal" data-bs-target="#delete-<%= lists._id %>">DELETE</button>
             <% } %>
         </div>
+        <hr>
     </div>
     <!-- model for permanently delete start -->
     <div class="modal fade" id="delete-<%= lists._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -245,8 +246,7 @@
     </div>
     <!-- model ends -->
     <% if(currUser){ %>
-        <hr>
-        <div class="col-8 offset-2 mb-2 mt-3">
+        <div class="col-8 offset-2 mb-2 mt-2">
             <h3 class="highlighted-feedback">Feedback Section </h3>
             <form action="/listings/<%= lists._id %>/reviews" method="post" class="needs-validation" novalidate>
                 <!-- <div>
@@ -284,8 +284,8 @@
             </form>
         </div>
     <% } %>
-    <hr> 
-    <div class="col-8 offset-2 mb-2 mt-2" style="margin-top: -10px;">
+    <!-- <hr>  -->
+    <div class="col-8 offset-2 mb-2 mt-4">
         <h3>Feedbacks : </h3>
         <% if(lists.reviews.length === 0){ %>
             <div class="d-flex justify-content-center">
