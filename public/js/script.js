@@ -152,7 +152,7 @@ async function initiateCard(){
       //after successful payement
 
       handler: async function(response) {
-        console.log(response);
+        // console.log(response);
           const verifyRes  = await fetch('/verify-payment', {
               method:  "POST",
               headers: { "Content-Type": "application/json" },

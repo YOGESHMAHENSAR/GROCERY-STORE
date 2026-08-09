@@ -23,18 +23,22 @@ router.get("/insights/data", isAnyOwner, isLoggedIn, wrapAsync(async (req, res) 
         order.items.forEach(item => {
             if (!item.product) return;
 
-            // Resolve the specific variant this line item was ordered from
             const variant = item.variantId ? item.product.variants.id(item.variantId) : null;
-            const costPrice = variant ? parseFloat(variant.costPrice) || 0 : 0;
+            const costPrice = parseFloat(variant?.costPrice) || 0;
+            const sellingPrice = parseFloat(item.price ?? variant?.sellingPrice ?? item.product?.sellingPrice ?? 0) || 0;
+            const taxRate = item.product && item.product.Tax ? parseFloat(item.product.Tax) / 100 : 0;
 
-            const profit = (item.price - costPrice) * item.quantity;
+            // ─── Matches order-delivery.ejs exactly: tax applied on top of BOTH selling and cost ───
+            const taxAdjustedSelling = sellingPrice * (1 + taxRate);
+            const taxAdjustedCost = costPrice * (1 + taxRate);
+
+            const profit = (taxAdjustedSelling - taxAdjustedCost) * item.quantity;
             monthlyProfit[month] = (monthlyProfit[month] || 0) + profit;
 
             const title = item.product.title;
             productSales[title] = (productSales[title] || 0) + item.quantity;
 
-            const revenue = item.price * item.quantity;
-            // category is now a single String, not an array
+            const revenue = taxAdjustedSelling * item.quantity;
             const cat = item.product.category;
             if (cat) {
                 categorySales[cat] = (categorySales[cat] || 0) + revenue;
